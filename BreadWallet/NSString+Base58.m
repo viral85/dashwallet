@@ -140,7 +140,7 @@ CFAllocatorRef SecureAllocator()
     CCStatus status;
     CCBigNumRef x = CCCreateBigNum(&status), r = CCCreateBigNum(&status);
 
-    CCBigNumClear(x);
+    CCBigNumSetI(x, 0);
     
     for (NSUInteger i = 0; i < self.length && [self characterAtIndex:i] == base58chars[0]; i++) {
         [d appendBytes:"\0" length:1];
