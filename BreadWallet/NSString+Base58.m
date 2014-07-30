@@ -27,7 +27,8 @@
 #import "NSData+Hash.h"
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
-#import <openssl/bn.h>
+#import "CommonBigNum.h"
+#import "ccMemory.h"
 
 static const char base58chars[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
@@ -47,7 +48,7 @@ static void secureDeallocate(void *ptr, void *info)
     CFIndex size = *((CFIndex *)ptr - 1);
 
     if (size) {
-        OPENSSL_cleanse(ptr, size);
+        CC_XZEROMEM(ptr, size);
         CFAllocatorDeallocate(kCFAllocatorDefault, (CFIndex *)ptr - 1);
     }
 }
@@ -95,33 +96,31 @@ CFAllocatorRef SecureAllocator()
 
 + (NSString *)base58WithData:(NSData *)d
 {
-    BN_CTX *ctx = BN_CTX_new();
-
-    BN_CTX_start(ctx);
-
     NSUInteger i = d.length*138/100 + 2;
     char s[i];
-    BIGNUM *base = BN_CTX_get(ctx), *x = BN_CTX_get(ctx), *r = BN_CTX_get(ctx);
+    CCStatus status;
+    CCBigNumRef base = CCCreateBigNum(&status), x = CCBigNumFromData(&status, d.bytes, d.length),
+                r = CCCreateBigNum(&status);
 
-    BN_set_word(base, 58);
-    BN_bin2bn(d.bytes, (int)d.length, x);
+    CCBigNumSetI(base, 58);
     s[--i] = '\0';
 
-    while (! BN_is_zero(x)) {
-        BN_div(x, r, x, base, ctx);
-        s[--i] = base58chars[BN_get_word(r)];
+    while (! CCBigNumIsZero(&status, x)) {
+        CCBigNumDiv(x, r, x, base);
+        s[--i] = base58chars[CCBigNumGetI(&status, r)];
     }
     
     for (NSUInteger j = 0; j < d.length && *((const uint8_t *)d.bytes + j) == 0; j++) {
         s[--i] = base58chars[0];
     }
 
-    BN_CTX_end(ctx);
-    BN_CTX_free(ctx);
+    CCBigNumFree(base);
+    CCBigNumFree(x);
+    CCBigNumFree(r);
     
     NSString *ret = CFBridgingRelease(CFStringCreateWithCString(SecureAllocator(), &s[i], kCFStringEncodingUTF8));
     
-    OPENSSL_cleanse(&s[0], d.length*138/100 + 2);
+    CC_XZEROMEM(&s[0], d.length*138/100 + 2);
     return ret;
 }
 
@@ -136,16 +135,12 @@ CFAllocatorRef SecureAllocator()
 
 - (NSData *)base58ToData
 {
-    BN_CTX *ctx = BN_CTX_new();
-
-    BN_CTX_start(ctx);
-
     NSMutableData *d = [NSMutableData secureDataWithCapacity:self.length + 1];
     unsigned int b;
-    BIGNUM *base = BN_CTX_get(ctx), *x = BN_CTX_get(ctx), *y = BN_CTX_get(ctx);
+    CCStatus status;
+    CCBigNumRef x = CCCreateBigNum(&status), r = CCCreateBigNum(&status);
 
-    BN_set_word(base, 58);
-    BN_zero(x);
+    CCBigNumClear(x);
     
     for (NSUInteger i = 0; i < self.length && [self characterAtIndex:i] == base58chars[0]; i++) {
         [d appendBytes:"\0" length:1];
@@ -182,18 +177,16 @@ CFAllocatorRef SecureAllocator()
                 goto breakout;
         }
         
-        BN_mul(x, x, base, ctx);
-        BN_set_word(y, b);
-        BN_add(x, x, y);
+        CCBigNumMulI(r, x, 58);
+        CCBigNumAddI(x, r, (const uint32_t)b);
     }
     
 breakout:
-    d.length += BN_num_bytes(x);
-    BN_bn2bin(x, (unsigned char *)d.mutableBytes + d.length - BN_num_bytes(x));
-
-    OPENSSL_cleanse(&b, sizeof(b));
-    BN_CTX_end(ctx);
-    BN_CTX_free(ctx);
+    d.length += CCBigNumByteCount(x);
+    CCBigNumToData(&status, x, (char *)d.mutableBytes + d.length - CCBigNumByteCount(x));
+    
+    CCBigNumFree(x);
+    CCBigNumFree(r);
     
     return d;
 }

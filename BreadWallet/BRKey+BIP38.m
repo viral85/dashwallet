@@ -30,6 +30,7 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import <openssl/ecdsa.h>
 #import <openssl/obj_mac.h>
+#import "ccMemory.h"
 
 // BIP38 is a method for encrypting private keys with a passphrase
 // https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki
@@ -87,7 +88,7 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r, uin
 {
     NSMutableData *d = [NSMutableData secureDataWithLength:length];
     uint8_t b[128*r*p];
-    uint64_t x[16*r], y[16*r], z[8], *v = OPENSSL_malloc(128*r*(int)n), m;
+    uint64_t x[16*r], y[16*r], z[8], *v = CC_XMALLOC(128*r*(int)n), m;
 
     CCKeyDerivationPBKDF(kCCPBKDF2, password.bytes, password.length, salt.bytes, salt.length, kCCPRFHmacAlgSHA256, 1,
                          b, sizeof(b));
@@ -121,13 +122,13 @@ static NSData *scrypt(NSData *password, NSData *salt, int64_t n, uint32_t r, uin
     CCKeyDerivationPBKDF(kCCPBKDF2, password.bytes, password.length, b, sizeof(b), kCCPRFHmacAlgSHA256, 1,
                          d.mutableBytes, d.length);
 
-    OPENSSL_cleanse(b, sizeof(b));
-    OPENSSL_cleanse(x, sizeof(x));
-    OPENSSL_cleanse(y, sizeof(y));
-    OPENSSL_cleanse(z, sizeof(z));
-    OPENSSL_cleanse(v, 128*r*(int)n);
-    OPENSSL_free(v);
-    OPENSSL_cleanse(&m, sizeof(m));
+    CC_XZEROMEM(b, sizeof(b));
+    CC_XZEROMEM(x, sizeof(x));
+    CC_XZEROMEM(y, sizeof(y));
+    CC_XZEROMEM(z, sizeof(z));
+    CC_XZEROMEM(v, 128*r*(int)n);
+    CC_XFREE(v, 28*r*(int)n);
+    CC_XZEROMEM(&m, sizeof(m));
     return d;
 }
 

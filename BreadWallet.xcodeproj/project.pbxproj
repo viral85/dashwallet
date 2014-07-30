@@ -1529,6 +1529,11 @@
 		75D5F3EE191EC270004AB296 /* BreadWalletTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BreadWalletTests-Info.plist"; sourceTree = "<group>"; };
 		75D5F3F0191EC270004AB296 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		75D5F3F2191EC270004AB296 /* BreadWalletTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BreadWalletTests.m; sourceTree = "<group>"; };
+		75FFC21E1988AAC400D4D053 /* CommonBigNum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonBigNum.h; sourceTree = "<group>"; };
+		75FFC2271988AAC400D4D053 /* CommonDigestSPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonDigestSPI.h; sourceTree = "<group>"; };
+		75FFC2281988AAC400D4D053 /* CommonECCryptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonECCryptor.h; sourceTree = "<group>"; };
+		75FFC22E1988AAC400D4D053 /* CommonRSACryptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommonRSACryptor.h; sourceTree = "<group>"; };
+		75FFC2C01988E66300D4D053 /* ccMemory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ccMemory.h; sourceTree = "<group>"; };
 		84780ABB197C5E9B003CC156 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		84C92C02197C3DF600BD1664 /* buildinf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = buildinf.h; sourceTree = "<group>"; };
 		84C92C0E197C3DF600BD1664 /* opensslconf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opensslconf.h; sourceTree = "<group>"; };
@@ -1736,6 +1741,7 @@
 			children = (
 				752E28EF19234E8100DB5A3C /* Reachability.h */,
 				752E28F019234E8100DB5A3C /* Reachability.m */,
+				75FFC1E01988AAC400D4D053 /* CommonCrypto */,
 				7579F7FF19231D7B00CA56F4 /* openssl */,
 			);
 			name = ThirdParty;
@@ -3001,6 +3007,34 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		75FFC1E01988AAC400D4D053 /* CommonCrypto */ = {
+			isa = PBXGroup;
+			children = (
+				75FFC21B1988AAC400D4D053 /* include */,
+				75FFC2BB1988E66300D4D053 /* lib */,
+			);
+			path = CommonCrypto;
+			sourceTree = SOURCE_ROOT;
+		};
+		75FFC21B1988AAC400D4D053 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				75FFC21E1988AAC400D4D053 /* CommonBigNum.h */,
+				75FFC2271988AAC400D4D053 /* CommonDigestSPI.h */,
+				75FFC2281988AAC400D4D053 /* CommonECCryptor.h */,
+				75FFC22E1988AAC400D4D053 /* CommonRSACryptor.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		75FFC2BB1988E66300D4D053 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				75FFC2C01988E66300D4D053 /* ccMemory.h */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
 		84C92BFF197C3DF600BD1664 /* MacOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -4019,6 +4053,8 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/openssl/include",
+					"$(SRCROOT)/CommonCrypto/include",
+					"$(SRCROOT)/CommonCrypto/lib",
 				);
 				INFOPLIST_FILE = "BreadWallet/BreadWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4206,6 +4242,8 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/openssl/include",
+					"$(SRCROOT)/CommonCrypto/include",
+					"$(SRCROOT)/CommonCrypto/lib",
 				);
 				INFOPLIST_FILE = "BreadWallet/BreadWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4225,6 +4263,8 @@
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/openssl/include",
+					"$(SRCROOT)/CommonCrypto/include",
+					"$(SRCROOT)/CommonCrypto/lib",
 				);
 				INFOPLIST_FILE = "BreadWallet/BreadWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";

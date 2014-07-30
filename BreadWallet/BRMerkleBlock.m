@@ -27,44 +27,46 @@
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Bitcoin.h"
 #import "NSData+Hash.h"
-#import <openssl/bn.h>
+#import "CommonBigNum.h"
 
 #define MAX_TIME_DRIFT    (2*60*60)     // the furthest in the future a block is allowed to be timestamped
 #define MAX_PROOF_OF_WORK 0x1d00ffffu   // highest value for difficulty target (higher values are less difficult)
 #define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments
 
 // convert difficulty target format to bignum, as per: https://github.com/bitcoin/bitcoin/blob/master/src/uint256.h#L323
-static void setCompact(BIGNUM *bn, uint32_t compact)
+static void setCompact(CCBigNumRef bn, uint32_t compact)
 {
     uint32_t size = compact >> 24, word = compact & 0x007fffff;
     
     if (size > 3) {
-        BN_set_word(bn, word);
-        BN_lshift(bn, bn, (size - 3)*8);
+        CCBigNumSetI(bn, word);
+        CCBigNumLeftShift(bn, bn, (size - 3)*8);
     }
-    else BN_set_word(bn, word >> (3 - size)*8);
+    else CCBigNumSetI(bn, word >> (3 - size)*8);
     
-    BN_set_negative(bn, (compact & 0x00800000) != 0);
+    if ((compact & 0x00800000) != 0) CCBigNumSetNegative(bn);
 }
 
-static uint32_t getCompact(const BIGNUM *bn)
+static uint32_t getCompact(const CCBigNumRef bn)
 {
-    uint32_t size = BN_num_bytes(bn), compact = 0;
-    BIGNUM x;
+    uint32_t size = CCBigNumByteCount(bn), compact = 0;
+    CCStatus status;
 
     if (size > 3) {
-        BN_init(&x);
-        BN_rshift(&x, bn, (size - 3)*8);
-        compact = BN_get_word(&x);
+        CCBigNumRef x = CCCreateBigNum(&status);
+
+        CCBigNumRightShift(x, bn, (size - 3)*8);
+        compact = CCBigNumGetI(&status, x);
+        CCBigNumFree(x);
     }
-    else compact = BN_get_word(bn) << (3 - size)*8;
+    else compact = CCBigNumGetI(&status, bn) << (3 - size)*8;
 
     if (compact & 0x00800000) { // if sign is already set, divide the mantissa by 256 and increment the exponent
         compact >>= 8;
         size++;
     }
 
-    return (compact | size << 24) | (BN_is_negative(bn) ? 0x00800000 : 0);
+    return (compact | size << 24) | (CCBigNumIsNegative(&status, bn) ? 0x00800000 : 0);
 }
 
 // from https://en.bitcoin.it/wiki/Protocol_specification#Merkle_Trees
@@ -162,7 +164,8 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 - (BOOL)isValid
 {
     NSMutableData *d = [NSMutableData data];
-    BIGNUM target, maxTarget, hash;
+    CCStatus status;
+    CCBigNumRef target = CCCreateBigNum(&status), maxTarget = CCCreateBigNum(&status), hash;
     int hashIdx = 0, flagIdx = 0;
     NSData *merkleRoot =
         [self _walk:&hashIdx :&flagIdx :0 :^id (NSData *hash, BOOL flag) {
@@ -179,16 +182,26 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     if (_timestamp > [NSDate timeIntervalSinceReferenceDate] + MAX_TIME_DRIFT) return NO; // timestamp too far in future
     
     // check proof-of-work
-    BN_init(&target);
-    BN_init(&maxTarget);
-    setCompact(&target, _target);
-    setCompact(&maxTarget, MAX_PROOF_OF_WORK);
-    if (BN_cmp(&target, BN_value_one()) < 0 || BN_cmp(&target, &maxTarget) > 0) return NO; // target out of range
+    setCompact(target, _target);
+    setCompact(maxTarget, MAX_PROOF_OF_WORK);
 
-    BN_init(&hash);
-    BN_bin2bn(_blockHash.reverse.bytes, (int)_blockHash.length, &hash);
-    if (BN_cmp(&hash, &target) > 0) return NO; // block not as difficult as target (smaller values are more difficult)
+    if (CCBigNumCompareI(target, 1) < 0 || CCBigNumCompare(target, maxTarget) > 0) { // target out of range
+        CCBigNumFree(target);
+        CCBigNumFree(maxTarget);
+        return NO;
+    }
 
+    CCBigNumFree(maxTarget);
+    hash = CCBigNumFromData(&status, _blockHash.reverse.bytes, _blockHash.length);
+
+    if (CCBigNumCompare(hash, target) > 0) { // block not as difficult as target
+        CCBigNumFree(target);
+        CCBigNumFree(hash);
+        return NO;
+    }
+
+    CCBigNumFree(target);
+    CCBigNumFree(hash);
     return YES;
 }
 
@@ -258,30 +271,37 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 
     if ((_height % BLOCK_DIFFICULTY_INTERVAL) != 0) return (_target == previous.target) ? YES : NO;
 
-    BN_CTX *ctx = BN_CTX_new();
-
-    BN_CTX_start(ctx);
-
     int32_t timespan = (int32_t)((int64_t)previous.timestamp - (int64_t)time);
-    BIGNUM target, *maxTarget = BN_CTX_get(ctx), *span = BN_CTX_get(ctx), *targetSpan = BN_CTX_get(ctx),
-           *bn = BN_CTX_get(ctx);
+    CCStatus status;
+    CCBigNumRef target = CCCreateBigNum(&status), maxTarget = CCCreateBigNum(&status), bn = CCCreateBigNum(&status),
+                targetSpan = CCCreateBigNum(&status);
 
     // limit difficulty transition to -75% or +400%
     if (timespan < TARGET_TIMESPAN/4) timespan = TARGET_TIMESPAN/4;
     if (timespan > TARGET_TIMESPAN*4) timespan = TARGET_TIMESPAN*4;
 
-    BN_init(&target);
-    setCompact(&target, previous.target);
+    setCompact(target, previous.target);
     setCompact(maxTarget, MAX_PROOF_OF_WORK);
-    BN_set_word(span, timespan);
-    BN_set_word(targetSpan, TARGET_TIMESPAN);
-    BN_mul(bn, &target, span, ctx);
-    BN_div(&target, NULL, bn, targetSpan, ctx);
-    if (BN_cmp(&target, maxTarget) > 0) BN_copy(&target, maxTarget); // limit to MAX_PROOF_OF_WORK
-    BN_CTX_end(ctx);
-    BN_CTX_free(ctx);
+    CCBigNumSetI(targetSpan, TARGET_TIMESPAN);
+    CCBigNumMulI(bn, target, timespan);
+    CCBigNumDiv(target, NULL, bn, targetSpan);
+    CCBigNumFree(bn);
+    CCBigNumFree(targetSpan);
+
+    if (CCBigNumCompare(target, maxTarget) > 0) { // limit to MAX_PROOF_OF_WORK
+        CCBigNumFree(target);
+        target = CCBigNumCopy(&status, maxTarget);
+    }
     
-    return (_target == getCompact(&target)) ? YES : NO;
+    CCBigNumFree(maxTarget);
+    
+    if (_target == getCompact(target)) {
+        CCBigNumFree(target);
+        return YES;
+    }
+
+    CCBigNumFree(target);
+    return NO;
 }
 
 // recursively walks the merkle tree in depth first order, calling leaf(hash, flag) for each stored hash, and
