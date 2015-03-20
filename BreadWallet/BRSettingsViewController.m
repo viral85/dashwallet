@@ -63,8 +63,8 @@
             queue:nil usingBlock:^(NSNotification *note) {
                 if (self.selectorType == 0) {
                     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m localCurrencyStringForAmount:SATOSHIS/m.localCurrencyPrice],
-                                                     [m stringForAmount:SATOSHIS/m.localCurrencyPrice]];
+                                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyPrice],
+                                                     [m stringForAmount:DUFFS/m.localCurrencyPrice]];
                 }
             }];
     }
@@ -132,13 +132,13 @@
         self.selectorType = 1;
         self.selectorOptions =
             @[NSLocalizedString(@"always require passcode", nil),
-              [NSString stringWithFormat:@"%@      (%@)", [m stringForAmount:SATOSHIS/10],
-               [m localCurrencyStringForAmount:SATOSHIS/10]],
-              [NSString stringWithFormat:@"%@   (%@)", [m stringForAmount:SATOSHIS],
-               [m localCurrencyStringForAmount:SATOSHIS]],
-              [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:SATOSHIS*10],
-               [m localCurrencyStringForAmount:SATOSHIS*10]]];
-        if (m.spendingLimit > SATOSHIS*10) m.spendingLimit = SATOSHIS*10;
+              [NSString stringWithFormat:@"%@      (%@)", [m stringForAmount:DUFFS/10],
+               [m localCurrencyStringForAmount:DUFFS/10]],
+              [NSString stringWithFormat:@"%@   (%@)", [m stringForAmount:DUFFS],
+               [m localCurrencyStringForAmount:DUFFS]],
+              [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:DUFFS*10],
+               [m localCurrencyStringForAmount:DUFFS*10]]];
+        if (m.spendingLimit > DUFFS*10) m.spendingLimit = DUFFS*10;
         self.selectedOption = self.selectorOptions[(log10(m.spendingLimit) < 6) ? 0 :
                                                    (NSUInteger)log10(m.spendingLimit) - 6];
         self.selectorController.title = NSLocalizedString(@"touch id spending limit", nil);
@@ -171,8 +171,8 @@
     [[NSUserDefaults standardUserDefaults] setInteger:digits forKey:SETTINGS_MAX_DIGITS_KEY];
     m.localCurrencyCode = m.localCurrencyCode; // force balance notification
     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                     [m localCurrencyStringForAmount:SATOSHIS/m.localCurrencyPrice],
-                                     [m stringForAmount:SATOSHIS/m.localCurrencyPrice]];
+                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyPrice],
+                                     [m stringForAmount:DUFFS/m.localCurrencyPrice]];
 }
 
 #pragma mark - UITableViewDataSource
@@ -352,7 +352,7 @@
                     c = [self.storyboard instantiateViewControllerWithIdentifier:@"AboutViewController"];
                     l = (id)[c.view viewWithTag:411];
                     s = [[NSMutableAttributedString alloc] initWithAttributedString:l.attributedText];
-#if BITCOIN_TESTNET
+#if DASH_TESTNET
                     [s replaceCharactersInRange:[s.string rangeOfString:@"%net%"] withString:@"%net% (testnet)"];
 #endif
                     [s replaceCharactersInRange:[s.string rangeOfString:@"%ver%"]
@@ -390,8 +390,8 @@
                     i = [m.currencyCodes indexOfObject:m.localCurrencyCode];
                     if (i < options.count) self.selectedOption = options[i];
                     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m localCurrencyStringForAmount:SATOSHIS/m.localCurrencyPrice],
-                                                     [m stringForAmount:SATOSHIS/m.localCurrencyPrice]];
+                                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyPrice],
+                                                     [m stringForAmount:DUFFS/m.localCurrencyPrice]];
                     [self.navigationController pushViewController:self.selectorController animated:YES];
                     [self.selectorController.tableView reloadData];
                     

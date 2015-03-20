@@ -25,13 +25,13 @@
 
 #import <Foundation/Foundation.h>
 
-#if BITCOIN_TESTNET
-#define BITCOIN_STANDARD_PORT          18333
+#if DASH_TESTNET
+#define DASH_STANDARD_PORT          18333
 #else
-#define BITCOIN_STANDARD_PORT          8333
+#define DASH_STANDARD_PORT          8333
 #endif
 
-#define BITCOIN_TIMEOUT_CODE           1001
+#define DASH_TIMEOUT_CODE           1001
 
 // explanation of message types at: https://en.bitcoin.it/wiki/Protocol_specification
 #define MSG_VERSION     @"version"

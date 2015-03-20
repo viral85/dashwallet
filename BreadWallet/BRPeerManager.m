@@ -44,7 +44,7 @@
 #define CHECKPOINT_COUNT     (sizeof(checkpoint_array)/sizeof(*checkpoint_array))
 #define GENESIS_BLOCK_HASH   ([NSString stringWithUTF8String:checkpoint_array[0].hash].hexToData.reverse)
 
-#if BITCOIN_TESTNET
+#if DASH_TESTNET
 
 static const struct { uint32_t height; char *hash; time_t timestamp; uint32_t target; } checkpoint_array[] = {
     {      0, "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943", 1296688602, 0x1d00ffffu },
@@ -219,12 +219,12 @@ static const char *dns_seeds[] = {
                     uint32_t addr = CFSwapInt32BigToHost(((struct in_addr *)h->h_addr_list[j])->s_addr);
 
                     // give dns peers a timestamp between 3 and 7 days ago
-                    [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:BITCOIN_STANDARD_PORT
+                    [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:DASH_STANDARD_PORT
                                        timestamp:now - 24*60*60*(3 + drand48()*4) services:NODE_NETWORK]];
                 }
             }
 
-#if BITCOIN_TESTNET
+#if DASH_TESTNET
             [self sortPeers];
             return _peers;
 #endif
@@ -233,7 +233,7 @@ static const char *dns_seeds[] = {
                 for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
                                            pathForResource:FIXED_PEERS ofType:@"plist"]]) {
                     // give hard coded peers a timestamp between 7 and 14 days ago
-                    [_peers addObject:[[BRPeer alloc] initWithAddress:address.intValue port:BITCOIN_STANDARD_PORT
+                    [_peers addObject:[[BRPeer alloc] initWithAddress:address.intValue port:DASH_STANDARD_PORT
                                        timestamp:now - 24*60*60*(7 + drand48()*7) services:NODE_NETWORK]];
                 }
             }
@@ -575,7 +575,7 @@ static const char *dns_seeds[] = {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(txTimeout:) object:txHash];
 
     if (callback) {
-        callback([NSError errorWithDomain:@"BreadWallet" code:BITCOIN_TIMEOUT_CODE userInfo:@{NSLocalizedDescriptionKey:
+        callback([NSError errorWithDomain:@"BreadWallet" code:DASH_TIMEOUT_CODE userInfo:@{NSLocalizedDescriptionKey:
                   NSLocalizedString(@"transaction canceled, network timeout", nil)}]);
     }
 }
@@ -842,7 +842,7 @@ static const char *dns_seeds[] = {
 {
     NSLog(@"%@:%d disconnected%@%@", peer.host, peer.port, (error ? @", " : @""), (error ? error : @""));
     
-    if ([error.domain isEqual:@"BreadWallet"] && error.code != BITCOIN_TIMEOUT_CODE) {
+    if ([error.domain isEqual:@"BreadWallet"] && error.code != DASH_TIMEOUT_CODE) {
         [self peerMisbehavin:peer]; // if it's protocol error other than timeout, the peer isn't following the rules
     }
     else if (error) { // timeout or some non-protocol related network error

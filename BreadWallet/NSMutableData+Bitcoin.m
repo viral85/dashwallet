@@ -207,7 +207,7 @@ CFAllocatorRef SecureAllocator()
 
 - (void)appendScriptPubKeyForAddress:(NSString *)address
 {
-    static uint8_t pubkeyAddress = BITCOIN_PUBKEY_ADDRESS, scriptAddress = BITCOIN_SCRIPT_ADDRESS;
+    static uint8_t pubkeyAddress = DASH_PUBKEY_ADDRESS, scriptAddress = DASH_SCRIPT_ADDRESS;
     NSData *d = address.base58checkToData;
 
     if (d.length != 21) return;
@@ -215,9 +215,9 @@ CFAllocatorRef SecureAllocator()
     uint8_t version = *(const uint8_t *)d.bytes;
     NSData *hash = [d subdataWithRange:NSMakeRange(1, d.length - 1)];
 
-#if BITCOIN_TESTNET
-    pubkeyAddress = BITCOIN_PUBKEY_ADDRESS_TEST;
-    scriptAddress = BITCOIN_SCRIPT_ADDRESS_TEST;
+#if DASH_TESTNET
+    pubkeyAddress = DASH_PUBKEY_ADDRESS_TEST;
+    scriptAddress = DASH_SCRIPT_ADDRESS_TEST;
 #endif
 
     if (version == pubkeyAddress) {
@@ -238,7 +238,7 @@ CFAllocatorRef SecureAllocator()
 
 - (void)appendMessage:(NSData *)message type:(NSString *)type;
 {
-    [self appendUInt32:BITCOIN_MAGIC_NUMBER];
+    [self appendUInt32:DASH_MAGIC_NUMBER];
     [self appendNullPaddedString:type length:12];
     [self appendUInt32:(uint32_t)message.length];
     [self appendBytes:message.SHA256_2.bytes length:4];

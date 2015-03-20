@@ -30,7 +30,7 @@
 @interface BRPaymentProtocolDetails : NSObject
 
 @property (nonatomic, readonly) NSString *network; // "main" or "test", default is "main"
-@property (nonatomic, readonly) NSArray *outputAmounts; // payment amounts in satoshis, default is 0
+@property (nonatomic, readonly) NSArray *outputAmounts; // payment amounts in DUFFS, default is 0
 @property (nonatomic, readonly) NSArray *outputScripts; // where to send payments, one of the standard script forms
 @property (nonatomic, readonly) NSTimeInterval time; // request creation time, seconds since 00:00:00 01/01/01, optional
 @property (nonatomic, readonly) NSTimeInterval expires; // when this request should be considered invalid, optional

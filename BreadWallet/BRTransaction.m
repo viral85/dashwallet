@@ -370,7 +370,7 @@ sequence:(uint32_t)sequence
     return YES;
 }
 
-// priority = sum(input_amount_in_satoshis*input_age_in_blocks)/size_in_bytes
+// priority = sum(input_amount_in_DUFFS*input_age_in_blocks)/size_in_bytes
 - (uint64_t)priorityForAmounts:(NSArray *)amounts withAges:(NSArray *)ages
 {
     uint64_t p = 0;

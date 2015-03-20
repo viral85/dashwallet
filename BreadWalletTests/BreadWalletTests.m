@@ -124,7 +124,7 @@
 
 #pragma mark - testKey
 
-#if ! BITCOIN_TESTNET
+#if ! DASH_TESTNET
 - (void)testKeyWithPrivateKey
 {
     XCTAssertFalse([@"S6c56bnXQiBjk9mqSYE7ykVQ7NzrRz" isValidBitcoinPrivateKey],
@@ -173,7 +173,7 @@
 
 #pragma mark - testKeyWithBIP38Key
 
-#if ! BITCOIN_TESTNET && ! SKIP_BIP38
+#if ! DASH_TESTNET && ! SKIP_BIP38
 - (void)testKeyWithBIP38Key
 {
     NSString *intercode, *confcode, *privkey;
@@ -736,7 +736,7 @@
 
 #pragma mark - testBIP32Sequence
 
-#if ! BITCOIN_TESTNET
+#if ! DASH_TESTNET
 - (void)testBIP32SequencePrivateKey
 {
     BRBIP32Sequence *seq = [BRBIP32Sequence new];
@@ -835,14 +835,14 @@
     [script appendScriptPubKeyForAddress:k.address];
 
     BRTransaction *tx = [[BRTransaction alloc] initWithInputHashes:@[hash] inputIndexes:@[@(0)] inputScripts:@[script]
-                         outputAddresses:@[w.receiveAddress] outputAmounts:@[@(SATOSHIS)]];
+                         outputAddresses:@[w.receiveAddress] outputAmounts:@[@(DUFFS)]];
 
     [tx signWithPrivateKeys:@[k.privateKey]];
     [w registerTransaction:tx];
 
-    XCTAssertEqual(w.balance, SATOSHIS, @"[BRWallet registerTransaction]");
+    XCTAssertEqual(w.balance, DUFFS, @"[BRWallet registerTransaction]");
 
-    tx = [w transactionFor:SATOSHIS/2 to:k.address withFee:NO];
+    tx = [w transactionFor:DUFFS/2 to:k.address withFee:NO];
 
     XCTAssertNotNil(tx, @"[BRWallet transactionFor:to:withFee:]");
 
@@ -852,9 +852,9 @@
 
     [w registerTransaction:tx];
 
-    XCTAssertEqual(w.balance, SATOSHIS/2, @"[BRWallet balance]");
+    XCTAssertEqual(w.balance, DUFFS/2, @"[BRWallet balance]");
 
-#if ! BITCOIN_TESTNET
+#if ! DASH_TESTNET
     w = [[BRWallet alloc] initWithContext:nil sequence:[BRBIP32Sequence new] masterPublicKey:nil
          seed:^NSData *(NSString *authprompt, uint64_t amount) { return [NSData data]; }];
     

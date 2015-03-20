@@ -88,7 +88,7 @@ typedef enum {
 {
     if (! (self = [self init])) return nil;
     _address = address;
-    _port = (port == 0) ? BITCOIN_STANDARD_PORT : port;
+    _port = (port == 0) ? DASH_STANDARD_PORT : port;
     return self;
 }
 
@@ -181,7 +181,7 @@ services:(uint64_t)services
         
         // after the reachablity check, the radios should be warmed up and we can set a short socket connect timeout
         [self performSelector:@selector(disconnectWithError:) withObject:[NSError errorWithDomain:@"BreadWallet"
-         code:BITCOIN_TIMEOUT_CODE userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"connect timeout", nil)}]
+         code:DASH_TIMEOUT_CODE userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"connect timeout", nil)}]
          afterDelay:CONNECT_TIMEOUT];
         
         [self.inputStream open];
@@ -293,7 +293,7 @@ services:(uint64_t)services
     [msg appendUInt64:ENABLED_SERVICES]; // services
     [msg appendUInt64:[NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970]; // timestamp
     [msg appendNetAddress:self.address port:self.port services:self.services]; // address of remote peer
-    [msg appendNetAddress:LOCAL_HOST port:BITCOIN_STANDARD_PORT services:ENABLED_SERVICES]; // address of local peer
+    [msg appendNetAddress:LOCAL_HOST port:DASH_STANDARD_PORT services:ENABLED_SERVICES]; // address of local peer
     self.localNonce = (((uint64_t)mrand48() << 32) | (uint32_t)mrand48()); // random nonce
     [msg appendUInt64:self.localNonce];
     [msg appendString:USERAGENT]; // user agent
@@ -964,7 +964,7 @@ services:(uint64_t)services
                 self.startTime = [NSDate timeIntervalSinceReferenceDate]; // don't count connect time in ping time
                 [NSObject cancelPreviousPerformRequestsWithTarget:self]; // cancel pending socket connect timeout
                 [self performSelector:@selector(disconnectWithError:)
-                 withObject:[NSError errorWithDomain:@"BreadWallet" code:BITCOIN_TIMEOUT_CODE
+                 withObject:[NSError errorWithDomain:@"BreadWallet" code:DASH_TIMEOUT_CODE
                              userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"connect timeout", nil)}]
                              afterDelay:CONNECT_TIMEOUT];
             }
@@ -1004,7 +1004,7 @@ services:(uint64_t)services
                     
                     // consume one byte at a time, up to the magic number that starts a new message header
                     while (self.msgHeader.length >= sizeof(uint32_t) &&
-                           [self.msgHeader UInt32AtOffset:0] != BITCOIN_MAGIC_NUMBER) {
+                           [self.msgHeader UInt32AtOffset:0] != DASH_MAGIC_NUMBER) {
 #if DEBUG
                         printf("%c", *(const char *)self.msgHeader.bytes);
 #endif

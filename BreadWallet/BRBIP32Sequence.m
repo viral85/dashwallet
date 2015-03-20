@@ -188,10 +188,10 @@ static NSString *serialize(uint8_t depth, uint32_t fingerprint, uint32_t child, 
     NSMutableData *I = [NSMutableData secureDataWithLength:CC_SHA512_DIGEST_LENGTH];
     NSMutableData *secret = [NSMutableData secureDataWithCapacity:32];
     NSMutableData *chain = [NSMutableData secureDataWithCapacity:32];
-    uint8_t version = BITCOIN_PRIVKEY;
+    uint8_t version = DASH_PRIVKEY;
 
-#if BITCOIN_TESTNET
-    version = BITCOIN_PRIVKEY_TEST;
+#if DASH_TESTNET
+    version = DASH_PRIVKEY_TEST;
 #endif
 
     CCHmac(kCCHmacAlgSHA512, BIP32_SEED_KEY, strlen(BIP32_SEED_KEY), seed.bytes, seed.length, I.mutableBytes);

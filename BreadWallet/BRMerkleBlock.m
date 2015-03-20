@@ -232,7 +232,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     if (! [_prevBlock isEqual:previous.blockHash] || _height != previous.height + 1) return NO;
     if ((_height % BLOCK_DIFFICULTY_INTERVAL) == 0 && time == 0) return NO;
 
-#if BITCOIN_TESTNET
+#if DASH_TESTNET
     //TODO: implement testnet difficulty rule check
     return YES; // don't worry about difficulty on testnet for now
 #endif

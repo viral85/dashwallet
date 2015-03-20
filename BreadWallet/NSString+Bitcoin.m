@@ -109,10 +109,10 @@ static const int8_t base58map[] = {
     NSArray *elem = [script scriptElements];
     NSUInteger l = elem.count;
     NSMutableData *d = [NSMutableData data];
-    uint8_t v = BITCOIN_PUBKEY_ADDRESS;
+    uint8_t v = DASH_PUBKEY_ADDRESS;
 
-#if BITCOIN_TESTNET
-    v = BITCOIN_PUBKEY_ADDRESS_TEST;
+#if DASH_TESTNET
+    v = DASH_PUBKEY_ADDRESS_TEST;
 #endif
 
     if (l == 5 && [elem[0] intValue] == OP_DUP && [elem[1] intValue] == OP_HASH160 && [elem[2] intValue] == 20 &&
@@ -123,9 +123,9 @@ static const int8_t base58map[] = {
     }
     else if (l == 3 && [elem[0] intValue] == OP_HASH160 && [elem[1] intValue] == 20 && [elem[2] intValue] == OP_EQUAL) {
         // pay-to-script-hash scriptPubKey
-        v = BITCOIN_SCRIPT_ADDRESS;
-#if BITCOIN_TESTNET
-        v = BITCOIN_SCRIPT_ADDRESS_TEST;
+        v = DASH_SCRIPT_ADDRESS;
+#if DASH_TESTNET
+        v = DASH_SCRIPT_ADDRESS_TEST;
 #endif
         [d appendBytes:&v length:1];
         [d appendData:elem[1]];
@@ -147,10 +147,10 @@ static const int8_t base58map[] = {
     NSArray *elem = [script scriptElements];
     NSUInteger l = elem.count;
     NSMutableData *d = [NSMutableData data];
-    uint8_t v = BITCOIN_PUBKEY_ADDRESS;
+    uint8_t v = DASH_PUBKEY_ADDRESS;
 
-#if BITCOIN_TESTNET
-    v = BITCOIN_PUBKEY_ADDRESS_TEST;
+#if DASH_TESTNET
+    v = DASH_PUBKEY_ADDRESS_TEST;
 #endif
 
     if (l >= 2 && [elem[l - 2] intValue] <= OP_PUSHDATA4 && [elem[l - 2] intValue] > 0 &&
@@ -160,9 +160,9 @@ static const int8_t base58map[] = {
     }
     else if (l >= 2 && [elem[l - 2] intValue] <= OP_PUSHDATA4 && [elem[l - 2] intValue] > 0 &&
              [elem[l - 1] intValue] <= OP_PUSHDATA4 && [elem[l - 1] intValue] > 0) { // pay-to-script-hash scriptSig
-        v = BITCOIN_SCRIPT_ADDRESS;
-#if BITCOIN_TESTNET
-        v = BITCOIN_SCRIPT_ADDRESS_TEST;
+        v = DASH_SCRIPT_ADDRESS;
+#if DASH_TESTNET
+        v = DASH_SCRIPT_ADDRESS_TEST;
 #endif
         [d appendBytes:&v length:1];
         [d appendData:[elem[l - 1] hash160]];
@@ -293,11 +293,11 @@ static const int8_t base58map[] = {
     
     uint8_t version = *(const uint8_t *)d.bytes;
         
-#if BITCOIN_TESTNET
-    return (version == BITCOIN_PUBKEY_ADDRESS_TEST || version == BITCOIN_SCRIPT_ADDRESS_TEST) ? YES : NO;
+#if DASH_TESTNET
+    return (version == DASH_PUBKEY_ADDRESS_TEST || version == DASH_SCRIPT_ADDRESS_TEST) ? YES : NO;
 #endif
 
-    return (version == BITCOIN_PUBKEY_ADDRESS || version == BITCOIN_SCRIPT_ADDRESS) ? YES : NO;
+    return (version == DASH_PUBKEY_ADDRESS || version == DASH_SCRIPT_ADDRESS) ? YES : NO;
 }
 
 - (BOOL)isValidBitcoinPrivateKey
@@ -305,10 +305,10 @@ static const int8_t base58map[] = {
     NSData *d = self.base58checkToData;
     
     if (d.length == 33 || d.length == 34) { // wallet import format: https://en.bitcoin.it/wiki/Wallet_import_format
-#if BITCOIN_TESNET
-        return (*(const uint8_t *)d.bytes == BITCOIN_PRIVKEY_TEST) ? YES : NO;
+#if DASH_TESNET
+        return (*(const uint8_t *)d.bytes == DASH_PRIVKEY_TEST) ? YES : NO;
 #else
-        return (*(const uint8_t *)d.bytes == BITCOIN_PRIVKEY) ? YES : NO;
+        return (*(const uint8_t *)d.bytes == DASH_PRIVKEY) ? YES : NO;
 #endif
     }
     else if ((self.length == 30 || self.length == 22) && [self characterAtIndex:0] == 'S') { // mini private key format

@@ -15,9 +15,9 @@
     #import <Foundation/Foundation.h>
 #endif
 
-#define BITCOIN_TESTNET    1
-#define SATOSHIS           100000000
-#define MAX_MONEY          (21000000LL*SATOSHIS)
+#define DASH_TESTNET    1
+#define DUFFS           100000000
+#define MAX_MONEY          (21000000LL*DUFFS)
 #define PARALAX_RATIO      0.25
 //#define TX_FEE_0_8_RULES   1
 

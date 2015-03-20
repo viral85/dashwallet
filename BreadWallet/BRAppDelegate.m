@@ -27,7 +27,7 @@
 #import "BRPeerManager.h"
 #import "BRWalletManager.h"
 
-#if BITCOIN_TESTNET
+#if DASH_TESTNET
 #warning testnet build
 #endif
 

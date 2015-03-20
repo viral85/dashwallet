@@ -76,7 +76,7 @@ sequence:(uint32_t)sequence;
 
 - (BOOL)signWithPrivateKeys:(NSArray *)privateKeys;
 
-// priority = sum(input_amount_in_satoshis*input_age_in_blocks)/tx_size_in_bytes
+// priority = sum(input_amount_in_DUFFS*input_age_in_blocks)/tx_size_in_bytes
 - (uint64_t)priorityForAmounts:(NSArray *)amounts withAges:(NSArray *)ages;
 
 // the block height after which the transaction can be confirmed without a fee, or TX_UNCONFIRMED for never

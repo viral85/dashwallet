@@ -291,7 +291,7 @@
     
     self.navigationController.delegate = self;
 
-#if BITCOIN_TESTNET
+#if DASH_TESTNET
     UILabel *label = [UILabel new];
 
     label.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:13.0];
@@ -308,13 +308,13 @@
         m.format.currencyCode = @"mBTC";
         m.format.currencySymbol = @"m" BTC NARROW_NBSP;
         m.format.maximumFractionDigits = 5;
-        m.format.maximum = @((MAX_MONEY/SATOSHIS)*1000);
+        m.format.maximum = @((MAX_MONEY/DUFFS)*1000);
     }
     else if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 8) {
         m.format.currencyCode = @"BTC";
         m.format.currencySymbol = BTC NARROW_NBSP;
         m.format.maximumFractionDigits = 8;
-        m.format.maximum = @(MAX_MONEY/SATOSHIS);
+        m.format.maximum = @(MAX_MONEY/DUFFS);
     }
 
     if (! m.noWallet) {
@@ -638,7 +638,7 @@
     if ([v.text hasPrefix:BALANCE_TIP]) {
         BRWalletManager *m = [BRWalletManager sharedInstance];
         UINavigationBar *b = self.navigationController.navigationBar;
-        NSString *text = [NSString stringWithFormat:BITS_TIP, m.format.currencySymbol, [m stringForAmount:SATOSHIS]];
+        NSString *text = [NSString stringWithFormat:BITS_TIP, m.format.currencySymbol, [m stringForAmount:DUFFS]];
         CGRect r = [self.navigationItem.title boundingRectWithSize:b.bounds.size options:0
                     attributes:b.titleTextAttributes context:nil];
 

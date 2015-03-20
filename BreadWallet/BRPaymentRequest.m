@@ -93,7 +93,7 @@
         NSString *value = (pair.count > 1) ? [arg substringFromIndex:[pair[0] length] + 1] : nil;
         
         if ([pair[0] isEqual:@"amount"]) {
-            self.amount = ([value doubleValue] + DBL_EPSILON)*SATOSHIS;
+            self.amount = ([value doubleValue] + DBL_EPSILON)*DUFFS;
         }
         else if ([pair[0] isEqual:@"label"]) {
             self.label = [[value stringByReplacingOccurrencesOfString:@"+" withString:@"%20"]
@@ -120,7 +120,7 @@
     
     if (self.amount > 0) {
         while (p > 0 && self.amount/(uint64_t)pow(10, 9 - p)*(uint64_t)pow(10, 9 - p) == self.amount) p--;
-        [q addObject:[NSString stringWithFormat:@"amount=%.*f", p, (double)self.amount/SATOSHIS + DBL_EPSILON]];
+        [q addObject:[NSString stringWithFormat:@"amount=%.*f", p, (double)self.amount/DUFFS + DBL_EPSILON]];
     }
 
     if (self.label.length > 0) {
@@ -180,7 +180,7 @@
 - (BRPaymentProtocolRequest *)protocolRequest
 {
     static NSString *network = @"main";
-#if BITCOIN_TESTNET
+#if DASH_TESTNET
     network = @"test";
 #endif
     NSData *name = [self.label dataUsingEncoding:NSUTF8StringEncoding];
@@ -230,7 +230,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
         BRPaymentProtocolRequest *req = [BRPaymentProtocolRequest requestWithData:data];
         NSString *network = @"main";
 
-#ifdef BITCOIN_TESTNET
+#ifdef DASH_TESTNET
         network = @"test";
 #endif
 

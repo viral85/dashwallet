@@ -25,10 +25,10 @@
 
 #import <Foundation/Foundation.h>
 
-#if BITCOIN_TESTNET
-#define BITCOIN_MAGIC_NUMBER 0x0709110b
+#if DASH_TESTNET
+#define DASH_MAGIC_NUMBER 0x0709110b
 #else
-#define BITCOIN_MAGIC_NUMBER 0xd9b4bef9
+#define DASH_MAGIC_NUMBER 0xd9b4bef9
 #endif
 
 CFAllocatorRef SecureAllocator();

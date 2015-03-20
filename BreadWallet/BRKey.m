@@ -166,10 +166,10 @@ int secp256k1_point_add(void *r, const void *a, const void *b, int compressed)
     }
     
     NSData *d = privateKey.base58checkToData;
-    uint8_t version = BITCOIN_PRIVKEY;
+    uint8_t version = DASH_PRIVKEY;
     
-#if BITCOIN_TESTNET
-    version = BITCOIN_PRIVKEY_TEST;
+#if DASH_TESTNET
+    version = DASH_PRIVKEY_TEST;
 #endif
     
     if (! d || d.length == 28) d = privateKey.base58ToData;
@@ -198,10 +198,10 @@ int secp256k1_point_add(void *r, const void *a, const void *b, int compressed)
     if (self.seckey.length != 32) return nil;
 
     NSMutableData *d = [NSMutableData secureDataWithCapacity:34];
-    uint8_t version = BITCOIN_PRIVKEY;
+    uint8_t version = DASH_PRIVKEY;
 
-#if BITCOIN_TESTNET
-    version = BITCOIN_PRIVKEY_TEST;
+#if DASH_TESTNET
+    version = DASH_PRIVKEY_TEST;
 #endif
 
     [d appendBytes:&version length:1];
@@ -240,10 +240,10 @@ int secp256k1_point_add(void *r, const void *a, const void *b, int compressed)
     if (! hash.length) return nil;
 
     NSMutableData *d = [NSMutableData secureDataWithCapacity:hash.length + 1];
-    uint8_t version = BITCOIN_PUBKEY_ADDRESS;
+    uint8_t version = DASH_PUBKEY_ADDRESS;
 
-#if BITCOIN_TESTNET
-    version = BITCOIN_PUBKEY_ADDRESS_TEST;
+#if DASH_TESTNET
+    version = DASH_PUBKEY_ADDRESS_TEST;
 #endif
     
     [d appendBytes:&version length:1];

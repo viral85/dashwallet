@@ -45,9 +45,9 @@
 
 #define SEED_ENTROPY_LENGTH    (128/8)
 #define SEC_ATTR_SERVICE       @"org.voisine.breadwallet"
-#define DEFAULT_CURRENCY_PRICE 500.0
+#define DEFAULT_CURRENCY_PRICE 3.0
 #define DEFAULT_CURRENCY_CODE  @"USD"
-#define DEFAULT_SPENT_LIMIT    SATOSHIS
+#define DEFAULT_SPENT_LIMIT    DUFFS
 
 #if TX_FEE_0_8_RULES
 #define DEFAULT_FEE_PER_KB 0 // use standard minimum fee instead
@@ -723,7 +723,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (uint64_t)spendingLimit
 {
     // it's ok to store this in userdefaults because increasing the value only takes effect after successful pin entry
-    if (! [[NSUserDefaults standardUserDefaults] objectForKey:SPEND_LIMIT_AMOUNT_KEY]) return SATOSHIS;
+    if (! [[NSUserDefaults standardUserDefaults] objectForKey:SPEND_LIMIT_AMOUNT_KEY]) return DUFFS;
     return [[NSUserDefaults standardUserDefaults] doubleForKey:SPEND_LIMIT_AMOUNT_KEY] + DBL_EPSILON;
 }
 
@@ -764,7 +764,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     _localCurrencyCode = [code copy];
     _localCurrencyPrice = (i < _currencyPrices.count) ? [_currencyPrices[i] doubleValue] : DEFAULT_CURRENCY_PRICE;
     self.localFormat.currencyCode = _localCurrencyCode;
-    self.localFormat.maximum = @((MAX_MONEY/SATOSHIS)*_localCurrencyPrice);
+    self.localFormat.maximum = @((MAX_MONEY/DUFFS)*_localCurrencyPrice);
     
     if ([self.localCurrencyCode isEqual:[[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode]]) {
         [defs removeObjectForKey:LOCAL_CURRENCY_CODE_KEY];
@@ -836,8 +836,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         [defs setObject:self.currencyNames forKey:CURRENCY_NAMES_KEY];
         [defs setObject:self.currencyPrices forKey:CURRENCY_PRICES_KEY];
         [defs synchronize];
-        NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:SATOSHIS],
-              [self stringForAmount:SATOSHIS]);
+        NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:DUFFS],
+              [self stringForAmount:DUFFS]);
     }];
 }
 
@@ -880,7 +880,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
     }
 
     NSURL *u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"bitcoin", key.address]];
-#ifdef BITCOIN_TESTNET
+#ifdef DASH_TESTNET
     u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"testnet3", key.address]];
 #endif
     NSURLRequest *req = [NSURLRequest requestWithURL:u cachePolicy:NSURLRequestReloadIgnoringCacheData
@@ -995,11 +995,11 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
             overflowbits = 0;
 
     if (local == 0) return 0;
-    while (llabs(local) + 1 > INT64_MAX/SATOSHIS) local /= 2, overflowbits++; // make sure we won't overflow an int64_t
+    while (llabs(local) + 1 > INT64_MAX/DUFFS) local /= 2, overflowbits++; // make sure we won't overflow an int64_t
 
-    int64_t min = llabs(local)*SATOSHIS/
+    int64_t min = llabs(local)*DUFFS/
                   (int64_t)(self.localCurrencyPrice*pow(10.0, self.localFormat.maximumFractionDigits)) + 1,
-            max = (llabs(local) + 1)*SATOSHIS/
+            max = (llabs(local) + 1)*DUFFS/
                   (int64_t)(self.localCurrencyPrice*pow(10.0, self.localFormat.maximumFractionDigits)) - 1,
             amount = (min + max)/2, p = 10;
 
@@ -1014,14 +1014,14 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
 
-    NSString *ret = [self.localFormat stringFromNumber:@(self.localCurrencyPrice*amount/SATOSHIS)];
+    NSString *ret = [self.localFormat stringFromNumber:@(self.localCurrencyPrice*amount/DUFFS)];
 
     // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
-    if (amount > 0 && self.localCurrencyPrice*amount/SATOSHIS + DBL_EPSILON <
+    if (amount > 0 && self.localCurrencyPrice*amount/DUFFS + DBL_EPSILON <
         0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
         ret = [self.localFormat stringFromNumber:@(1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
     }
-    else if (amount < 0 && self.localCurrencyPrice*amount/SATOSHIS - DBL_EPSILON >
+    else if (amount < 0 && self.localCurrencyPrice*amount/DUFFS - DBL_EPSILON >
              -0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
         ret = [self.localFormat stringFromNumber:@(-1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
     }
