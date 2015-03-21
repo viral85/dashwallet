@@ -850,7 +850,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
     if (! completion) return;
 
-    if ([privKey isValidBitcoinBIP38Key]) {
+    if ([privKey isValidDigitalCashBIP38Key]) {
         UIAlertView *v = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"password protected key", nil)
                           message:nil delegate:self cancelButtonTitle:NSLocalizedString(@"cancel", nil)
                           otherButtonTitles:NSLocalizedString(@"ok", nil), nil];

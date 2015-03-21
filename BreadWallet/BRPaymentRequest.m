@@ -171,7 +171,7 @@
 
 - (BOOL)isValid
 {
-    if (! [self.paymentAddress isValidBitcoinAddress] && (! self.r || ! [NSURL URLWithString:self.r])) return NO;
+    if (! [self.paymentAddress isValidDigitalCashAddress] && (! self.r || ! [NSURL URLWithString:self.r])) return NO;
 
     return YES;
 }

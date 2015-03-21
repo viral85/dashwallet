@@ -234,7 +234,7 @@ CFAllocatorRef SecureAllocator()
     }
 }
 
-#pragma mark - bitcoin protocol
+#pragma mark - dash protocol
 
 - (void)appendMessage:(NSData *)message type:(NSString *)type;
 {

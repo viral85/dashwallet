@@ -285,7 +285,7 @@ static const int8_t base58map[] = {
     return (d.length == 160/8 + 1) ? [d subdataWithRange:NSMakeRange(1, d.length - 1)] : nil;
 }
 
-- (BOOL)isValidBitcoinAddress
+- (BOOL)isValidDigitalCashAddress
 {
     NSData *d = self.base58checkToData;
     
@@ -300,7 +300,7 @@ static const int8_t base58map[] = {
     return (version == DASH_PUBKEY_ADDRESS || version == DASH_SCRIPT_ADDRESS) ? YES : NO;
 }
 
-- (BOOL)isValidBitcoinPrivateKey
+- (BOOL)isValidDigitalCashPrivateKey
 {
     NSData *d = self.base58checkToData;
     
@@ -324,7 +324,7 @@ static const int8_t base58map[] = {
 }
 
 // BIP38 encrypted keys: https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki
-- (BOOL)isValidBitcoinBIP38Key
+- (BOOL)isValidDigitalCashBIP38Key
 {
     NSData *d = self.base58checkToData;
 

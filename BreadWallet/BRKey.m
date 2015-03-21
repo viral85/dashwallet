@@ -157,7 +157,7 @@ int secp256k1_point_add(void *r, const void *a, const void *b, int compressed)
     
     // mini private key format
     if ((privateKey.length == 30 || privateKey.length == 22) && [privateKey characterAtIndex:0] == 'S') {
-        if (! [privateKey isValidBitcoinPrivateKey]) return nil;
+        if (! [privateKey isValidDigitalCashPrivateKey]) return nil;
         
         self.seckey = [CFBridgingRelease(CFStringCreateExternalRepresentation(SecureAllocator(),
                        (CFStringRef)privateKey, kCFStringEncodingUTF8, 0)) SHA256];

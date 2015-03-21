@@ -212,7 +212,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
 - (void)confirmRequest:(BRPaymentRequest *)request
 {
     if (! [request isValid]) {
-        if ([request.paymentAddress isValidBitcoinPrivateKey] || [request.paymentAddress isValidBitcoinBIP38Key]) {
+        if ([request.paymentAddress isValidDigitalCashPrivateKey] || [request.paymentAddress isValidDigitalCashBIP38Key]) {
             [self confirmSweep:request.paymentAddress];
         }
         else {
@@ -491,7 +491,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
 
 - (void)confirmSweep:(NSString *)privKey
 {
-    if (! [privKey isValidBitcoinPrivateKey] && ! [privKey isValidBitcoinBIP38Key]) return;
+    if (! [privKey isValidDigitalCashPrivateKey] && ! [privKey isValidDigitalCashBIP38Key]) return;
 
     BRWalletManager *m = [BRWalletManager sharedInstance];
     BRBubbleView *v = [BRBubbleView viewWithText:NSLocalizedString(@"checking private key balance...", nil)
@@ -594,11 +594,11 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
         // if the clipboard contains a known txHash, we know it's not a hex encoded private key
         if (d.length == 32 && [[m.wallet.recentTransactions valueForKey:@"txHash"] containsObject:d]) continue;
         
-        if ([req.paymentAddress isValidBitcoinAddress]) {
+        if ([req.paymentAddress isValidDigitalCashAddress]) {
             self.clipboardText.text = (req.label.length > 0) ? sanitizeString(req.label) : req.paymentAddress;
             break;
         }
-        else if ([req isValid] || [s isValidBitcoinPrivateKey] || [s isValidBitcoinBIP38Key]) {
+        else if ([req isValid] || [s isValidDigitalCashPrivateKey] || [s isValidDigitalCashBIP38Key]) {
             self.clipboardText.text = sanitizeString(s);
             break;
         }
@@ -660,7 +660,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
         // if the clipboard contains a known txHash, we know it's not a hex encoded private key
         if (d.length == 32 && [[m.wallet.recentTransactions valueForKey:@"txHash"] containsObject:d]) continue;
         
-        if ([req isValid] || [s isValidBitcoinPrivateKey] || [s isValidBitcoinBIP38Key]) {
+        if ([req isValid] || [s isValidDigitalCashPrivateKey] || [s isValidDigitalCashBIP38Key]) {
             [self performSelector:@selector(confirmRequest:) withObject:req afterDelay:0.1];// delayed to show highlight
             return;
         }
@@ -712,7 +712,7 @@ fromConnection:(AVCaptureConnection *)connection
         NSString *s = o.stringValue;
         BRPaymentRequest *request = [BRPaymentRequest requestWithString:s];
 
-        if (! [request isValid] && ! [s isValidBitcoinPrivateKey] && ! [s isValidBitcoinBIP38Key]) {
+        if (! [request isValid] && ! [s isValidDigitalCashPrivateKey] && ! [s isValidDigitalCashBIP38Key]) {
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetQRGuide) object:nil];
             self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-red"];
 
