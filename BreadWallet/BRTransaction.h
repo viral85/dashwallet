@@ -50,10 +50,11 @@
 @property (nonatomic, readonly) NSArray *outputAddresses;
 @property (nonatomic, readonly) NSArray *outputScripts;
 
-@property (nonatomic, assign) uint32_t version;
 @property (nonatomic, strong) NSData *txHash;
+@property (nonatomic, assign) uint32_t version;
 @property (nonatomic, assign) uint32_t lockTime;
 @property (nonatomic, assign) uint32_t blockHeight;
+@property (nonatomic, assign) NSTimeInterval timestamp; // time interval since refrence date, 00:00:00 01/01/01 GMT
 @property (nonatomic, readonly) size_t size; // size in bytes if signed, or estimated size assuming compact pubkey sigs
 @property (nonatomic, readonly) uint64_t standardFee;
 @property (nonatomic, readonly) BOOL isSigned; // checks if all signatures exist, but does not verify them
@@ -68,12 +69,10 @@ outputAddresses:(NSArray *)addresses outputAmounts:(NSArray *)amounts;
 - (void)addInputHash:(NSData *)hash index:(NSUInteger)index script:(NSData *)script;
 - (void)addInputHash:(NSData *)hash index:(NSUInteger)index script:(NSData *)script signature:(NSData *)signature
 sequence:(uint32_t)sequence;
-
 - (void)addOutputAddress:(NSString *)address amount:(uint64_t)amount;
 - (void)addOutputScript:(NSData *)script amount:(uint64_t)amount;
-
 - (void)setInputAddress:(NSString *)address atIndex:(NSUInteger)index;
-
+- (void)shuffleOutputOrder;
 - (BOOL)signWithPrivateKeys:(NSArray *)privateKeys;
 
 // priority = sum(input_amount_in_satoshis*input_age_in_blocks)/tx_size_in_bytes

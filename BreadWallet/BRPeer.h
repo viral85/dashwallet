@@ -105,8 +105,9 @@ typedef enum {
 @property (nonatomic, assign) NSTimeInterval timestamp; // last seen time (interval since refrence date)
 @property (nonatomic, assign) int16_t misbehavin;
 
-@property (nonatomic, assign) BOOL needsFilterUpdate;
-@property (nonatomic, assign) uint32_t currentBlockHeight;
+@property (nonatomic, assign) BOOL needsFilterUpdate; // set this when wallet addresses need to be added to bloom filter
+@property (nonatomic, assign) uint32_t currentBlockHeight; // set this to local block height (helps detect tarpit nodes)
+@property (nonatomic, assign) BOOL synced; // use this to keep track of peer state
 
 + (instancetype)peerWithAddress:(uint32_t)address andPort:(uint16_t)port;
 
@@ -119,10 +120,11 @@ services:(uint64_t)services;
 - (void)sendMessage:(NSData *)message type:(NSString *)type;
 - (void)sendFilterloadMessage:(NSData *)filter;
 - (void)sendMempoolMessage;
-- (void)sendGetaddrMessage;
 - (void)sendGetheadersMessageWithLocators:(NSArray *)locators andHashStop:(NSData *)hashStop;
 - (void)sendGetblocksMessageWithLocators:(NSArray *)locators andHashStop:(NSData *)hashStop;
-- (void)sendInvMessageWithTxHash:(NSData *)txHash;
+- (void)sendInvMessageWithTxHashes:(NSArray *)txHashes;
+- (void)sendGetdataMessageWithTxHashes:(NSArray *)txHashes andBlockHashes:(NSArray *)blockHashes;
+- (void)sendGetaddrMessage;
 - (void)sendPingMessageWithPongHandler:(void (^)(BOOL success))pongHandler;
 - (void)rerequestBlocksFrom:(NSData *)blockHash; // useful to get additional transactions after a bloom filter update
 
