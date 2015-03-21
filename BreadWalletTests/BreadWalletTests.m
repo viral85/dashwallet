@@ -32,6 +32,7 @@
 #import "BRKey+BIP38.h"
 #import "BRBloomFilter.h"
 #import "BRMerkleBlock.h"
+#import "BRPaymentRequest.h"
 #import "BRPaymentProtocol.h"
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
@@ -378,11 +379,27 @@
 
 #pragma mark - testPaymentRequest
 
-//TODO: test valid request with no arguments
-//TODO: test valid request with known arguments
 //TODO: test valid request with unkown arguments
 //TODO: test invalid bitcoin address
 //TODO: test invalid request with unkown required arguments
+
+- (void)testPaymentRequest
+{
+    BRPaymentRequest *r = [BRPaymentRequest requestWithString:@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW"];
+    XCTAssertEqualObjects(@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW", r.string);
+    
+    r = [BRPaymentRequest requestWithString:@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW?amount=1"];
+    XCTAssertEqualObjects(@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW?amount=1", r.string);
+    
+    r = [BRPaymentRequest requestWithString:@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW?amount=0.00000001"];
+    XCTAssertEqualObjects(@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW?amount=0.00000001", r.string);
+    
+    r = [BRPaymentRequest requestWithString:@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW?amount=21000000"];
+    XCTAssertEqualObjects(@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW?amount=21000000", r.string);
+
+    r = [BRPaymentRequest requestWithString:@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW?amount=20999999.99999999"];
+    XCTAssertEqualObjects(@"bitcoin:1BTCorgHwCg6u2YSAWKgS17qUad6kHmtQW?amount=20999999.99999999", r.string);
+}
 
 #pragma mark - testTransaction
 
@@ -915,10 +932,12 @@
 
     // larger than 1k transaction
     tx = [w transactionFor:25000000ULL to:@"16c7nyuu2D99LqJ8TQ8GSsWSyrCYDS5qBA" withFee:YES];
-    NSLog(@"fee: %llu, should be %llu", [w feeForTransaction:tx], tx.standardFee);
+    NSLog(@"fee: %llu, should be %llu", [w feeForTransaction:tx], [w feeForTxSize:tx.size + 1965]);
 
-    XCTAssertEqual([w feeForTransaction:tx], tx.standardFee, @"[BRWallet transactionFor:to:withFee:]");
+    XCTAssertEqual([w feeForTransaction:tx], [w feeForTxSize:tx.size + 1965], @"[BRWallet transactionFor:to:withFee:]");
 #endif
+
+    XCTAssertEqual([w feeForTxSize:tx.size], tx.standardFee, @"[BRWallet feeForTxSize:]");
 }
 
 #pragma mark - testBloomFilter

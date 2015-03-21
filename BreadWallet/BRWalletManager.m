@@ -724,7 +724,10 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 {
     // it's ok to store this in userdefaults because increasing the value only takes effect after successful pin entry
     if (! [[NSUserDefaults standardUserDefaults] objectForKey:SPEND_LIMIT_AMOUNT_KEY]) return DUFFS;
-    return [[NSUserDefaults standardUserDefaults] doubleForKey:SPEND_LIMIT_AMOUNT_KEY] + DBL_EPSILON;
+
+    double limit = [[NSUserDefaults standardUserDefaults] doubleForKey:SPEND_LIMIT_AMOUNT_KEY];
+    
+    return limit + DBL_EPSILON*limit;
 }
 
 - (void)setSpendingLimit:(uint64_t)spendingLimit
@@ -843,7 +846,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 
 #pragma mark - sweep private key
 
-// given a private key, queries blockchain for unspent outputs and calls the completion block with a signed transaction
+// given a private key, queries chain.com for unspent outputs and calls the completion block with a signed transaction
 // that will sweep the balance into the wallet (doesn't publish the tx)
 - (void)sweepPrivateKey:(NSString *)privKey withFee:(BOOL)fee
 completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
@@ -964,8 +967,9 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 
 - (int64_t)amountForString:(NSString *)string
 {
-    return ([[self.format numberFromString:string] doubleValue] + DBL_EPSILON)*
-           pow(10.0, self.format.maximumFractionDigits);
+    double amt = [[self.format numberFromString:string] doubleValue]*pow(10.0, self.format.maximumFractionDigits);
+
+    return amt + DBL_EPSILON*amt;
 }
 
 - (NSString *)stringForAmount:(int64_t)amount
@@ -977,7 +981,8 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
             (self.format.maximumFractionDigits > 4) ? 4 : self.format.maximumFractionDigits;
     }
 
-    NSString *r = [self.format stringFromNumber:@(amount/pow(10.0, self.format.maximumFractionDigits))];
+    double amt = amount/pow(10.0, self.format.maximumFractionDigits);
+    NSString *r = [self.format stringFromNumber:@(amt + DBL_EPSILON*amt)];
 
     self.format.minimumFractionDigits = min;
     return r;
@@ -990,17 +995,23 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
     if (self.localCurrencyPrice <= DBL_EPSILON) return 0;
     if ([string hasPrefix:@"<"]) string = [string substringFromIndex:1];
 
-    int64_t local = ([[self.localFormat numberFromString:string] doubleValue] + DBL_EPSILON)*
-                     pow(10.0, self.localFormat.maximumFractionDigits),
-            overflowbits = 0;
+    double price = self.localCurrencyPrice*pow(10.0, self.localFormat.maximumFractionDigits),
+           amt = [[self.localFormat numberFromString:string] doubleValue]*
+                 pow(10.0, self.localFormat.maximumFractionDigits);
+    int64_t local = amt + DBL_EPSILON*amt, overflowbits = 0;
 
     if (local == 0) return 0;
     while (llabs(local) + 1 > INT64_MAX/DUFFS) local /= 2, overflowbits++; // make sure we won't overflow an int64_t
 
+<<<<<<< HEAD
     int64_t min = llabs(local)*DUFFS/
                   (int64_t)(self.localCurrencyPrice*pow(10.0, self.localFormat.maximumFractionDigits)) + 1,
             max = (llabs(local) + 1)*DUFFS/
                   (int64_t)(self.localCurrencyPrice*pow(10.0, self.localFormat.maximumFractionDigits)) - 1,
+=======
+    int64_t min = llabs(local)*SATOSHIS/(int64_t)(price + DBL_EPSILON*price) + 1,
+            max = (llabs(local) + 1)*SATOSHIS/(int64_t)(price + DBL_EPSILON*price) - 1,
+>>>>>>> 89aa5703ad7818afe85f6fe0f06b0ddb3350aa1c
             amount = (min + max)/2, p = 10;
 
     while (overflowbits > 0) local *= 2, min *= 2, max *= 2, amount *= 2, overflowbits--;
@@ -1014,6 +1025,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
 
+<<<<<<< HEAD
     NSString *ret = [self.localFormat stringFromNumber:@(self.localCurrencyPrice*amount/DUFFS)];
 
     // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
@@ -1023,6 +1035,16 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
     }
     else if (amount < 0 && self.localCurrencyPrice*amount/DUFFS - DBL_EPSILON >
              -0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
+=======
+    double local = self.localCurrencyPrice*amount/SATOSHIS;
+    NSString *ret = [self.localFormat stringFromNumber:@(local + DBL_EPSILON*local)];
+
+    // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
+    if (amount > 0 && local < 0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
+        ret = [self.localFormat stringFromNumber:@(1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
+    }
+    else if (amount < 0 && local > -0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
+>>>>>>> 89aa5703ad7818afe85f6fe0f06b0ddb3350aa1c
         ret = [self.localFormat stringFromNumber:@(-1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
     }
 

@@ -93,7 +93,7 @@
         NSString *value = (pair.count > 1) ? [arg substringFromIndex:[pair[0] length] + 1] : nil;
         
         if ([pair[0] isEqual:@"amount"]) {
-            self.amount = ([value doubleValue] + DBL_EPSILON)*DUFFS;
+            self.amount = [value doubleValue]*DUFFS + DBL_EPSILON*[value doubleValue]*DUFFS;
         }
         else if ([pair[0] isEqual:@"label"]) {
             self.label = [[value stringByReplacingOccurrencesOfString:@"+" withString:@"%20"]
@@ -120,7 +120,8 @@
     
     if (self.amount > 0) {
         while (p > 0 && self.amount/(uint64_t)pow(10, 9 - p)*(uint64_t)pow(10, 9 - p) == self.amount) p--;
-        [q addObject:[NSString stringWithFormat:@"amount=%.*f", p, (double)self.amount/DUFFS + DBL_EPSILON]];
+        [q addObject:[NSString stringWithFormat:@"amount=%.*f", p,
+                      (double)self.amount/DUFFS + DBL_EPSILON*self.amount/DUFFS]];
     }
 
     if (self.label.length > 0) {
@@ -176,7 +177,7 @@
     return YES;
 }
 
-// reciever converted to BIP70 request object
+// receiver converted to BIP70 request object
 - (BRPaymentProtocolRequest *)protocolRequest
 {
     static NSString *network = @"main";
