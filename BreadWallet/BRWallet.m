@@ -380,6 +380,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         
         // add up size of unconfirmed, non-change inputs for child-pays-for-parent fee calculation
         if (tx.blockHeight == TX_UNCONFIRMED && [self amountSentByTransaction:tx] == 0) cpfpSize += tx.size;
+        
         if (fee) feeAmount = [self feeForTxSize:transaction.size + 34 + cpfpSize]; // assume we will add a change output
         if (balance == amount + feeAmount || balance >= amount + feeAmount + TX_MIN_OUTPUT_AMOUNT) break;
     }
@@ -389,9 +390,9 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         return nil;
     }
     
-    //TODO: randomly swap order of outputs so the change address isn't publicy known
     if (balance - (amount + feeAmount) >= TX_MIN_OUTPUT_AMOUNT) {
         [transaction addOutputAddress:self.changeAddress amount:balance - (amount + feeAmount)];
+        [transaction shuffleOutputOrder];
     }
     
     return transaction;
@@ -451,7 +452,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 
     //TODO: verify signatures when possible
     //TODO: XXX handle tx replacement with input sequence numbers (now replacements appear invalid until confirmation)
-
+    
     self.allTx[transaction.txHash] = transaction;
     [self.transactions insertObject:transaction atIndex:0];
     [self.usedAddresses addObjectsFromArray:transaction.inputAddresses];
@@ -523,7 +524,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 // returns true if transaction won't be valid by blockHeight + 1 or within the next 10 minutes
 - (BOOL)transactionIsPostdated:(BRTransaction *)transaction atBlockHeight:(uint32_t)blockHeight
 {
-    if (transaction.blockHeight <= blockHeight + 1) return NO; // confirmed transactions are not postdated
+    if (transaction.blockHeight != TX_UNCONFIRMED) return NO; // confirmed transactions are not postdated
 
     // TODO: XXX consider marking any unconfirmed transaction with a non-final sequence number as postdated
     for (NSData *txHash in transaction.inputHashes) { // check if any inputs are known to be postdated
@@ -542,16 +543,17 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     return NO;
 }
 
-// set the block heights for the given transactions
-- (void)setBlockHeight:(int32_t)height forTxHashes:(NSArray *)txHashes
+// set the block heights and timestamps for the given transactions
+- (void)setBlockHeight:(int32_t)height andTimestamp:(NSTimeInterval)timestamp forTxHashes:(NSArray *)txHashes
 {
     BOOL set = NO;
 
     for (NSData *hash in txHashes) {
         BRTransaction *tx = self.allTx[hash];
 
-        if (! tx || tx.blockHeight == height) continue;
+        if (! tx || (tx.blockHeight == height && tx.timestamp == timestamp)) continue;
         tx.blockHeight = height;
+        tx.timestamp = timestamp;
         set = YES;
     }
 
@@ -562,6 +564,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         [self.moc performBlock:^{
             for (BRTransactionEntity *e in [BRTransactionEntity objectsMatching:@"txHash in %@", txHashes]) {
                 e.blockHeight = height;
+                e.timestamp = timestamp;
             }
         }];
     }
