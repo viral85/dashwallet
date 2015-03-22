@@ -151,7 +151,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         } :^id (id left, id right) {
             [d setData:left];
             [d appendData:(right) ? right : left]; // if right branch is missing, duplicate left branch
-            return d.SHA256_2;
+            return d.x11;
         }];
     
     if (_totalTransactions > 0 && ! [merkleRoot isEqual:_merkleRoot]) return NO; // merkle root check failed

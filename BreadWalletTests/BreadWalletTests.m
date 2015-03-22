@@ -37,6 +37,8 @@
 #import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSString+Bitcoin.h"
+#import "NSData+Blake.h"
+#import "NSData+Bmw.h"
 
 //#define SKIP_BIP38 1
 
@@ -60,7 +62,20 @@
 
 -(void)testBlake
 {
-    
+    NSString * fox = @"The quick brown fox jumps over the lazy dog";
+    NSData * foxData = [fox dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * blaked = [foxData blake512];
+    NSString * blakedString = [blaked hexadecimalString];
+    XCTAssertEqualObjects([blakedString uppercaseString], @"1F7E26F63B6AD25A0896FD978FD050A1766391D2FD0471A77AFB975E5034B7AD2D9CCF8DFB47ABBBE656E1B82FBC634BA42CE186E8DC5E1CE09A885D41F43451",@"[NSData blake512]");
+}
+
+-(void)testBmw
+{
+    NSString * fox = @"The quick brown fox jumps over the lazy dog";
+    NSData * foxData = [fox dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * bmwed = [foxData bmw512];
+    NSString * blakedString = [bmwed hexadecimalString];
+    XCTAssertEqualObjects([blakedString uppercaseString], @"2998D4CB31323E1169B458AB03A54D0B68E411A3C7CC7612ADBF05BF901B8197DFD852C1C0099C09717D2FAD3537207E737C6159C31D377D1AB8F5ED1CEEEA06",@"[NSData bmw512]"); //not verified
 }
 
 #pragma mark - testBase58
@@ -135,19 +150,19 @@
 #if ! DASH_TESTNET
 - (void)testKeyWithPrivateKey
 {
-    XCTAssertFalse([@"S6c56bnXQiBjk9mqSYE7ykVQ7NzrRz" isValidBitcoinPrivateKey],
-                  @"[NSString+Base58 isValidBitcoinPrivateKey]");
+    XCTAssertFalse([@"S6c56bnXQiBjk9mqSYE7ykVQ7NzrRz" isValidDigitalCashPrivateKey],
+                  @"[NSString+Base58 isValidDigitalCashPrivateKey]");
 
-    XCTAssertTrue([@"S6c56bnXQiBjk9mqSYE7ykVQ7NzrRy" isValidBitcoinPrivateKey],
-                 @"[NSString+Base58 isValidBitcoinPrivateKey]");
+    XCTAssertTrue([@"S6c56bnXQiBjk9mqSYE7ykVQ7NzrRy" isValidDigitalCashPrivateKey],
+                 @"[NSString+Base58 isValidDigitalCashPrivateKey]");
 
     // mini private key format
     BRKey *key = [BRKey keyWithPrivateKey:@"S6c56bnXQiBjk9mqSYE7ykVQ7NzrRy"];
     
     NSLog(@"privKey:S6c56bnXQiBjk9mqSYE7ykVQ7NzrRy = %@", key.address);
     XCTAssertEqualObjects(@"1CciesT23BNionJeXrbxmjc7ywfiyM4oLW", key.address, @"[BRKey keyWithPrivateKey:]");
-    XCTAssertTrue([@"SzavMBLoXU6kDrqtUVmffv" isValidBitcoinPrivateKey],
-                 @"[NSString+Base58 isValidBitcoinPrivateKey]");
+    XCTAssertTrue([@"SzavMBLoXU6kDrqtUVmffv" isValidDigitalCashPrivateKey],
+                 @"[NSString+Base58 isValidDigitalCashPrivateKey]");
 
     // old mini private key format
     key = [BRKey keyWithPrivateKey:@"SzavMBLoXU6kDrqtUVmffv"];

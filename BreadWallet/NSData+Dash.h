@@ -52,6 +52,8 @@
 - (NSData *)reverse;
 - (NSData *)x11;
 
+- (NSString *)hexadecimalString;
+
 - (uint8_t)UInt8AtOffset:(NSUInteger)offset;
 - (uint16_t)UInt16AtOffset:(NSUInteger)offset;
 - (uint32_t)UInt32AtOffset:(NSUInteger)offset;
