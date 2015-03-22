@@ -56,6 +56,13 @@
     [super tearDown];
 }
 
+#pragma mark - X11
+
+-(void)testBlake
+{
+    
+}
+
 #pragma mark - testBase58
 
 - (void)testBase58

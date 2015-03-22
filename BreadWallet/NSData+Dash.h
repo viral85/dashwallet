@@ -42,7 +42,7 @@
 #define OP_HASH160     0xa9
 #define OP_CHECKSIG    0xac
 
-@interface NSData (Bitcoin)
+@interface NSData (Dash)
 
 - (NSData *)SHA1;
 - (NSData *)SHA256;
@@ -50,6 +50,7 @@
 - (NSData *)RMD160;
 - (NSData *)hash160;
 - (NSData *)reverse;
+- (NSData *)x11;
 
 - (uint8_t)UInt8AtOffset:(NSUInteger)offset;
 - (uint16_t)UInt16AtOffset:(NSUInteger)offset;

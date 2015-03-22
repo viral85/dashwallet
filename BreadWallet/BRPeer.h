@@ -26,9 +26,9 @@
 #import <Foundation/Foundation.h>
 
 #if DASH_TESTNET
-#define DASH_STANDARD_PORT          18333
+#define DASH_STANDARD_PORT          19999
 #else
-#define DASH_STANDARD_PORT          8333
+#define DASH_STANDARD_PORT          9999
 #endif
 
 #define DASH_TIMEOUT_CODE           1001

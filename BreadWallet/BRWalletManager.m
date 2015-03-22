@@ -1002,16 +1002,8 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 
     if (local == 0) return 0;
     while (llabs(local) + 1 > INT64_MAX/DUFFS) local /= 2, overflowbits++; // make sure we won't overflow an int64_t
-
-<<<<<<< HEAD
-    int64_t min = llabs(local)*DUFFS/
-                  (int64_t)(self.localCurrencyPrice*pow(10.0, self.localFormat.maximumFractionDigits)) + 1,
-            max = (llabs(local) + 1)*DUFFS/
-                  (int64_t)(self.localCurrencyPrice*pow(10.0, self.localFormat.maximumFractionDigits)) - 1,
-=======
-    int64_t min = llabs(local)*SATOSHIS/(int64_t)(price + DBL_EPSILON*price) + 1,
-            max = (llabs(local) + 1)*SATOSHIS/(int64_t)(price + DBL_EPSILON*price) - 1,
->>>>>>> 89aa5703ad7818afe85f6fe0f06b0ddb3350aa1c
+    int64_t min = llabs(local)*DUFFS/(int64_t)(price + DBL_EPSILON*price) + 1,
+            max = (llabs(local) + 1)*DUFFS/(int64_t)(price + DBL_EPSILON*price) - 1,
             amount = (min + max)/2, p = 10;
 
     while (overflowbits > 0) local *= 2, min *= 2, max *= 2, amount *= 2, overflowbits--;
@@ -1025,18 +1017,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
 
-<<<<<<< HEAD
-    NSString *ret = [self.localFormat stringFromNumber:@(self.localCurrencyPrice*amount/DUFFS)];
-
-    // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
-    if (amount > 0 && self.localCurrencyPrice*amount/DUFFS + DBL_EPSILON <
-        0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
-        ret = [self.localFormat stringFromNumber:@(1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
-    }
-    else if (amount < 0 && self.localCurrencyPrice*amount/DUFFS - DBL_EPSILON >
-             -0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
-=======
-    double local = self.localCurrencyPrice*amount/SATOSHIS;
+    double local = self.localCurrencyPrice*amount/DUFFS;
     NSString *ret = [self.localFormat stringFromNumber:@(local + DBL_EPSILON*local)];
 
     // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
@@ -1044,7 +1025,6 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
         ret = [self.localFormat stringFromNumber:@(1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
     }
     else if (amount < 0 && local > -0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
->>>>>>> 89aa5703ad7818afe85f6fe0f06b0ddb3350aa1c
         ret = [self.localFormat stringFromNumber:@(-1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
     }
 

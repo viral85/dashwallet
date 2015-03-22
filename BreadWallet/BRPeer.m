@@ -27,7 +27,7 @@
 #import "BRTransaction.h"
 #import "BRMerkleBlock.h"
 #import "NSMutableData+Bitcoin.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import <arpa/inet.h>
 #import "Reachability.h"
 

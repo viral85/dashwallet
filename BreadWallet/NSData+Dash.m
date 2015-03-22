@@ -23,8 +23,10 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import <CommonCrypto/CommonCrypto.h>
+#import "hash.h"
+#import "uint256.h"
 
 // bitwise left rotation
 #define rotl(a, b) (((a) << (b)) | ((a) >> (32 - (b))))
@@ -116,7 +118,8 @@ static void RMD160(const void *data, size_t len, uint8_t *md)
     for (i = 0; i < sizeof(buf)/sizeof(*buf); i++) ((uint32_t *)md)[i] = CFSwapInt32HostToLittle(buf[i]); // write to md
 }
 
-@implementation NSData (Bitcoin)
+
+@implementation NSData (Dash)
 
 - (NSData *)SHA1
 {
@@ -161,6 +164,11 @@ static void RMD160(const void *data, size_t len, uint8_t *md)
     return d;
 }
 
+- (NSData *)x11
+{
+    uint256 hash = has
+}
+
 - (NSData *)reverse
 {
     NSUInteger len = self.length;
@@ -174,6 +182,7 @@ static void RMD160(const void *data, size_t len, uint8_t *md)
     
     return d;
 }
+
 
 - (uint8_t)UInt8AtOffset:(NSUInteger)offset
 {

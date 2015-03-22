@@ -28,7 +28,7 @@
 		752E28D919234C3600DB5A3C /* BRTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28C919234C3600DB5A3C /* BRTransaction.m */; };
 		752E28DA19234C3600DB5A3C /* BRWallet.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28CB19234C3600DB5A3C /* BRWallet.m */; };
 		752E28DB19234C3600DB5A3C /* BRWalletManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28CD19234C3600DB5A3C /* BRWalletManager.m */; };
-		752E28E719234DA200DB5A3C /* NSData+Bitcoin.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28DE19234DA200DB5A3C /* NSData+Bitcoin.m */; };
+		752E28E719234DA200DB5A3C /* NSData+Dash.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28DE19234DA200DB5A3C /* NSData+Dash.m */; };
 		752E28E919234DA200DB5A3C /* NSManagedObject+Sugar.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28E219234DA200DB5A3C /* NSManagedObject+Sugar.m */; };
 		752E28EA19234DA200DB5A3C /* NSMutableData+Bitcoin.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28E419234DA200DB5A3C /* NSMutableData+Bitcoin.m */; };
 		752E28EB19234DA200DB5A3C /* NSString+Bitcoin.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28E619234DA200DB5A3C /* NSString+Bitcoin.m */; };
@@ -67,6 +67,10 @@
 		75D5F3F1191EC270004AB296 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 75D5F3EF191EC270004AB296 /* InfoPlist.strings */; };
 		75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 75D5F3F2191EC270004AB296 /* BreadWalletTests.m */; };
 		84F68C8A1975E9E2002FC300 /* BRScanViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F68C891975E9E2002FC300 /* BRScanViewController.m */; };
+		FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
+		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
+		FBBFEF691ABE4ECC00CA937F /* hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF671ABE4ECC00CA937F /* hash.cpp */; };
+		FBBFEF6A1ABE4ECC00CA937F /* hash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF671ABE4ECC00CA937F /* hash.cpp */; };
 		FBE4D98E1ABD655B007C3BA6 /* shavite.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98B1ABD655B007C3BA6 /* shavite.c */; };
 		FBE4D98F1ABD655B007C3BA6 /* shavite.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98B1ABD655B007C3BA6 /* shavite.c */; };
 		FBE4D9901ABD655B007C3BA6 /* shavite.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98B1ABD655B007C3BA6 /* shavite.c */; };
@@ -182,8 +186,8 @@
 		752E28CC19234C3600DB5A3C /* BRWalletManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRWalletManager.h; sourceTree = "<group>"; };
 		752E28CD19234C3600DB5A3C /* BRWalletManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRWalletManager.m; sourceTree = "<group>"; };
 		752E28DC19234D1000DB5A3C /* BRBIP32Sequence.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BRBIP32Sequence.h; sourceTree = "<group>"; };
-		752E28DD19234DA200DB5A3C /* NSData+Bitcoin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Bitcoin.h"; sourceTree = "<group>"; };
-		752E28DE19234DA200DB5A3C /* NSData+Bitcoin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Bitcoin.m"; sourceTree = "<group>"; };
+		752E28DD19234DA200DB5A3C /* NSData+Dash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Dash.h"; sourceTree = "<group>"; };
+		752E28DE19234DA200DB5A3C /* NSData+Dash.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Dash.m"; sourceTree = "<group>"; };
 		752E28E119234DA200DB5A3C /* NSManagedObject+Sugar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObject+Sugar.h"; sourceTree = "<group>"; };
 		752E28E219234DA200DB5A3C /* NSManagedObject+Sugar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObject+Sugar.m"; sourceTree = "<group>"; };
 		752E28E319234DA200DB5A3C /* NSMutableData+Bitcoin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMutableData+Bitcoin.h"; sourceTree = "<group>"; };
@@ -274,6 +278,11 @@
 		75F27B0619DE2AB20047FC62 /* ccMemory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ccMemory.h; sourceTree = SOURCE_ROOT; };
 		84F68C881975E9E2002FC300 /* BRScanViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRScanViewController.h; sourceTree = "<group>"; };
 		84F68C891975E9E2002FC300 /* BRScanViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRScanViewController.m; sourceTree = "<group>"; };
+		FBBFEF631ABD796000CA937F /* aes_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes_helper.c; sourceTree = "<group>"; };
+		FBBFEF661ABD7D8100CA937F /* uint256.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uint256.h; sourceTree = "<group>"; };
+		FBBFEF671ABE4ECC00CA937F /* hash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = hash.cpp; sourceTree = "<group>"; };
+		FBBFEF681ABE4ECC00CA937F /* hash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = hash.h; sourceTree = "<group>"; };
+		FBBFEF6B1ABE4EF400CA937F /* serialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serialize.h; sourceTree = "<group>"; };
 		FBE4D97F1ABD652B007C3BA6 /* sph_blake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_blake.h; sourceTree = "<group>"; };
 		FBE4D9801ABD652B007C3BA6 /* sph_bmw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_bmw.h; sourceTree = "<group>"; };
 		FBE4D9811ABD652B007C3BA6 /* sph_cubehash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_cubehash.h; sourceTree = "<group>"; };
@@ -407,8 +416,8 @@
 			children = (
 				752E28E519234DA200DB5A3C /* NSString+Bitcoin.h */,
 				752E28E619234DA200DB5A3C /* NSString+Bitcoin.m */,
-				752E28DD19234DA200DB5A3C /* NSData+Bitcoin.h */,
-				752E28DE19234DA200DB5A3C /* NSData+Bitcoin.m */,
+				752E28DD19234DA200DB5A3C /* NSData+Dash.h */,
+				752E28DE19234DA200DB5A3C /* NSData+Dash.m */,
 				752E28E319234DA200DB5A3C /* NSMutableData+Bitcoin.h */,
 				752E28E419234DA200DB5A3C /* NSMutableData+Bitcoin.m */,
 				752E28E119234DA200DB5A3C /* NSManagedObject+Sugar.h */,
@@ -618,6 +627,11 @@
 				FBE4D9891ABD652B007C3BA6 /* sph_skein.h */,
 				FBE4D98D1ABD655B007C3BA6 /* skein.c */,
 				FBE4D98A1ABD652B007C3BA6 /* sph_types.h */,
+				FBBFEF631ABD796000CA937F /* aes_helper.c */,
+				FBBFEF661ABD7D8100CA937F /* uint256.h */,
+				FBBFEF671ABE4ECC00CA937F /* hash.cpp */,
+				FBBFEF6B1ABE4EF400CA937F /* serialize.h */,
+				FBBFEF681ABE4ECC00CA937F /* hash.h */,
 			);
 			name = "Hash Utils";
 			sourceTree = "<group>";
@@ -836,7 +850,8 @@
 				757BE7E3192C0E9D0061CB20 /* BRRestoreViewController.m in Sources */,
 				757BE7E6192C1FF70061CB20 /* BRWelcomeViewController.m in Sources */,
 				757BE7E9192D4E880061CB20 /* BRSeedViewController.m in Sources */,
-				752E28E719234DA200DB5A3C /* NSData+Bitcoin.m in Sources */,
+				FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */,
+				752E28E719234DA200DB5A3C /* NSData+Dash.m in Sources */,
 				752E28E919234DA200DB5A3C /* NSManagedObject+Sugar.m in Sources */,
 				FBE4D9911ABD655B007C3BA6 /* simd.c in Sources */,
 				752E28EA19234DA200DB5A3C /* NSMutableData+Bitcoin.m in Sources */,
@@ -849,6 +864,7 @@
 				FBE4D9B01ABD65B7007C3BA6 /* bmw.c in Sources */,
 				752E289A192349CE00DB5A3C /* BreadWallet.xcdatamodeld in Sources */,
 				759FBB37193290F600AB4465 /* BRSendViewController.m in Sources */,
+				FBBFEF691ABE4ECC00CA937F /* hash.cpp in Sources */,
 				752E28F119234E8100DB5A3C /* Reachability.m in Sources */,
 				75D5F3CE191EC270004AB296 /* main.m in Sources */,
 			);
@@ -869,7 +885,9 @@
 				FBE4D99A1ABD656F007C3BA6 /* luffa.c in Sources */,
 				FBE4D9961ABD655B007C3BA6 /* skein.c in Sources */,
 				FBE4D9A71ABD65A1007C3BA6 /* echo.c in Sources */,
+				FBBFEF6A1ABE4ECC00CA937F /* hash.cpp in Sources */,
 				FBE4D9931ABD655B007C3BA6 /* simd.c in Sources */,
+				FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
