@@ -25,7 +25,7 @@
 
 #import "BRKey.h"
 #import "NSString+Bitcoin.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 
 #import <secp256k1/include/secp256k1.h>

@@ -27,7 +27,7 @@
 #import "BRKey.h"
 #import "NSString+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import <CommonCrypto/CommonHMAC.h>
 
 #define TX_VERSION    0x00000001u

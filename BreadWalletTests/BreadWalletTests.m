@@ -34,7 +34,7 @@
 #import "BRMerkleBlock.h"
 #import "BRPaymentRequest.h"
 #import "BRPaymentProtocol.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSString+Bitcoin.h"
 

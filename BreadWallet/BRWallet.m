@@ -29,7 +29,7 @@
 #import "BRTransaction.h"
 #import "BRTransactionEntity.h"
 #import "BRKeySequence.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
 

@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 
 #import "BRBIP39Mnemonic.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "ccMemory.h"
 #import <CommonCrypto/CommonKeyDerivation.h>

@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 
 #import "NSMutableData+Bitcoin.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import "NSString+Bitcoin.h"
 #import "ccMemory.h"
 

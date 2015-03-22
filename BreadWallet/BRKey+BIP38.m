@@ -25,7 +25,7 @@
 
 #import "BRKey+BIP38.h"
 #import "NSString+Bitcoin.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "ccMemory.h"
 #import <CommonCrypto/CommonCrypto.h>

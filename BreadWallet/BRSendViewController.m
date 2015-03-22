@@ -37,7 +37,7 @@
 #import "BRTransaction.h"
 #import "NSString+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 
 #define SCAN_TIP      NSLocalizedString(@"Scan someone else's QR code to get their bitcoin address. "\
                                          "You can send a payment to anyone with an address.", nil)
