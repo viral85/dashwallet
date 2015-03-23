@@ -69,24 +69,6 @@
 		84F68C8A1975E9E2002FC300 /* BRScanViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F68C891975E9E2002FC300 /* BRScanViewController.m */; };
 		FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
-		FBE4D98E1ABD655B007C3BA6 /* shavite.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98B1ABD655B007C3BA6 /* shavite.c */; };
-		FBE4D98F1ABD655B007C3BA6 /* shavite.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98B1ABD655B007C3BA6 /* shavite.c */; };
-		FBE4D9901ABD655B007C3BA6 /* shavite.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98B1ABD655B007C3BA6 /* shavite.c */; };
-		FBE4D9911ABD655B007C3BA6 /* simd.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98C1ABD655B007C3BA6 /* simd.c */; };
-		FBE4D9921ABD655B007C3BA6 /* simd.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98C1ABD655B007C3BA6 /* simd.c */; };
-		FBE4D9931ABD655B007C3BA6 /* simd.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98C1ABD655B007C3BA6 /* simd.c */; };
-		FBE4D9941ABD655B007C3BA6 /* skein.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98D1ABD655B007C3BA6 /* skein.c */; };
-		FBE4D9951ABD655B007C3BA6 /* skein.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98D1ABD655B007C3BA6 /* skein.c */; };
-		FBE4D9961ABD655B007C3BA6 /* skein.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D98D1ABD655B007C3BA6 /* skein.c */; };
-		FBE4D9981ABD656F007C3BA6 /* luffa.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D9971ABD656F007C3BA6 /* luffa.c */; };
-		FBE4D9991ABD656F007C3BA6 /* luffa.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D9971ABD656F007C3BA6 /* luffa.c */; };
-		FBE4D99A1ABD656F007C3BA6 /* luffa.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D9971ABD656F007C3BA6 /* luffa.c */; };
-		FBE4D99C1ABD6583007C3BA6 /* keccak.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D99B1ABD6583007C3BA6 /* keccak.c */; };
-		FBE4D99D1ABD6583007C3BA6 /* keccak.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D99B1ABD6583007C3BA6 /* keccak.c */; };
-		FBE4D99E1ABD6583007C3BA6 /* keccak.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D99B1ABD6583007C3BA6 /* keccak.c */; };
-		FBE4D9A01ABD658D007C3BA6 /* jh.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D99F1ABD658D007C3BA6 /* jh.c */; };
-		FBE4D9A11ABD658D007C3BA6 /* jh.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D99F1ABD658D007C3BA6 /* jh.c */; };
-		FBE4D9A21ABD658D007C3BA6 /* jh.c in Sources */ = {isa = PBXBuildFile; fileRef = FBE4D99F1ABD658D007C3BA6 /* jh.c */; };
 		FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
 		FBE689B91ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
 		FBE689BC1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689BB1ABF1F9B00467F4C /* NSData+Bmw.m */; };
@@ -98,6 +80,16 @@
 		FBE689C81AC0785F00467F4C /* NSData+Groestl.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689C61AC0785F00467F4C /* NSData+Groestl.m */; };
 		FBE689CB1AC07ABF00467F4C /* NSData+Jh.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689CA1AC07ABF00467F4C /* NSData+Jh.m */; };
 		FBE689CC1AC07ABF00467F4C /* NSData+Jh.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689CA1AC07ABF00467F4C /* NSData+Jh.m */; };
+		FBE689CF1AC07BB500467F4C /* NSData+Keccak.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689CE1AC07BB500467F4C /* NSData+Keccak.m */; };
+		FBE689D01AC07BB500467F4C /* NSData+Keccak.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689CE1AC07BB500467F4C /* NSData+Keccak.m */; };
+		FBE689D31AC07BCD00467F4C /* NSData+Luffa.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689D21AC07BCD00467F4C /* NSData+Luffa.m */; };
+		FBE689D41AC07BCD00467F4C /* NSData+Luffa.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689D21AC07BCD00467F4C /* NSData+Luffa.m */; };
+		FBE689D71AC07BE400467F4C /* NSData+Shavite.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689D61AC07BE400467F4C /* NSData+Shavite.m */; };
+		FBE689D81AC07BE400467F4C /* NSData+Shavite.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689D61AC07BE400467F4C /* NSData+Shavite.m */; };
+		FBE689DB1AC07BFF00467F4C /* NSData+Simd.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DA1AC07BFF00467F4C /* NSData+Simd.m */; };
+		FBE689DC1AC07BFF00467F4C /* NSData+Simd.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DA1AC07BFF00467F4C /* NSData+Simd.m */; };
+		FBE689DF1AC07C1800467F4C /* NSData+Skein.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DE1AC07C1800467F4C /* NSData+Skein.m */; };
+		FBE689E01AC07C1800467F4C /* NSData+Skein.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DE1AC07C1800467F4C /* NSData+Skein.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -273,19 +265,7 @@
 		84F68C881975E9E2002FC300 /* BRScanViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRScanViewController.h; sourceTree = "<group>"; };
 		84F68C891975E9E2002FC300 /* BRScanViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRScanViewController.m; sourceTree = "<group>"; };
 		FBBFEF631ABD796000CA937F /* aes_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes_helper.c; sourceTree = "<group>"; };
-		FBE4D9841ABD652B007C3BA6 /* sph_jh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_jh.h; sourceTree = "<group>"; };
-		FBE4D9851ABD652B007C3BA6 /* sph_keccak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_keccak.h; sourceTree = "<group>"; };
-		FBE4D9861ABD652B007C3BA6 /* sph_luffa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_luffa.h; sourceTree = "<group>"; };
-		FBE4D9871ABD652B007C3BA6 /* sph_shavite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_shavite.h; sourceTree = "<group>"; };
-		FBE4D9881ABD652B007C3BA6 /* sph_simd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_simd.h; sourceTree = "<group>"; };
-		FBE4D9891ABD652B007C3BA6 /* sph_skein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_skein.h; sourceTree = "<group>"; };
 		FBE4D98A1ABD652B007C3BA6 /* sph_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_types.h; sourceTree = "<group>"; };
-		FBE4D98B1ABD655B007C3BA6 /* shavite.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = shavite.c; sourceTree = "<group>"; };
-		FBE4D98C1ABD655B007C3BA6 /* simd.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = simd.c; sourceTree = "<group>"; };
-		FBE4D98D1ABD655B007C3BA6 /* skein.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = skein.c; sourceTree = "<group>"; };
-		FBE4D9971ABD656F007C3BA6 /* luffa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = luffa.c; sourceTree = "<group>"; };
-		FBE4D99B1ABD6583007C3BA6 /* keccak.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = keccak.c; sourceTree = "<group>"; };
-		FBE4D99F1ABD658D007C3BA6 /* jh.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = jh.c; sourceTree = "<group>"; };
 		FBE689B61ABF160000467F4C /* NSData+Blake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Blake.h"; sourceTree = "<group>"; };
 		FBE689B71ABF160000467F4C /* NSData+Blake.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Blake.m"; sourceTree = "<group>"; };
 		FBE689BA1ABF1F9B00467F4C /* NSData+Bmw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Bmw.h"; sourceTree = "<group>"; };
@@ -298,6 +278,16 @@
 		FBE689C61AC0785F00467F4C /* NSData+Groestl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Groestl.m"; sourceTree = "<group>"; };
 		FBE689C91AC07ABF00467F4C /* NSData+Jh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Jh.h"; sourceTree = "<group>"; };
 		FBE689CA1AC07ABF00467F4C /* NSData+Jh.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Jh.m"; sourceTree = "<group>"; };
+		FBE689CD1AC07BB500467F4C /* NSData+Keccak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Keccak.h"; sourceTree = "<group>"; };
+		FBE689CE1AC07BB500467F4C /* NSData+Keccak.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Keccak.m"; sourceTree = "<group>"; };
+		FBE689D11AC07BCD00467F4C /* NSData+Luffa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Luffa.h"; sourceTree = "<group>"; };
+		FBE689D21AC07BCD00467F4C /* NSData+Luffa.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Luffa.m"; sourceTree = "<group>"; };
+		FBE689D51AC07BE400467F4C /* NSData+Shavite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Shavite.h"; sourceTree = "<group>"; };
+		FBE689D61AC07BE400467F4C /* NSData+Shavite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Shavite.m"; sourceTree = "<group>"; };
+		FBE689D91AC07BFF00467F4C /* NSData+Simd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Simd.h"; sourceTree = "<group>"; };
+		FBE689DA1AC07BFF00467F4C /* NSData+Simd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Simd.m"; sourceTree = "<group>"; };
+		FBE689DD1AC07C1800467F4C /* NSData+Skein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Skein.h"; sourceTree = "<group>"; };
+		FBE689DE1AC07C1800467F4C /* NSData+Skein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Skein.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -608,18 +598,16 @@
 				FBE689C61AC0785F00467F4C /* NSData+Groestl.m */,
 				FBE689C91AC07ABF00467F4C /* NSData+Jh.h */,
 				FBE689CA1AC07ABF00467F4C /* NSData+Jh.m */,
-				FBE4D9841ABD652B007C3BA6 /* sph_jh.h */,
-				FBE4D99F1ABD658D007C3BA6 /* jh.c */,
-				FBE4D9851ABD652B007C3BA6 /* sph_keccak.h */,
-				FBE4D99B1ABD6583007C3BA6 /* keccak.c */,
-				FBE4D9861ABD652B007C3BA6 /* sph_luffa.h */,
-				FBE4D9971ABD656F007C3BA6 /* luffa.c */,
-				FBE4D9871ABD652B007C3BA6 /* sph_shavite.h */,
-				FBE4D98B1ABD655B007C3BA6 /* shavite.c */,
-				FBE4D9881ABD652B007C3BA6 /* sph_simd.h */,
-				FBE4D98C1ABD655B007C3BA6 /* simd.c */,
-				FBE4D9891ABD652B007C3BA6 /* sph_skein.h */,
-				FBE4D98D1ABD655B007C3BA6 /* skein.c */,
+				FBE689CD1AC07BB500467F4C /* NSData+Keccak.h */,
+				FBE689CE1AC07BB500467F4C /* NSData+Keccak.m */,
+				FBE689D11AC07BCD00467F4C /* NSData+Luffa.h */,
+				FBE689D21AC07BCD00467F4C /* NSData+Luffa.m */,
+				FBE689D51AC07BE400467F4C /* NSData+Shavite.h */,
+				FBE689D61AC07BE400467F4C /* NSData+Shavite.m */,
+				FBE689D91AC07BFF00467F4C /* NSData+Simd.h */,
+				FBE689DA1AC07BFF00467F4C /* NSData+Simd.m */,
+				FBE689DD1AC07C1800467F4C /* NSData+Skein.h */,
+				FBE689DE1AC07C1800467F4C /* NSData+Skein.m */,
 				FBE4D98A1ABD652B007C3BA6 /* sph_types.h */,
 				FBBFEF631ABD796000CA937F /* aes_helper.c */,
 			);
@@ -782,13 +770,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FBE4D98F1ABD655B007C3BA6 /* shavite.c in Sources */,
-				FBE4D99D1ABD6583007C3BA6 /* keccak.c in Sources */,
 				759F2C431AABE4B60029A5AB /* secp256k1.c in Sources */,
-				FBE4D9A11ABD658D007C3BA6 /* jh.c in Sources */,
-				FBE4D9991ABD656F007C3BA6 /* luffa.c in Sources */,
-				FBE4D9951ABD655B007C3BA6 /* skein.c in Sources */,
-				FBE4D9921ABD655B007C3BA6 /* simd.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -799,7 +781,6 @@
 				752E28AA19234AE300DB5A3C /* BRAddressEntity.m in Sources */,
 				75AA5F55194143D5003F23BD /* BRBouncyBurgerButton.m in Sources */,
 				752E28AB19234AE300DB5A3C /* BRMerkleBlockEntity.m in Sources */,
-				FBE4D9A01ABD658D007C3BA6 /* jh.c in Sources */,
 				752E28AC19234AE300DB5A3C /* BRPeerEntity.m in Sources */,
 				FBE689C01ABF909C00467F4C /* NSData+CubeHash.m in Sources */,
 				752E28AD19234AE300DB5A3C /* BRTransactionEntity.m in Sources */,
@@ -808,14 +789,14 @@
 				758DBD0E1980634900389E2A /* BRTxDetailViewController.m in Sources */,
 				7548CF3719556FD700EF827F /* BRCopyLabel.m in Sources */,
 				75767C421A0EC6F9003E7DE9 /* UIImage+Blur.m in Sources */,
-				FBE4D9981ABD656F007C3BA6 /* luffa.c in Sources */,
 				752E28D119234C3600DB5A3C /* BRKey.m in Sources */,
 				84F68C8A1975E9E2002FC300 /* BRScanViewController.m in Sources */,
 				752E28D219234C3600DB5A3C /* BRKey+BIP38.m in Sources */,
 				752E28D919234C3600DB5A3C /* BRTransaction.m in Sources */,
-				FBE4D98E1ABD655B007C3BA6 /* shavite.c in Sources */,
 				752E28CE19234C3600DB5A3C /* BRBIP32Sequence.m in Sources */,
 				752E28CF19234C3600DB5A3C /* BRBIP39Mnemonic.m in Sources */,
+				FBE689D31AC07BCD00467F4C /* NSData+Luffa.m in Sources */,
+				FBE689DB1AC07BFF00467F4C /* NSData+Simd.m in Sources */,
 				752E28DA19234C3600DB5A3C /* BRWallet.m in Sources */,
 				752E28DB19234C3600DB5A3C /* BRWalletManager.m in Sources */,
 				752E28D319234C3600DB5A3C /* BRMerkleBlock.m in Sources */,
@@ -823,9 +804,11 @@
 				752E28D619234C3600DB5A3C /* BRPeer.m in Sources */,
 				FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */,
 				752E28D819234C3600DB5A3C /* BRPeerManager.m in Sources */,
+				FBE689CF1AC07BB500467F4C /* NSData+Keccak.m in Sources */,
 				752E28D419234C3600DB5A3C /* BRPaymentProtocol.m in Sources */,
 				752E28D519234C3600DB5A3C /* BRPaymentRequest.m in Sources */,
 				7525B619192453840041C0F2 /* BRNavigationBar.m in Sources */,
+				FBE689D71AC07BE400467F4C /* NSData+Shavite.m in Sources */,
 				FBE689CB1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
 				75878BC1192AEC3F002505AB /* BRReceiveViewController.m in Sources */,
 				75878BBF192ACD46002505AB /* BRAmountViewController.m in Sources */,
@@ -837,16 +820,14 @@
 				FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */,
 				752E28E719234DA200DB5A3C /* NSData+Dash.m in Sources */,
 				752E28E919234DA200DB5A3C /* NSManagedObject+Sugar.m in Sources */,
-				FBE4D9911ABD655B007C3BA6 /* simd.c in Sources */,
+				FBE689DF1AC07C1800467F4C /* NSData+Skein.m in Sources */,
 				FBE689BC1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */,
 				752E28EA19234DA200DB5A3C /* NSMutableData+Bitcoin.m in Sources */,
 				752E28EB19234DA200DB5A3C /* NSString+Bitcoin.m in Sources */,
 				757C89521A2FCE420076B373 /* BRSettingsViewController.m in Sources */,
 				75D5F3D2191EC270004AB296 /* BRAppDelegate.m in Sources */,
-				FBE4D9941ABD655B007C3BA6 /* skein.c in Sources */,
 				759FBB36193290F600AB4465 /* BRRootViewController.m in Sources */,
 				FBE689C71AC0785F00467F4C /* NSData+Groestl.m in Sources */,
-				FBE4D99C1ABD6583007C3BA6 /* keccak.c in Sources */,
 				752E289A192349CE00DB5A3C /* BreadWallet.xcdatamodeld in Sources */,
 				759FBB37193290F600AB4465 /* BRSendViewController.m in Sources */,
 				FBE689C31ABF9A1B00467F4C /* NSData+Echo.m in Sources */,
@@ -861,17 +842,16 @@
 			files = (
 				FBE689CC1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
 				FBE689BD1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */,
-				FBE4D9901ABD655B007C3BA6 /* shavite.c in Sources */,
 				FBE689C41ABF9A1B00467F4C /* NSData+Echo.m in Sources */,
-				FBE4D99E1ABD6583007C3BA6 /* keccak.c in Sources */,
 				75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */,
-				FBE4D9A21ABD658D007C3BA6 /* jh.c in Sources */,
-				FBE4D99A1ABD656F007C3BA6 /* luffa.c in Sources */,
-				FBE4D9961ABD655B007C3BA6 /* skein.c in Sources */,
+				FBE689D81AC07BE400467F4C /* NSData+Shavite.m in Sources */,
 				FBE689B91ABF160000467F4C /* NSData+Blake.m in Sources */,
-				FBE4D9931ABD655B007C3BA6 /* simd.c in Sources */,
+				FBE689DC1AC07BFF00467F4C /* NSData+Simd.m in Sources */,
 				FBE689C81AC0785F00467F4C /* NSData+Groestl.m in Sources */,
+				FBE689D41AC07BCD00467F4C /* NSData+Luffa.m in Sources */,
+				FBE689D01AC07BB500467F4C /* NSData+Keccak.m in Sources */,
 				FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */,
+				FBE689E01AC07C1800467F4C /* NSData+Skein.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

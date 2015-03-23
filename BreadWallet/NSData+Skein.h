@@ -1,5 +1,5 @@
 //
-//  NSData+Groestl.h
+//  NSData+Skein.h
 //  BreadWallet
 //
 //  Created by Quantum Explorer on 3/22/15.
@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSData(Groestl)
-
--(NSData*)groestl512;
+@interface NSData(Skein)
 
 @end

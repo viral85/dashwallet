@@ -1,5 +1,5 @@
 //
-//  NSData+Groestl.h
+//  NSData+Shavite.h
 //  BreadWallet
 //
 //  Created by Quantum Explorer on 3/22/15.
@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSData(Groestl)
+@interface NSData(Shavite)
 
--(NSData*)groestl512;
+-(NSData*)shavite512;
 
 @end

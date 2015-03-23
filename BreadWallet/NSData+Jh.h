@@ -10,4 +10,6 @@
 
 @interface NSData(Jh)
 
+-(NSData*)jh512;
+
 @end
