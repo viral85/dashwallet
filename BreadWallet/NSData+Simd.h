@@ -10,4 +10,6 @@
 
 @interface NSData(Simd)
 
+-(NSData*)simd512;
+
 @end

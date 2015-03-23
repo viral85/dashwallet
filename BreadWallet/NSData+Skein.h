@@ -10,4 +10,6 @@
 
 @interface NSData(Skein)
 
+-(NSData*)skein512;
+
 @end
