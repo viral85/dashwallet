@@ -53,6 +53,7 @@
 - (NSData *)x11;
 
 - (NSString *)hexadecimalString;
++ (NSData *)dataFromHexString:(NSString *)string;
 
 - (uint8_t)UInt8AtOffset:(NSUInteger)offset;
 - (uint16_t)UInt16AtOffset:(NSUInteger)offset;

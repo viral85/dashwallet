@@ -60,8 +60,6 @@ typedef struct {
 #pragma warning (disable: 4146)
 #endif
 
-#if SPH_64
-
 #if 0
 /* obsolete */
 /*
