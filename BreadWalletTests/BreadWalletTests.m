@@ -39,6 +39,8 @@
 #import "NSString+Bitcoin.h"
 #import "NSData+Blake.h"
 #import "NSData+Bmw.h"
+#import "NSData+CubeHash.h"
+#import "NSData+Echo.h"
 
 //#define SKIP_BIP38 1
 
@@ -74,8 +76,28 @@
     NSString * fox = @"The quick brown fox jumps over the lazy dog";
     NSData * foxData = [fox dataUsingEncoding:NSASCIIStringEncoding];
     NSData * bmwed = [foxData bmw512];
-    NSString * blakedString = [bmwed hexadecimalString];
-    XCTAssertEqualObjects([blakedString uppercaseString], @"2998D4CB31323E1169B458AB03A54D0B68E411A3C7CC7612ADBF05BF901B8197DFD852C1C0099C09717D2FAD3537207E737C6159C31D377D1AB8F5ED1CEEEA06",@"[NSData bmw512]"); //not verified
+    NSString * bmwedString = [bmwed hexadecimalString];
+    XCTAssertEqualObjects([bmwedString uppercaseString], @"2998D4CB31323E1169B458AB03A54D0B68E411A3C7CC7612ADBF05BF901B8197DFD852C1C0099C09717D2FAD3537207E737C6159C31D377D1AB8F5ED1CEEEA06",@"[NSData bmw512]"); //not verified
+}
+
+-(void)testCubehash
+{
+    NSString * hello = @"Hello";
+    NSData * helloData = [hello dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * cubeHashed = [helloData cubehash512];
+    NSString * cubeHashedString = [cubeHashed hexadecimalString];
+    XCTAssertEqualObjects(cubeHashedString,@"dcc0503aae279a3c8c95fa1181d37c418783204e2e3048a081392fd61bace883a1f7c4c96b16b4060c42104f1ce45a622f1a9abaeb994beb107fed53a78f588c",@"[NSData cubehash512]");
+    
+}
+
+-(void)testEcho
+{
+    NSString * echo = @"Echo";
+    NSData * echoData = [echo dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * echoed = [echoData echo512];
+    NSString * echoedString = [echoed hexadecimalString];
+    XCTAssertEqualObjects(echoedString,@"7ce309a25e2e1603ca0fc369267b4d43f0b1b744ac45d6213ca08e75675664448e2f62fdbf7bbd637ce40fc293286d75b9d09e8dda31bd029113e02ecccfd39b",@"[NSData echo512]");//not verified
+    
 }
 
 #pragma mark - testBase58

@@ -39,6 +39,15 @@
 
 @implementation NSData(Bmw)
 
+typedef struct {
+#ifndef DOXYGEN_IGNORE
+    unsigned char buf[128];    /* first field, for alignment */
+    size_t ptr;
+    sph_u64 H[16];
+    sph_u64 bit_count;
+#endif
+} sph_bmw_big_context;
+
 static const sph_u64 IV512[] = {
     SPH_C64(0x8081828384858687), SPH_C64(0x88898A8B8C8D8E8F),
     SPH_C64(0x9091929394959697), SPH_C64(0x98999A9B9C9D9E9F),
@@ -424,15 +433,6 @@ static const sph_u64 final_b[16] = {
     SPH_C64(0xaaaaaaaaaaaaaaac), SPH_C64(0xaaaaaaaaaaaaaaad),
     SPH_C64(0xaaaaaaaaaaaaaaae), SPH_C64(0xaaaaaaaaaaaaaaaf)
 };
-
-typedef struct {
-#ifndef DOXYGEN_IGNORE
-    unsigned char buf[128];    /* first field, for alignment */
-    size_t ptr;
-    sph_u64 H[16];
-    sph_u64 bit_count;
-#endif
-} sph_bmw_big_context;
 
 static void
 bmw64_init(sph_bmw_big_context *sc, const sph_u64 *iv)

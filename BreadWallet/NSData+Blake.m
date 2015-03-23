@@ -40,6 +40,16 @@
 
 @implementation NSData(Blake)
 
+typedef struct {
+#ifndef DOXYGEN_IGNORE
+    unsigned char buf[128];    /* first field, for alignment */
+    size_t ptr;
+    sph_u64 H[8];
+    sph_u64 S[4];
+    sph_u64 T0, T1;
+#endif
+} sph_blake_big_context;
+
 static const sph_u64 IV512[8] = {
     SPH_C64(0x6A09E667F3BCC908), SPH_C64(0xBB67AE8584CAA73B),
     SPH_C64(0x3C6EF372FE94F82B), SPH_C64(0xA54FF53A5F1D36F1),
@@ -364,16 +374,6 @@ H5 ^= S1 ^ V5 ^ VD; \
 H6 ^= S2 ^ V6 ^ VE; \
 H7 ^= S3 ^ V7 ^ VF; \
 } while (0)
-
-typedef struct {
-#ifndef DOXYGEN_IGNORE
-    unsigned char buf[128];    /* first field, for alignment */
-    size_t ptr;
-    sph_u64 H[8];
-    sph_u64 S[4];
-    sph_u64 T0, T1;
-#endif
-} sph_blake_big_context;
 
 
 static const sph_u64 salt_zero_big[4] = { 0, 0, 0, 0 };
