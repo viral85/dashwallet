@@ -181,8 +181,8 @@ int secp256k1_point_mul(void *r, const void *p, const void *i, int compressed)
     
     if (! d || d.length == 28) d = privateKey.base58ToData;
     if (d.length < SECKEY_LENGTH || d.length > SECKEY_LENGTH + 2) d = privateKey.hexToData;
-    
-    if ((d.length == SECKEY_LENGTH + 1 || d.length == SECKEY_LENGTH + 2) && *(const uint8_t *)d.bytes == version) {
+    uint8_t keyVersion = *(const uint8_t *)d.bytes;
+    if ((d.length == SECKEY_LENGTH + 1 || d.length == SECKEY_LENGTH + 2) && keyVersion == version) {
         self.seckey = CFBridgingRelease(CFDataCreate(SecureAllocator(), (const uint8_t *)d.bytes + 1, SECKEY_LENGTH));
         self.compressed = (d.length == SECKEY_LENGTH + 2) ? YES : NO;
     }

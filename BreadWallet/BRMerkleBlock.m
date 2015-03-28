@@ -29,16 +29,15 @@
 
 #define MAX_TIME_DRIFT    (2*60*60)     // the furthest in the future a block is allowed to be timestamped
 #define MAX_PROOF_OF_WORK 0x1d00ffffu   // highest value for difficulty target (higher values are less difficult)
-#define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments
 
 // from https://en.bitcoin.it/wiki/Protocol_specification#Merkle_Trees
-// Merkle trees are binary trees of hashes. Merkle trees in bitcoin use a double SHA-256, the SHA-256 hash of the
-// SHA-256 hash of something. If, when forming a row in the tree (other than the root of the tree), it would have an odd
-// number of elements, the final double-hash is duplicated to ensure that the row has an even number of hashes. First
-// form the bottom row of the tree with the ordered double-SHA-256 hashes of the byte streams of the transactions in the
-// block. Then the row above it consists of half that number of hashes. Each entry is the double-SHA-256 of the 64-byte
-// concatenation of the corresponding two hashes below it in the tree. This procedure repeats recursively until we reach
-// a row consisting of just a single double-hash. This is the merkle root of the tree.
+// Merkle trees are binary trees of hashes. Merkle trees in darkcoin use x11, a cobined hash of 11 of the NIST
+// SHA-3 finalists. If, when forming a row in the tree (other than the root of the tree), it would have an odd
+// number of elements, the final hash is duplicated to ensure that the row has an even number of hashes. First
+// form the bottom row of the tree with the ordered x11 hashes of the byte streams of the transactions in the block.
+// Then the row above it consists of half that number of hashes. Each entry is the x11 of the 64-byte concatenation
+// of the corresponding two hashes below it in the tree. This procedure repeats recursively until we reach a row
+// consisting of just a single hash. This is the merkle root of the tree.
 //
 // from https://github.com/bitcoin/bips/blob/master/bip-0037.mediawiki#Partial_Merkle_branch_format
 // The encoding works as follows: we traverse the tree in depth-first order, storing a bit for each traversed node,
@@ -229,38 +228,39 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 // intuitively named MAX_PROOF_OF_WORK... since larger values are less difficult.
 - (BOOL)verifyDifficultyFromPreviousBlock:(BRMerkleBlock *)previous andTransitionTime:(NSTimeInterval)time
 {
-    if (! [_prevBlock isEqual:previous.blockHash] || _height != previous.height + 1) return NO;
-    if ((_height % BLOCK_DIFFICULTY_INTERVAL) == 0 && time == 0) return NO;
-
-#if DASH_TESTNET
-    //TODO: implement testnet difficulty rule check
-    return YES; // don't worry about difficulty on testnet for now
-#endif
-
-    if ((_height % BLOCK_DIFFICULTY_INTERVAL) != 0) return (_target == previous.target) ? YES : NO;
-
-    // target is in "compact" format, explained in isValid:
-    static const uint32_t maxsize = MAX_PROOF_OF_WORK >> 24, maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
-    uint32_t size = previous.target >> 24;
-    double target = previous.target & 0x00ffffffu;
-    int32_t timespan = (int32_t)((int64_t)(previous.timestamp + DBL_EPSILON*previous.timestamp) -
-                                 (int64_t)(time + DBL_EPSILON*time));
-
-    // limit difficulty transition to -75% or +400%
-    if (timespan < TARGET_TIMESPAN/4) timespan = TARGET_TIMESPAN/4;
-    if (timespan > TARGET_TIMESPAN*4) timespan = TARGET_TIMESPAN*4;
-
-    target *= timespan;
-    target /= TARGET_TIMESPAN;
-    
-    // normalize target for "compact" format
-    while ((uint32_t)(target + DBL_EPSILON*target) < 0x00080000u) target *= 256, size--;
-    while ((uint32_t)(target + DBL_EPSILON*target) > 0x007fffffu) target /= 256, size++;
-    
-    // limit to MAX_PROOF_OF_WORK
-    if (size > maxsize || (size == maxsize && target > maxtarget)) target = maxtarget, size = maxsize;
-    
-    return (_target == ((uint32_t)(target + DBL_EPSILON*target) | size << 24)) ? YES : NO;
+    return YES;
+//    if (! [_prevBlock isEqual:previous.blockHash] || _height != previous.height + 1) return NO;
+//    if ((_height % BLOCK_DIFFICULTY_INTERVAL) == 0 && time == 0) return NO;
+//
+//#if DASH_TESTNET
+//    //TODO: implement testnet difficulty rule check
+//    return YES; // don't worry about difficulty on testnet for now
+//#endif
+//
+//    if ((_height % BLOCK_DIFFICULTY_INTERVAL) != 0) return (_target == previous.target) ? YES : NO;
+//
+//    // target is in "compact" format, explained in isValid:
+//    static const uint32_t maxsize = MAX_PROOF_OF_WORK >> 24, maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
+//    uint32_t size = previous.target >> 24;
+//    double target = previous.target & 0x00ffffffu;
+//    int32_t timespan = (int32_t)((int64_t)(previous.timestamp + DBL_EPSILON*previous.timestamp) -
+//                                 (int64_t)(time + DBL_EPSILON*time));
+//
+//    // limit difficulty transition to -75% or +400%
+//    if (timespan < TARGET_TIMESPAN/4) timespan = TARGET_TIMESPAN/4;
+//    if (timespan > TARGET_TIMESPAN*4) timespan = TARGET_TIMESPAN*4;
+//
+//    target *= timespan;
+//    target /= TARGET_TIMESPAN;
+//    
+//    // normalize target for "compact" format
+//    while ((uint32_t)(target + DBL_EPSILON*target) < 0x00080000u) target *= 256, size--;
+//    while ((uint32_t)(target + DBL_EPSILON*target) > 0x007fffffu) target /= 256, size++;
+//    
+//    // limit to MAX_PROOF_OF_WORK
+//    if (size > maxsize || (size == maxsize && target > maxtarget)) target = maxtarget, size = maxsize;
+//    
+//    return (_target == ((uint32_t)(target + DBL_EPSILON*target) | size << 24)) ? YES : NO;
 }
 
 // recursively walks the merkle tree in depth first order, calling leaf(hash, flag) for each stored hash, and

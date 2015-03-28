@@ -41,8 +41,9 @@
 #import "NSData+Bmw.h"
 #import "NSData+CubeHash.h"
 #import "NSData+Echo.h"
+#import "NSData+Keccak.h"
 
-//#define SKIP_BIP38 1
+#define SKIP_BIP38 1
 
 @implementation BreadWalletTests
 
@@ -68,16 +69,7 @@
     NSData * foxData = [fox dataUsingEncoding:NSASCIIStringEncoding];
     NSData * blaked = [foxData blake512];
     NSString * blakedString = [blaked hexadecimalString];
-    XCTAssertEqualObjects([blakedString uppercaseString], @"1F7E26F63B6AD25A0896FD978FD050A1766391D2FD0471A77AFB975E5034B7AD2D9CCF8DFB47ABBBE656E1B82FBC634BA42CE186E8DC5E1CE09A885D41F43451",@"[NSData blake512]");
-}
-
--(void)testBmw
-{
-    NSString * fox = @"The quick brown fox jumps over the lazy dog";
-    NSData * foxData = [fox dataUsingEncoding:NSASCIIStringEncoding];
-    NSData * bmwed = [foxData bmw512];
-    NSString * bmwedString = [bmwed hexadecimalString];
-    XCTAssertEqualObjects([bmwedString uppercaseString], @"2998D4CB31323E1169B458AB03A54D0B68E411A3C7CC7612ADBF05BF901B8197DFD852C1C0099C09717D2FAD3537207E737C6159C31D377D1AB8F5ED1CEEEA06",@"[NSData bmw512]"); //not verified
+    XCTAssertEqualObjects([blakedString uppercaseString], @"1F7E26F63B6AD25A0896FD978FD050A1766391D2FD0471A77AFB975E5034B7AD2D9CCF8DFB47ABBBE656E1B82FBC634BA42CE186E8DC5E1CE09A885D41F43451",@"[NSData blake512]"); //verified by wikipedia
 }
 
 -(void)testCubehash
@@ -90,15 +82,15 @@
     
 }
 
-//-(void)testEcho
-//{
-//    NSString * echo = @"Echo";
-//    NSData * echoData = [echo dataUsingEncoding:NSASCIIStringEncoding];
-//    NSData * echoed = [echoData echo512];
-//    NSString * echoedString = [echoed hexadecimalString];
-//    XCTAssertEqualObjects(echoedString,@"7ce309a25e2e1603ca0fc369267b4d43f0b1b744ac45d6213ca08e75675664448e2f62fdbf7bbd637ce40fc293286d75b9d09e8dda31bd029113e02ecccfd39b",@"[NSData echo512]");//not verified
-//    
-//}
+-(void)testKeccak
+{
+    NSString * string = @"";
+    NSData * stringData = [string dataUsingEncoding:NSASCIIStringEncoding];
+    NSData * hashed = [stringData keccak512];
+    NSString * hashedString = [hashed hexadecimalString];
+    XCTAssertEqualObjects(hashedString,@"0eab42de4c3ceb9235fc91acffe746b29c29a8c366b7c60e4e67c466f36a4304c00fa9caf9d87976ba469bcbe06713b435f091ef2769fb160cdab33d3670680e",@"[NSData keccak512]");
+    
+}
 
 -(void)testX11
 {
@@ -109,78 +101,78 @@
     XCTAssertEqualObjects(x11edString,@"f29c0f286fd8071669286c6987eb941181134ff5f3978bf89f34070000000000",@"[NSData x11]");//not verified
 }
 
-//#pragma mark - testBase58
-//
-//- (void)testBase58
-//{
-//    // test bad input
-//    NSString *s = [NSString base58WithData:[BTC @"#&$@*^(*#!^" base58ToData]];
-//
-//    XCTAssertTrue(s.length == 0, @"[NSString base58WithData:]");
-//
-//    s = [NSString base58WithData:[@"" base58ToData]];
-//    XCTAssertEqualObjects(@"", s, @"[NSString base58WithData:]");
-//
-//    s = [NSString base58WithData:[@"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" base58ToData]];
-//    XCTAssertEqualObjects(@"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz", s,
-//                          @"[NSString base58WithData:]");
-//
-//    s = [NSString base58WithData:[@"1111111111111111111111111111111111111111111111111111111111111111111" base58ToData]];
-//    XCTAssertEqualObjects(@"1111111111111111111111111111111111111111111111111111111111111111111", s,
-//                          @"[NSString base58WithData:]");
-//    
-//    s = [NSString base58WithData:[@"111111111111111111111111111111111111111111111111111111111111111111z" base58ToData]];
-//    XCTAssertEqualObjects(@"111111111111111111111111111111111111111111111111111111111111111111z", s,
-//                          @"[NSString base58WithData:]");
-//
-//    s = [NSString base58WithData:[@"z" base58ToData]];
-//    XCTAssertEqualObjects(@"z", s, @"[NSString base58WithData:]");
-//    
-//    s = [NSString base58checkWithData:@"000000000000000000000000000000000000000000".hexToData];
-//    XCTAssertEqualObjects(@"000000000000000000000000000000000000000000".hexToData, [s base58checkToData],
-//                          @"[NSString base58checkWithData:]");
-//
-//    s = [NSString base58checkWithData:@"000000000000000000000000000000000000000001".hexToData];
-//    XCTAssertEqualObjects(@"000000000000000000000000000000000000000001".hexToData, [s base58checkToData],
-//                          @"[NSString base58checkWithData:]");
-//
-//    s = [NSString base58checkWithData:@"05FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".hexToData];
-//    XCTAssertEqualObjects(@"05FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".hexToData, [s base58checkToData],
-//                          @"[NSString base58checkWithData:]");
-//}
-//
-//#pragma mark - testRMD160
-//
-//- (void)testRMD160
-//{
-//    NSData *d = [@"Free online RIPEMD160 Calculator, type text here..." dataUsingEncoding:NSUTF8StringEncoding].RMD160;
-//    
-//    XCTAssertEqualObjects(@"9501a56fb829132b8748f0ccc491f0ecbc7f945b".hexToData, d, @"[NSData RMD160]");
-//    
-//    d = [@"this is some text to test the ripemd160 implementation with more than 64bytes of data since it's internal "
-//         "digest buffer is 64bytes in size" dataUsingEncoding:NSUTF8StringEncoding].RMD160;
-//    XCTAssertEqualObjects(@"4402eff42157106a5d92e4d946185856fbc50e09".hexToData, d, @"[NSData RMD160]");
-//
-//    d = [@"123456789012345678901234567890123456789012345678901234567890"
-//         dataUsingEncoding:NSUTF8StringEncoding].RMD160;
-//    XCTAssertEqualObjects(@"00263b999714e756fa5d02814b842a2634dd31ac".hexToData, d, @"[NSData RMD160]");
-//
-//    d = [@"1234567890123456789012345678901234567890123456789012345678901234"
-//         dataUsingEncoding:NSUTF8StringEncoding].RMD160;
-//    XCTAssertEqualObjects(@"fa8c1a78eb763bb97d5ea14ce9303d1ce2f33454".hexToData, d, @"[NSData RMD160]");
-//
-//    d = [NSData data].RMD160; // empty
-//    XCTAssertEqualObjects(@"9c1185a5c5e9fc54612808977ee8f548b2258d31".hexToData, d, @"[NSData RMD160]");
-//    
-//    d = [@"a" dataUsingEncoding:NSUTF8StringEncoding].RMD160;
-//    XCTAssertEqualObjects(@"0bdc9d2d256b3ee9daae347be6f4dc835a467ffe".hexToData, d, @"[NSData RMD160]");
-//}
-//
-//#pragma mark - testKey
-//
-//#if ! DASH_TESTNET
-//- (void)testKeyWithPrivateKey
-//{
+#pragma mark - testBase58
+
+- (void)testBase58
+{
+    // test bad input
+    NSString *s = [NSString base58WithData:[BTC @"#&$@*^(*#!^" base58ToData]];
+
+    XCTAssertTrue(s.length == 0, @"[NSString base58WithData:]");
+
+    s = [NSString base58WithData:[@"" base58ToData]];
+    XCTAssertEqualObjects(@"", s, @"[NSString base58WithData:]");
+
+    s = [NSString base58WithData:[@"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" base58ToData]];
+    XCTAssertEqualObjects(@"123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz", s,
+                          @"[NSString base58WithData:]");
+
+    s = [NSString base58WithData:[@"1111111111111111111111111111111111111111111111111111111111111111111" base58ToData]];
+    XCTAssertEqualObjects(@"1111111111111111111111111111111111111111111111111111111111111111111", s,
+                          @"[NSString base58WithData:]");
+    
+    s = [NSString base58WithData:[@"111111111111111111111111111111111111111111111111111111111111111111z" base58ToData]];
+    XCTAssertEqualObjects(@"111111111111111111111111111111111111111111111111111111111111111111z", s,
+                          @"[NSString base58WithData:]");
+
+    s = [NSString base58WithData:[@"z" base58ToData]];
+    XCTAssertEqualObjects(@"z", s, @"[NSString base58WithData:]");
+    
+    s = [NSString base58checkWithData:@"000000000000000000000000000000000000000000".hexToData];
+    XCTAssertEqualObjects(@"000000000000000000000000000000000000000000".hexToData, [s base58checkToData],
+                          @"[NSString base58checkWithData:]");
+
+    s = [NSString base58checkWithData:@"000000000000000000000000000000000000000001".hexToData];
+    XCTAssertEqualObjects(@"000000000000000000000000000000000000000001".hexToData, [s base58checkToData],
+                          @"[NSString base58checkWithData:]");
+
+    s = [NSString base58checkWithData:@"05FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".hexToData];
+    XCTAssertEqualObjects(@"05FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF".hexToData, [s base58checkToData],
+                          @"[NSString base58checkWithData:]");
+}
+
+#pragma mark - testRMD160
+
+- (void)testRMD160
+{
+    NSData *d = [@"Free online RIPEMD160 Calculator, type text here..." dataUsingEncoding:NSUTF8StringEncoding].RMD160;
+    
+    XCTAssertEqualObjects(@"9501a56fb829132b8748f0ccc491f0ecbc7f945b".hexToData, d, @"[NSData RMD160]");
+    
+    d = [@"this is some text to test the ripemd160 implementation with more than 64bytes of data since it's internal "
+         "digest buffer is 64bytes in size" dataUsingEncoding:NSUTF8StringEncoding].RMD160;
+    XCTAssertEqualObjects(@"4402eff42157106a5d92e4d946185856fbc50e09".hexToData, d, @"[NSData RMD160]");
+
+    d = [@"123456789012345678901234567890123456789012345678901234567890"
+         dataUsingEncoding:NSUTF8StringEncoding].RMD160;
+    XCTAssertEqualObjects(@"00263b999714e756fa5d02814b842a2634dd31ac".hexToData, d, @"[NSData RMD160]");
+
+    d = [@"1234567890123456789012345678901234567890123456789012345678901234"
+         dataUsingEncoding:NSUTF8StringEncoding].RMD160;
+    XCTAssertEqualObjects(@"fa8c1a78eb763bb97d5ea14ce9303d1ce2f33454".hexToData, d, @"[NSData RMD160]");
+
+    d = [NSData data].RMD160; // empty
+    XCTAssertEqualObjects(@"9c1185a5c5e9fc54612808977ee8f548b2258d31".hexToData, d, @"[NSData RMD160]");
+    
+    d = [@"a" dataUsingEncoding:NSUTF8StringEncoding].RMD160;
+    XCTAssertEqualObjects(@"0bdc9d2d256b3ee9daae347be6f4dc835a467ffe".hexToData, d, @"[NSData RMD160]");
+}
+
+#pragma mark - testKey
+
+#if ! DASH_TESTNET
+- (void)testKeyWithPrivateKey
+{
 //    XCTAssertFalse([@"S6c56bnXQiBjk9mqSYE7ykVQ7NzrRz" isValidDigitalCashPrivateKey],
 //                  @"[NSString+Base58 isValidDigitalCashPrivateKey]");
 //
@@ -200,235 +192,235 @@
 //    
 //    NSLog(@"privKey:SzavMBLoXU6kDrqtUVmffv = %@", key.address);
 //    XCTAssertEqualObjects(@"1CC3X2gu58d6wXUWMffpuzN9JAfTUWu4Kj", key.address, @"[BRKey keyWithPrivateKey:]");
-//
-//    // uncompressed private key
-//    key = [BRKey keyWithPrivateKey:@"5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYB9KF"];
-//    
-//    NSLog(@"privKey:5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYB9KF = %@", key.address);
-//    XCTAssertEqualObjects(@"1CC3X2gu58d6wXUWMffpuzN9JAfTUWu4Kj", key.address, @"[BRKey keyWithPrivateKey:]");
-//
-//    // uncompressed private key export
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYB9KF", key.privateKey,
-//                          @"[BRKey privateKey]");
-//
-//    // compressed private key
-//    key = [BRKey keyWithPrivateKey:@"KyvGbxRUoofdw3TNydWn2Z78dBHSy2odn1d3wXWN2o3SAtccFNJL"];
-//    
-//    NSLog(@"privKey:KyvGbxRUoofdw3TNydWn2Z78dBHSy2odn1d3wXWN2o3SAtccFNJL = %@", key.address);
-//    XCTAssertEqualObjects(@"1JMsC6fCtYWkTjPPdDrYX3we2aBrewuEM3", key.address, @"[BRKey keyWithPrivateKey:]");
-//
-//    // compressed private key export
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"KyvGbxRUoofdw3TNydWn2Z78dBHSy2odn1d3wXWN2o3SAtccFNJL", key.privateKey,
-//                          @"[BRKey privateKey]");
-//}
-//#endif
-//
-//#pragma mark - testKeyWithBIP38Key
-//
-//#if ! DASH_TESTNET && ! SKIP_BIP38
-//- (void)testKeyWithBIP38Key
-//{
-//    NSString *intercode, *confcode, *privkey;
-//    BRKey *key;
-//
-//    // non EC multiplied, uncompressed
-//    key = [BRKey keyWithBIP38Key:@"6PRVWUbkzzsbcVac2qwfssoUJAN1Xhrg6bNk8J7Nzm5H7kxEbn2Nh2ZoGg"
-//           andPassphrase:@"TestingOneTwoThree"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//    XCTAssertEqualObjects([key BIP38KeyWithPassphrase:@"TestingOneTwoThree"],
-//                          @"6PRVWUbkzzsbcVac2qwfssoUJAN1Xhrg6bNk8J7Nzm5H7kxEbn2Nh2ZoGg",
-//                          @"[BRKey BIP38KeyWithPassphrase:]");
-//
-//    key = [BRKey keyWithBIP38Key:@"6PRNFFkZc2NZ6dJqFfhRoFNMR9Lnyj7dYGrzdgXXVMXcxoKTePPX1dWByq"
-//           andPassphrase:@"Satoshi"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"5HtasZ6ofTHP6HCwTqTkLDuLQisYPah7aUnSKfC7h4hMUVw2gi5", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//    XCTAssertEqualObjects([key BIP38KeyWithPassphrase:@"Satoshi"],
-//                          @"6PRNFFkZc2NZ6dJqFfhRoFNMR9Lnyj7dYGrzdgXXVMXcxoKTePPX1dWByq",
-//                          @"[BRKey BIP38KeyWithPassphrase:]");
-//
-//    // non EC multiplied, compressed
-//    key = [BRKey keyWithBIP38Key:@"6PYNKZ1EAgYgmQfmNVamxyXVWHzK5s6DGhwP4J5o44cvXdoY7sRzhtpUeo"
-//           andPassphrase:@"TestingOneTwoThree"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"L44B5gGEpqEDRS9vVPz7QT35jcBG2r3CZwSwQ4fCewXAhAhqGVpP", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//    XCTAssertEqualObjects([key BIP38KeyWithPassphrase:@"TestingOneTwoThree"],
-//                          @"6PYNKZ1EAgYgmQfmNVamxyXVWHzK5s6DGhwP4J5o44cvXdoY7sRzhtpUeo",
-//                          @"[BRKey BIP38KeyWithPassphrase:]");
-//
-//    key = [BRKey keyWithBIP38Key:@"6PYLtMnXvfG3oJde97zRyLYFZCYizPU5T3LwgdYJz1fRhh16bU7u6PPmY7"
-//           andPassphrase:@"Satoshi"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"KwYgW8gcxj1JWJXhPSu4Fqwzfhp5Yfi42mdYmMa4XqK7NJxXUSK7", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//    XCTAssertEqualObjects([key BIP38KeyWithPassphrase:@"Satoshi"],
-//                          @"6PYLtMnXvfG3oJde97zRyLYFZCYizPU5T3LwgdYJz1fRhh16bU7u6PPmY7",
-//                          @"[BRKey BIP38KeyWithPassphrase:]");
-//
-//    // EC multiplied, uncompressed, no lot/sequence number
-//    key = [BRKey keyWithBIP38Key:@"6PfQu77ygVyJLZjfvMLyhLMQbYnu5uguoJJ4kMCLqWwPEdfpwANVS76gTX"
-//           andPassphrase:@"TestingOneTwoThree"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"5K4caxezwjGCGfnoPTZ8tMcJBLB7Jvyjv4xxeacadhq8nLisLR2", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//    intercode = [BRKey BIP38IntermediateCodeWithSalt:0xa50dba6772cb9383ULL andPassphrase:@"TestingOneTwoThree"];
-//    NSLog(@"intercode = %@", intercode);
-//    privkey = [BRKey BIP38KeyWithIntermediateCode:intercode
-//               seedb:@"99241d58245c883896f80843d2846672d7312e6195ca1a6c".hexToData compressed:NO
-//               confirmationCode:&confcode];
-//    NSLog(@"confcode = %@", confcode);
-//    XCTAssertEqualObjects(@"6PfQu77ygVyJLZjfvMLyhLMQbYnu5uguoJJ4kMCLqWwPEdfpwANVS76gTX", privkey,
-//                          @"[BRKey BIP38KeyWithIntermediateCode:]");
-//    XCTAssertTrue([BRKey confirmWithBIP38ConfirmationCode:confcode address:@"1PE6TQi6HTVNz5DLwB1LcpMBALubfuN2z2"
-//                   passphrase:@"TestingOneTwoThree"], @"[BRKey confirmWithBIP38ConfirmationCode:]");
-//
-//    key = [BRKey keyWithBIP38Key:@"6PfLGnQs6VZnrNpmVKfjotbnQuaJK4KZoPFrAjx1JMJUa1Ft8gnf5WxfKd"
-//           andPassphrase:@"Satoshi"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"5KJ51SgxWaAYR13zd9ReMhJpwrcX47xTJh2D3fGPG9CM8vkv5sH", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//    intercode = [BRKey BIP38IntermediateCodeWithSalt:0x67010a9573418906ULL andPassphrase:@"Satoshi"];
-//    NSLog(@"intercode = %@", intercode);
-//    privkey = [BRKey BIP38KeyWithIntermediateCode:intercode
-//               seedb:@"49111e301d94eab339ff9f6822ee99d9f49606db3b47a497".hexToData compressed:NO
-//               confirmationCode:&confcode];
-//    NSLog(@"confcode = %@", confcode);
-//    XCTAssertEqualObjects(@"6PfLGnQs6VZnrNpmVKfjotbnQuaJK4KZoPFrAjx1JMJUa1Ft8gnf5WxfKd", privkey,
-//                          @"[BRKey BIP38KeyWithIntermediateCode:]");
-//    XCTAssertTrue([BRKey confirmWithBIP38ConfirmationCode:confcode address:@"1CqzrtZC6mXSAhoxtFwVjz8LtwLJjDYU3V"
-//                   passphrase:@"Satoshi"], @"[BRKey confirmWithBIP38ConfirmationCode:]");
-//
-//    // EC multiplied, uncompressed, with lot/sequence number
-//    key = [BRKey keyWithBIP38Key:@"6PgNBNNzDkKdhkT6uJntUXwwzQV8Rr2tZcbkDcuC9DZRsS6AtHts4Ypo1j"
-//           andPassphrase:@"MOLON LABE"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"5JLdxTtcTHcfYcmJsNVy1v2PMDx432JPoYcBTVVRHpPaxUrdtf8", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//    intercode = [BRKey BIP38IntermediateCodeWithLot:263183 sequence:1 salt:0x4fca5a97u passphrase:@"MOLON LABE"];
-//    NSLog(@"intercode = %@", intercode);
-//    privkey = [BRKey BIP38KeyWithIntermediateCode:intercode
-//               seedb:@"87a13b07858fa753cd3ab3f1c5eafb5f12579b6c33c9a53f".hexToData compressed:NO
-//               confirmationCode:&confcode];
-//    NSLog(@"confcode = %@", confcode);
-//    XCTAssertEqualObjects(@"6PgNBNNzDkKdhkT6uJntUXwwzQV8Rr2tZcbkDcuC9DZRsS6AtHts4Ypo1j", privkey,
-//                          @"[BRKey BIP38KeyWithIntermediateCode:]");
-//    XCTAssertTrue([BRKey confirmWithBIP38ConfirmationCode:confcode address:@"1Jscj8ALrYu2y9TD8NrpvDBugPedmbj4Yh"
-//                   passphrase:@"MOLON LABE"], @"[BRKey confirmWithBIP38ConfirmationCode:]");
-//
-//    key = [BRKey keyWithBIP38Key:@"6PgGWtx25kUg8QWvwuJAgorN6k9FbE25rv5dMRwu5SKMnfpfVe5mar2ngH"
-//           andPassphrase:@"\u039c\u039f\u039b\u03a9\u039d \u039b\u0391\u0392\u0395"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"5KMKKuUmAkiNbA3DazMQiLfDq47qs8MAEThm4yL8R2PhV1ov33D", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//    intercode = [BRKey BIP38IntermediateCodeWithLot:806938 sequence:1 salt:0xc40ea76fu
-//                 passphrase:@"\u039c\u039f\u039b\u03a9\u039d \u039b\u0391\u0392\u0395"];
-//    NSLog(@"intercode = %@", intercode);
-//    privkey = [BRKey BIP38KeyWithIntermediateCode:intercode
-//               seedb:@"03b06a1ea7f9219ae364560d7b985ab1fa27025aaa7e427a".hexToData compressed:NO
-//               confirmationCode:&confcode];
-//    NSLog(@"confcode = %@", confcode);
-//    XCTAssertEqualObjects(@"6PgGWtx25kUg8QWvwuJAgorN6k9FbE25rv5dMRwu5SKMnfpfVe5mar2ngH", privkey,
-//                          @"[BRKey BIP38KeyWithIntermediateCode:]");
-//    XCTAssertTrue([BRKey confirmWithBIP38ConfirmationCode:confcode address:@"1Lurmih3KruL4xDB5FmHof38yawNtP9oGf"
-//                   passphrase:@"\u039c\u039f\u039b\u03a9\u039d \u039b\u0391\u0392\u0395"],
-//                  @"[BRKey confirmWithBIP38ConfirmationCode:]");
-//
-//    // password NFC unicode normalization test
-//    key = [BRKey keyWithBIP38Key:@"6PRW5o9FLp4gJDDVqJQKJFTpMvdsSGJxMYHtHaQBF3ooa8mwD69bapcDQn"
-//           andPassphrase:@"\u03D2\u0301\0\U00010400\U0001F4A9"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertEqualObjects(@"5Jajm8eQ22H3pGWLEVCXyvND8dQZhiQhoLJNKjYXk9roUFTMSZ4", key.privateKey,
-//                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//
-//    // incorrect password test
-//    key = [BRKey keyWithBIP38Key:@"6PRW5o9FLp4gJDDVqJQKJFTpMvdsSGJxMYHtHaQBF3ooa8mwD69bapcDQn" andPassphrase:@"foobar"];
-//    NSLog(@"privKey = %@", key.privateKey);
-//    XCTAssertNil(key, @"[BRKey keyWithBIP38Key:andPassphrase:]");
-//}
-//#endif
-//
-//#pragma mark - testSign
-//
-//- (void)testSign
-//{
-//    NSData *d, *sig;
-//    BRKey *key = [BRKey keyWithSecret:@"0000000000000000000000000000000000000000000000000000000000000001".hexToData
-//                  compressed:YES];
-//
-//    d = [@"Everything should be made as simple as possible, but not simpler."
-//         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
-//    sig = [key sign:d];
-//
-//    XCTAssertEqualObjects(sig, @"3044022033a69cd2065432a30f3d1ce4eb0d59b8ab58c74f27c41a7fdb5696ad4e6108c902206f80798286"
-//                          "6f785d3f6418d24163ddae117b7db4d5fdf0071de069fa54342262".hexToData, @"[BRKey sign:]");
-//    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
-//    
-//    key = [BRKey keyWithSecret:@"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140".hexToData
-//           compressed:YES];
-//    d = [@"Equations are more important to me, because politics is for the present, but an equation is something for "
-//         "eternity." dataUsingEncoding:NSUTF8StringEncoding].SHA256;
-//    sig = [key sign:d];
-//
-//    XCTAssertEqualObjects(sig, @"3044022054c4a33c6423d689378f160a7ff8b61330444abb58fb470f96ea16d99d4a2fed02200708230441"
-//                          "0efa6b2943111b6a4e0aaa7b7db55a07e9861d1fb3cb1f421044a5".hexToData, @"[BRKey sign:]");
-//    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
-//
-//    key = [BRKey keyWithSecret:@"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140".hexToData
-//           compressed:YES];
-//    d = [@"Not only is the Universe stranger than we think, it is stranger than we can think."
-//         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
-//    sig = [key sign:d];
-//
-//    XCTAssertEqualObjects(sig, @"3045022100ff466a9f1b7b273e2f4c3ffe032eb2e814121ed18ef84665d0f515360dab3dd002206fc95f51"
-//                          "32e5ecfdc8e5e6e616cc77151455d46ed48f5589b7db7771a332b283".hexToData, @"[BRKey sign:]");
-//    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
-//
-//    key = [BRKey keyWithSecret:@"0000000000000000000000000000000000000000000000000000000000000001".hexToData
-//           compressed:YES];
-//    d = [@"How wonderful that we have met with a paradox. Now we have some hope of making progress."
-//         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
-//    sig = [key sign:d];
-//
-//    XCTAssertEqualObjects(sig, @"3045022100c0dafec8251f1d5010289d210232220b03202cba34ec11fec58b3e93a85b91d3022075afdc06"
-//                          "b7d6322a590955bf264e7aaa155847f614d80078a90292fe205064d3".hexToData, @"[BRKey sign:]");
-//    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
-//
-//    key = [BRKey keyWithSecret:@"69ec59eaa1f4f2e36b639716b7c30ca86d9a5375c7b38d8918bd9c0ebc80ba64".hexToData
-//           compressed:YES];
-//    d = [@"Computer science is no more about computers than astronomy is about telescopes."
-//         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
-//    sig = [key sign:d];
-//
-//    XCTAssertEqualObjects(sig, @"304402207186363571d65e084e7f02b0b77c3ec44fb1b257dee26274c38c928986fea45d02200de0b38e06"
-//                          "807e46bda1f1e293f4f6323e854c86d58abdd00c46c16441085df6".hexToData, @"[BRKey sign:]");
-//    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
-//
-//    key = [BRKey keyWithSecret:@"00000000000000000000000000007246174ab1e92e9149c6e446fe194d072637".hexToData
-//           compressed:YES];
-//    d = [@"...if you aren't, at any given time, scandalized by code you wrote five or even three years ago, you're not "
-//         "learning anywhere near enough" dataUsingEncoding:NSUTF8StringEncoding].SHA256;
-//    sig = [key sign:d];
-//
-//    XCTAssertEqualObjects(sig, @"3045022100fbfe5076a15860ba8ed00e75e9bd22e05d230f02a936b653eb55b61c99dda48702200e68880e"
-//                          "bb0050fe4312b1b1eb0899e1b82da89baa5b895f612619edf34cbd37".hexToData, @"[BRKey sign:]");
-//    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
-//
-//    key = [BRKey keyWithSecret:@"000000000000000000000000000000000000000000056916d0f9b31dc9b637f3".hexToData
-//           compressed:YES];
-//    d = [@"The question of whether computers can think is like the question of whether submarines can swim."
-//         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
-//    sig = [key sign:d];
-//
-//    XCTAssertEqualObjects(sig, @"3045022100cde1302d83f8dd835d89aef803c74a119f561fbaef3eb9129e45f30de86abbf9022006ce643f"
-//                          "5049ee1f27890467b77a6a8e11ec4661cc38cd8badf90115fbd03cef".hexToData, @"[BRKey sign:]");
-//    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
-//}
+
+    // uncompressed private key
+    BRKey *key = [BRKey keyWithPrivateKey:@"7qwYRxzaEDPJafr5Yf5VYwKu5XP16FTHeRB3cwqah7yX6vKMajF"];
+    
+    NSLog(@"privKey:7qwYRxzaEDPJafr5Yf5VYwKu5XP16FTHeRB3cwqah7yX6vKMajF = %@", key.address);
+    XCTAssertEqualObjects(@"Xv5YDiRUifbcR6YQrre586J2uHVrhpKZgr", key.address, @"[BRKey keyWithPrivateKey:]");
+
+    // uncompressed private key export
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"7qwYRxzaEDPJafr5Yf5VYwKu5XP16FTHeRB3cwqah7yX6vKMajF", key.privateKey,
+                          @"[BRKey privateKey]");
+
+    // compressed private key
+    key = [BRKey keyWithPrivateKey:@"XCUfXvWZJLASAsRzbGoLw8h7gYgkm8tn3YpWtA6bLmMxFHGSERBG"];
+    
+    NSLog(@"privKey:XCUfXvWZJLASAsRzbGoLw8h7gYgkm8tn3YpWtA6bLmMxFHGSERBG = %@", key.address);
+    XCTAssertEqualObjects(@"Xcd3vnQ2oBetuwmHmB4dGbUunzgmNWNcPM", key.address, @"[BRKey keyWithPrivateKey:]");
+
+    // compressed private key export
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"XCUfXvWZJLASAsRzbGoLw8h7gYgkm8tn3YpWtA6bLmMxFHGSERBG", key.privateKey,
+                          @"[BRKey privateKey]");
+}
+#endif
+
+#pragma mark - testKeyWithBIP38Key
+
+#if ! DASH_TESTNET && ! SKIP_BIP38
+- (void)testKeyWithBIP38Key
+{
+    NSString *intercode, *confcode, *privkey;
+    BRKey *key;
+
+    // non EC multiplied, uncompressed
+    key = [BRKey keyWithBIP38Key:@"6PRVWUbkzzsbcVac2qwfssoUJAN1Xhrg6bNk8J7Nzm5H7kxEbn2Nh2ZoGg"
+           andPassphrase:@"TestingOneTwoThree"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+    XCTAssertEqualObjects([key BIP38KeyWithPassphrase:@"TestingOneTwoThree"],
+                          @"6PRVWUbkzzsbcVac2qwfssoUJAN1Xhrg6bNk8J7Nzm5H7kxEbn2Nh2ZoGg",
+                          @"[BRKey BIP38KeyWithPassphrase:]");
+
+    key = [BRKey keyWithBIP38Key:@"6PRNFFkZc2NZ6dJqFfhRoFNMR9Lnyj7dYGrzdgXXVMXcxoKTePPX1dWByq"
+           andPassphrase:@"Satoshi"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"5HtasZ6ofTHP6HCwTqTkLDuLQisYPah7aUnSKfC7h4hMUVw2gi5", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+    XCTAssertEqualObjects([key BIP38KeyWithPassphrase:@"Satoshi"],
+                          @"6PRNFFkZc2NZ6dJqFfhRoFNMR9Lnyj7dYGrzdgXXVMXcxoKTePPX1dWByq",
+                          @"[BRKey BIP38KeyWithPassphrase:]");
+
+    // non EC multiplied, compressed
+    key = [BRKey keyWithBIP38Key:@"6PYNKZ1EAgYgmQfmNVamxyXVWHzK5s6DGhwP4J5o44cvXdoY7sRzhtpUeo"
+           andPassphrase:@"TestingOneTwoThree"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"L44B5gGEpqEDRS9vVPz7QT35jcBG2r3CZwSwQ4fCewXAhAhqGVpP", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+    XCTAssertEqualObjects([key BIP38KeyWithPassphrase:@"TestingOneTwoThree"],
+                          @"6PYNKZ1EAgYgmQfmNVamxyXVWHzK5s6DGhwP4J5o44cvXdoY7sRzhtpUeo",
+                          @"[BRKey BIP38KeyWithPassphrase:]");
+
+    key = [BRKey keyWithBIP38Key:@"6PYLtMnXvfG3oJde97zRyLYFZCYizPU5T3LwgdYJz1fRhh16bU7u6PPmY7"
+           andPassphrase:@"Satoshi"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"KwYgW8gcxj1JWJXhPSu4Fqwzfhp5Yfi42mdYmMa4XqK7NJxXUSK7", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+    XCTAssertEqualObjects([key BIP38KeyWithPassphrase:@"Satoshi"],
+                          @"6PYLtMnXvfG3oJde97zRyLYFZCYizPU5T3LwgdYJz1fRhh16bU7u6PPmY7",
+                          @"[BRKey BIP38KeyWithPassphrase:]");
+
+    // EC multiplied, uncompressed, no lot/sequence number
+    key = [BRKey keyWithBIP38Key:@"6PfQu77ygVyJLZjfvMLyhLMQbYnu5uguoJJ4kMCLqWwPEdfpwANVS76gTX"
+           andPassphrase:@"TestingOneTwoThree"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"5K4caxezwjGCGfnoPTZ8tMcJBLB7Jvyjv4xxeacadhq8nLisLR2", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+    intercode = [BRKey BIP38IntermediateCodeWithSalt:0xa50dba6772cb9383ULL andPassphrase:@"TestingOneTwoThree"];
+    NSLog(@"intercode = %@", intercode);
+    privkey = [BRKey BIP38KeyWithIntermediateCode:intercode
+               seedb:@"99241d58245c883896f80843d2846672d7312e6195ca1a6c".hexToData compressed:NO
+               confirmationCode:&confcode];
+    NSLog(@"confcode = %@", confcode);
+    XCTAssertEqualObjects(@"6PfQu77ygVyJLZjfvMLyhLMQbYnu5uguoJJ4kMCLqWwPEdfpwANVS76gTX", privkey,
+                          @"[BRKey BIP38KeyWithIntermediateCode:]");
+    XCTAssertTrue([BRKey confirmWithBIP38ConfirmationCode:confcode address:@"1PE6TQi6HTVNz5DLwB1LcpMBALubfuN2z2"
+                   passphrase:@"TestingOneTwoThree"], @"[BRKey confirmWithBIP38ConfirmationCode:]");
+
+    key = [BRKey keyWithBIP38Key:@"6PfLGnQs6VZnrNpmVKfjotbnQuaJK4KZoPFrAjx1JMJUa1Ft8gnf5WxfKd"
+           andPassphrase:@"Satoshi"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"5KJ51SgxWaAYR13zd9ReMhJpwrcX47xTJh2D3fGPG9CM8vkv5sH", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+    intercode = [BRKey BIP38IntermediateCodeWithSalt:0x67010a9573418906ULL andPassphrase:@"Satoshi"];
+    NSLog(@"intercode = %@", intercode);
+    privkey = [BRKey BIP38KeyWithIntermediateCode:intercode
+               seedb:@"49111e301d94eab339ff9f6822ee99d9f49606db3b47a497".hexToData compressed:NO
+               confirmationCode:&confcode];
+    NSLog(@"confcode = %@", confcode);
+    XCTAssertEqualObjects(@"6PfLGnQs6VZnrNpmVKfjotbnQuaJK4KZoPFrAjx1JMJUa1Ft8gnf5WxfKd", privkey,
+                          @"[BRKey BIP38KeyWithIntermediateCode:]");
+    XCTAssertTrue([BRKey confirmWithBIP38ConfirmationCode:confcode address:@"1CqzrtZC6mXSAhoxtFwVjz8LtwLJjDYU3V"
+                   passphrase:@"Satoshi"], @"[BRKey confirmWithBIP38ConfirmationCode:]");
+
+    // EC multiplied, uncompressed, with lot/sequence number
+    key = [BRKey keyWithBIP38Key:@"6PgNBNNzDkKdhkT6uJntUXwwzQV8Rr2tZcbkDcuC9DZRsS6AtHts4Ypo1j"
+           andPassphrase:@"MOLON LABE"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"5JLdxTtcTHcfYcmJsNVy1v2PMDx432JPoYcBTVVRHpPaxUrdtf8", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+    intercode = [BRKey BIP38IntermediateCodeWithLot:263183 sequence:1 salt:0x4fca5a97u passphrase:@"MOLON LABE"];
+    NSLog(@"intercode = %@", intercode);
+    privkey = [BRKey BIP38KeyWithIntermediateCode:intercode
+               seedb:@"87a13b07858fa753cd3ab3f1c5eafb5f12579b6c33c9a53f".hexToData compressed:NO
+               confirmationCode:&confcode];
+    NSLog(@"confcode = %@", confcode);
+    XCTAssertEqualObjects(@"6PgNBNNzDkKdhkT6uJntUXwwzQV8Rr2tZcbkDcuC9DZRsS6AtHts4Ypo1j", privkey,
+                          @"[BRKey BIP38KeyWithIntermediateCode:]");
+    XCTAssertTrue([BRKey confirmWithBIP38ConfirmationCode:confcode address:@"1Jscj8ALrYu2y9TD8NrpvDBugPedmbj4Yh"
+                   passphrase:@"MOLON LABE"], @"[BRKey confirmWithBIP38ConfirmationCode:]");
+
+    key = [BRKey keyWithBIP38Key:@"6PgGWtx25kUg8QWvwuJAgorN6k9FbE25rv5dMRwu5SKMnfpfVe5mar2ngH"
+           andPassphrase:@"\u039c\u039f\u039b\u03a9\u039d \u039b\u0391\u0392\u0395"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"5KMKKuUmAkiNbA3DazMQiLfDq47qs8MAEThm4yL8R2PhV1ov33D", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+    intercode = [BRKey BIP38IntermediateCodeWithLot:806938 sequence:1 salt:0xc40ea76fu
+                 passphrase:@"\u039c\u039f\u039b\u03a9\u039d \u039b\u0391\u0392\u0395"];
+    NSLog(@"intercode = %@", intercode);
+    privkey = [BRKey BIP38KeyWithIntermediateCode:intercode
+               seedb:@"03b06a1ea7f9219ae364560d7b985ab1fa27025aaa7e427a".hexToData compressed:NO
+               confirmationCode:&confcode];
+    NSLog(@"confcode = %@", confcode);
+    XCTAssertEqualObjects(@"6PgGWtx25kUg8QWvwuJAgorN6k9FbE25rv5dMRwu5SKMnfpfVe5mar2ngH", privkey,
+                          @"[BRKey BIP38KeyWithIntermediateCode:]");
+    XCTAssertTrue([BRKey confirmWithBIP38ConfirmationCode:confcode address:@"1Lurmih3KruL4xDB5FmHof38yawNtP9oGf"
+                   passphrase:@"\u039c\u039f\u039b\u03a9\u039d \u039b\u0391\u0392\u0395"],
+                  @"[BRKey confirmWithBIP38ConfirmationCode:]");
+
+    // password NFC unicode normalization test
+    key = [BRKey keyWithBIP38Key:@"6PRW5o9FLp4gJDDVqJQKJFTpMvdsSGJxMYHtHaQBF3ooa8mwD69bapcDQn"
+           andPassphrase:@"\u03D2\u0301\0\U00010400\U0001F4A9"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertEqualObjects(@"5Jajm8eQ22H3pGWLEVCXyvND8dQZhiQhoLJNKjYXk9roUFTMSZ4", key.privateKey,
+                          @"[BRKey keyWithBIP38Key:andPassphrase:]");
+
+    // incorrect password test
+    key = [BRKey keyWithBIP38Key:@"6PRW5o9FLp4gJDDVqJQKJFTpMvdsSGJxMYHtHaQBF3ooa8mwD69bapcDQn" andPassphrase:@"foobar"];
+    NSLog(@"privKey = %@", key.privateKey);
+    XCTAssertNil(key, @"[BRKey keyWithBIP38Key:andPassphrase:]");
+}
+#endif
+
+#pragma mark - testSign
+
+- (void)testSign
+{
+    NSData *d, *sig;
+    BRKey *key = [BRKey keyWithSecret:@"0000000000000000000000000000000000000000000000000000000000000001".hexToData
+                  compressed:YES];
+
+    d = [@"Everything should be made as simple as possible, but not simpler."
+         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
+    sig = [key sign:d];
+
+    XCTAssertEqualObjects(sig, @"3044022033a69cd2065432a30f3d1ce4eb0d59b8ab58c74f27c41a7fdb5696ad4e6108c902206f80798286"
+                          "6f785d3f6418d24163ddae117b7db4d5fdf0071de069fa54342262".hexToData, @"[BRKey sign:]");
+    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
+    
+    key = [BRKey keyWithSecret:@"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140".hexToData
+           compressed:YES];
+    d = [@"Equations are more important to me, because politics is for the present, but an equation is something for "
+         "eternity." dataUsingEncoding:NSUTF8StringEncoding].SHA256;
+    sig = [key sign:d];
+
+    XCTAssertEqualObjects(sig, @"3044022054c4a33c6423d689378f160a7ff8b61330444abb58fb470f96ea16d99d4a2fed02200708230441"
+                          "0efa6b2943111b6a4e0aaa7b7db55a07e9861d1fb3cb1f421044a5".hexToData, @"[BRKey sign:]");
+    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
+
+    key = [BRKey keyWithSecret:@"fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364140".hexToData
+           compressed:YES];
+    d = [@"Not only is the Universe stranger than we think, it is stranger than we can think."
+         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
+    sig = [key sign:d];
+
+    XCTAssertEqualObjects(sig, @"3045022100ff466a9f1b7b273e2f4c3ffe032eb2e814121ed18ef84665d0f515360dab3dd002206fc95f51"
+                          "32e5ecfdc8e5e6e616cc77151455d46ed48f5589b7db7771a332b283".hexToData, @"[BRKey sign:]");
+    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
+
+    key = [BRKey keyWithSecret:@"0000000000000000000000000000000000000000000000000000000000000001".hexToData
+           compressed:YES];
+    d = [@"How wonderful that we have met with a paradox. Now we have some hope of making progress."
+         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
+    sig = [key sign:d];
+
+    XCTAssertEqualObjects(sig, @"3045022100c0dafec8251f1d5010289d210232220b03202cba34ec11fec58b3e93a85b91d3022075afdc06"
+                          "b7d6322a590955bf264e7aaa155847f614d80078a90292fe205064d3".hexToData, @"[BRKey sign:]");
+    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
+
+    key = [BRKey keyWithSecret:@"69ec59eaa1f4f2e36b639716b7c30ca86d9a5375c7b38d8918bd9c0ebc80ba64".hexToData
+           compressed:YES];
+    d = [@"Computer science is no more about computers than astronomy is about telescopes."
+         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
+    sig = [key sign:d];
+
+    XCTAssertEqualObjects(sig, @"304402207186363571d65e084e7f02b0b77c3ec44fb1b257dee26274c38c928986fea45d02200de0b38e06"
+                          "807e46bda1f1e293f4f6323e854c86d58abdd00c46c16441085df6".hexToData, @"[BRKey sign:]");
+    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
+
+    key = [BRKey keyWithSecret:@"00000000000000000000000000007246174ab1e92e9149c6e446fe194d072637".hexToData
+           compressed:YES];
+    d = [@"...if you aren't, at any given time, scandalized by code you wrote five or even three years ago, you're not "
+         "learning anywhere near enough" dataUsingEncoding:NSUTF8StringEncoding].SHA256;
+    sig = [key sign:d];
+
+    XCTAssertEqualObjects(sig, @"3045022100fbfe5076a15860ba8ed00e75e9bd22e05d230f02a936b653eb55b61c99dda48702200e68880e"
+                          "bb0050fe4312b1b1eb0899e1b82da89baa5b895f612619edf34cbd37".hexToData, @"[BRKey sign:]");
+    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
+
+    key = [BRKey keyWithSecret:@"000000000000000000000000000000000000000000056916d0f9b31dc9b637f3".hexToData
+           compressed:YES];
+    d = [@"The question of whether computers can think is like the question of whether submarines can swim."
+         dataUsingEncoding:NSUTF8StringEncoding].SHA256;
+    sig = [key sign:d];
+
+    XCTAssertEqualObjects(sig, @"3045022100cde1302d83f8dd835d89aef803c74a119f561fbaef3eb9129e45f30de86abbf9022006ce643f"
+                          "5049ee1f27890467b77a6a8e11ec4661cc38cd8badf90115fbd03cef".hexToData, @"[BRKey sign:]");
+    XCTAssertTrue([key verify:d signature:sig], @"[BRKey verify:signature:]");
+}
 //
 //#pragma mark - testPaymentRequest
 //
@@ -1051,43 +1043,43 @@
 //    XCTAssertEqualObjects(@"03ce4299050000000100008002".hexToData, f.data, @"[BRBloomFilter data:]");
 //}
 //
-//#pragma mark - testMerkleBlock
-//
-//- (void)testMerkleBlock
-//{
-//    // block 10001 filtered to include only transactions 0, 1, 2, and 6
-//    NSData *block = @"0100000006e533fd1ada86391f3f6c343204b0d278d4aaec1c0b20aa27ba0300000000006abbb3eb3d733a9fe18967fd7"
-//                     "d4c117e4ccbbac5bec4d910d900b3ae0793e77f54241b4d4c86041b4089cc9b0c000000084c30b63cfcdc2d35e3329421"
-//                     "b9805ef0c6565d35381ca857762ea0b3a5a128bbca5065ff9617cbcba45eb23726df6498a9b9cafed4f54cbab9d227b00"
-//                     "35ddefbbb15ac1d57d0182aaee61c74743a9c4f785895e563909bafec45c9a2b0ff3181d77706be8b1dcc91112eada86d"
-//                     "424e2d0a8907c3488b6e44fda5a74a25cbc7d6bb4fa04245f4ac8a1a571d5537eac24adca1454d65eda446055479af6c6"
-//                     "d4dd3c9ab658448c10b6921b7a4ce3021eb22ed6bb6a7fde1e5bcc4b1db6615c6abc5ca042127bfaf9f44ebce29cb29c6"
-//                     "df9d05b47f35b2edff4f0064b578ab741fa78276222651209fe1a2c4c0fa1c58510aec8b090dd1eb1f82f9d261b8273b5"
-//                     "25b02ff1a".hexToData;
-//    
-//    BRMerkleBlock *b = [BRMerkleBlock blockWithMessage:block];
-//    
-//    XCTAssertEqualObjects(b.blockHash,
-//                         @"00000000000080b66c911bd5ba14a74260057311eaeb1982802f7010f1a9f090".hexToData.reverse,
-//                         @"[BRMerkleBlock blockHash]");
-//
-//    XCTAssertTrue(b.valid, @"[BRMerkleBlock isValid]");
-//
-//    XCTAssertTrue([b containsTxHash:@"4c30b63cfcdc2d35e3329421b9805ef0c6565d35381ca857762ea0b3a5a128bb".hexToData],
-//                 @"[BRMerkleBlock containsTxHash:]");
-//
-//    XCTAssertTrue(b.txHashes.count == 4, @"[BRMerkleBlock txHashes]");
-//    XCTAssertEqualObjects(b.txHashes[0], @"4c30b63cfcdc2d35e3329421b9805ef0c6565d35381ca857762ea0b3a5a128bb".hexToData,
-//                         @"[BRMerkleBlock txHashes]");
-//    XCTAssertEqualObjects(b.txHashes[1], @"ca5065ff9617cbcba45eb23726df6498a9b9cafed4f54cbab9d227b0035ddefb".hexToData,
-//                         @"[BRMerkleBlock txHashes]");
-//    XCTAssertEqualObjects(b.txHashes[2], @"bb15ac1d57d0182aaee61c74743a9c4f785895e563909bafec45c9a2b0ff3181".hexToData,
-//                         @"[BRMerkleBlock txHashes]");
-//    XCTAssertEqualObjects(b.txHashes[3], @"c9ab658448c10b6921b7a4ce3021eb22ed6bb6a7fde1e5bcc4b1db6615c6abc5".hexToData,
-//                         @"[BRMerkleBlock txHashes]");
-//    
-//    //TODO: test a block with an odd number of tree rows both at the tx level and merkle node level
-//}
+#pragma mark - testMerkleBlock
+
+- (void)testMerkleBlock
+{
+    // block 10001 filtered to include only transactions 0, 1, 2, and 6
+    NSData *block = @"0100000006e533fd1ada86391f3f6c343204b0d278d4aaec1c0b20aa27ba0300000000006abbb3eb3d733a9fe18967fd7"
+                     "d4c117e4ccbbac5bec4d910d900b3ae0793e77f54241b4d4c86041b4089cc9b0c000000084c30b63cfcdc2d35e3329421"
+                     "b9805ef0c6565d35381ca857762ea0b3a5a128bbca5065ff9617cbcba45eb23726df6498a9b9cafed4f54cbab9d227b00"
+                     "35ddefbbb15ac1d57d0182aaee61c74743a9c4f785895e563909bafec45c9a2b0ff3181d77706be8b1dcc91112eada86d"
+                     "424e2d0a8907c3488b6e44fda5a74a25cbc7d6bb4fa04245f4ac8a1a571d5537eac24adca1454d65eda446055479af6c6"
+                     "d4dd3c9ab658448c10b6921b7a4ce3021eb22ed6bb6a7fde1e5bcc4b1db6615c6abc5ca042127bfaf9f44ebce29cb29c6"
+                     "df9d05b47f35b2edff4f0064b578ab741fa78276222651209fe1a2c4c0fa1c58510aec8b090dd1eb1f82f9d261b8273b5"
+                     "25b02ff1a".hexToData;
+    
+    BRMerkleBlock *b = [BRMerkleBlock blockWithMessage:block];
+    
+    XCTAssertEqualObjects(b.blockHash,
+                         @"00000000000080b66c911bd5ba14a74260057311eaeb1982802f7010f1a9f090".hexToData.reverse,
+                         @"[BRMerkleBlock blockHash]");
+
+    XCTAssertTrue(b.valid, @"[BRMerkleBlock isValid]");
+
+    XCTAssertTrue([b containsTxHash:@"4c30b63cfcdc2d35e3329421b9805ef0c6565d35381ca857762ea0b3a5a128bb".hexToData],
+                 @"[BRMerkleBlock containsTxHash:]");
+
+    XCTAssertTrue(b.txHashes.count == 4, @"[BRMerkleBlock txHashes]");
+    XCTAssertEqualObjects(b.txHashes[0], @"4c30b63cfcdc2d35e3329421b9805ef0c6565d35381ca857762ea0b3a5a128bb".hexToData,
+                         @"[BRMerkleBlock txHashes]");
+    XCTAssertEqualObjects(b.txHashes[1], @"ca5065ff9617cbcba45eb23726df6498a9b9cafed4f54cbab9d227b0035ddefb".hexToData,
+                         @"[BRMerkleBlock txHashes]");
+    XCTAssertEqualObjects(b.txHashes[2], @"bb15ac1d57d0182aaee61c74743a9c4f785895e563909bafec45c9a2b0ff3181".hexToData,
+                         @"[BRMerkleBlock txHashes]");
+    XCTAssertEqualObjects(b.txHashes[3], @"c9ab658448c10b6921b7a4ce3021eb22ed6bb6a7fde1e5bcc4b1db6615c6abc5".hexToData,
+                         @"[BRMerkleBlock txHashes]");
+    
+    //TODO: test a block with an odd number of tree rows both at the tx level and merkle node level
+}
 //
 //#pragma mark - testPaymentProtocol
 //

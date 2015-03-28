@@ -396,6 +396,7 @@ static const char *dns_seeds[] = {
 
 - (void)connect
 {
+    return; //don't connect just yet
     if ([[BRWalletManager sharedInstance] noWallet]) return; // check to make sure the wallet has been created
     if (self.connectFailures >= MAX_CONNECT_FAILURES) self.connectFailures = 0; // this attempt is a manual retry
     
@@ -538,7 +539,7 @@ static const char *dns_seeds[] = {
     }
 
     if (_blocks.count > 0) {
-        if (blockHeight >= self.lastBlockHeight - BLOCK_DIFFICULTY_INTERVAL*2) { // recent block we have the header for
+        if (blockHeight >= self.lastBlockHeight /*- BLOCK_DIFFICULTY_INTERVAL*/*2) { // recent block we have the header for
             BRMerkleBlock *block = self.lastBlock;
 
             while (block && block.height > blockHeight) block = self.blocks[block.prevBlock];
@@ -1066,20 +1067,20 @@ static const char *dns_seeds[] = {
     block.height = prev.height + 1;
     txTimestamp = (block.timestamp + prev.timestamp)/2;
 
-    if ((block.height % BLOCK_DIFFICULTY_INTERVAL) == 0) { // hit a difficulty transition, find previous transition time
-        BRMerkleBlock *b = block;
-
-        for (uint32_t i = 0; b && i < BLOCK_DIFFICULTY_INTERVAL; i++) {
-            b = self.blocks[b.prevBlock];
-        }
-
-        transitionTime = b.timestamp;
-
-        while (b) { // free up some memory
-            b = self.blocks[b.prevBlock];
-            if (b) [self.blocks removeObjectForKey:b.blockHash];
-        }
-    }
+//    if ((block.height % BLOCK_DIFFICULTY_INTERVAL) == 0) { // hit a difficulty transition, find previous transition time
+//        BRMerkleBlock *b = block;
+//
+//        for (uint32_t i = 0; b && i < BLOCK_DIFFICULTY_INTERVAL; i++) {
+//            b = self.blocks[b.prevBlock];
+//        }
+//
+//        transitionTime = b.timestamp;
+//
+//        while (b) { // free up some memory
+//            b = self.blocks[b.prevBlock];
+//            if (b) [self.blocks removeObjectForKey:b.blockHash];
+//        }
+//    }
 
     // verify block difficulty
     if (! [block verifyDifficultyFromPreviousBlock:prev andTransitionTime:transitionTime]) {

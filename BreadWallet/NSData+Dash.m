@@ -178,10 +178,10 @@ static void RMD160(const void *data, size_t len, uint8_t *md)
     NSData * blake = [self blake512];
     NSData * bmw = [blake bmw512];
     NSData * groestl = [bmw groestl512];
-    NSData * jh = [groestl jh512];
+    NSData * skein = [groestl skein512];
+    NSData * jh = [skein jh512];
     NSData * keccak = [jh keccak512];
-    NSData * skein = [keccak skein512];
-    NSData * luffa = [skein luffa512];
+    NSData * luffa = [keccak luffa512];
     NSData * cubehash = [luffa cubehash512];
     NSData * shavite = [cubehash shavite512];
     NSData * simd = [shavite simd512];
