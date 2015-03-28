@@ -41,7 +41,8 @@
 #define DOT    @"\xE2\x97\x8F" // black circle (utf-8)
 
 #define UNSPENT_URL @"https://api.chain.com/v2/%@/addresses/%@/unspents?api-key-id=eed0d7697a880144bb854676f88d123f"
-#define TICKER_URL  @"https://bitpay.com/rates"
+#define BITCOIN_TICKER_URL  @"https://bitpay.com/rates"
+#define CRYPTSY_TICKER_URL  @"http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=155"
 
 #define SEED_ENTROPY_LENGTH    (128/8)
 #define SEC_ATTR_SERVICE       @"org.voisine.breadwallet"
@@ -60,6 +61,7 @@
 #define CURRENCY_CODES_KEY      @"CURRENCY_CODES"
 #define CURRENCY_NAMES_KEY      @"CURRENCY_NAMES"
 #define CURRENCY_PRICES_KEY     @"CURRENCY_PRICES"
+#define DASH_BTC_PRICE_KEY      @"DASH_BTC_PRICE"
 #define SPEND_LIMIT_AMOUNT_KEY  @"SPEND_LIMIT_AMOUNT"
 #define SECURE_TIME_KEY         @"SECURE_TIME"
 
@@ -244,7 +246,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     _currencyPrices = [defs arrayForKey:CURRENCY_PRICES_KEY];
     self.localCurrencyCode = ([defs stringForKey:LOCAL_CURRENCY_CODE_KEY]) ?
         [defs stringForKey:LOCAL_CURRENCY_CODE_KEY] : [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
-    [self updateExchangeRate];
+    [self updateBitcoinExchangeRate];
+    [self updateDashExchangeRate];
 }
 
 - (void)dealloc
@@ -781,13 +784,45 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     });
 }
 
-- (void)updateExchangeRate
+
+// until there is a public api for dash prices among multiple currencies it's better that we pull Bitcoin prices per currency and convert it to dash
+- (void)updateDashExchangeRate
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExchangeRate) object:nil];
-    [self performSelector:@selector(updateExchangeRate) withObject:nil afterDelay:60.0];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDashExchangeRate) object:nil];
+    [self performSelector:@selector(updateDashExchangeRate) withObject:nil afterDelay:60.0];
+    if (self.reachability.currentReachabilityStatus == NotReachable) return;
+    
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:CRYPTSY_TICKER_URL]
+                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    
+    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                               if (connectionError) {
+                                   NSLog(@"%@", connectionError);
+                                   return;
+                               }
+                               NSError *error = nil;
+                               NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                               NSString * lastTradePriceString = [json objectForKey:@"lasttradeprice"];
+                               if (lastTradePriceString) {
+                                   NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+                                   numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+                                   NSNumber *lastTradePriceNumber = [numberFormatter numberFromString:lastTradePriceString];
+                                   NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+                                   [defs setObject:lastTradePriceNumber forKey:DASH_BTC_PRICE_KEY];
+                                   [defs synchronize];
+                               }
+                           }
+     ];
+}
+
+- (void)updateBitcoinExchangeRate
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateBitcoinExchangeRate) object:nil];
+    [self performSelector:@selector(updateBitcoinExchangeRate) withObject:nil afterDelay:60.0];
     if (self.reachability.currentReachabilityStatus == NotReachable) return;
 
-    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:TICKER_URL]
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:BITCOIN_TICKER_URL]
                          cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
 
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]

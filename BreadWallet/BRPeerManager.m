@@ -61,7 +61,8 @@ static const struct { uint32_t height; char *hash; time_t timestamp; uint32_t ta
 };
 
 static const char *dns_seeds[] = {
-    "testnet-seed.bitcoin.petertodd.org", "testnet-seed.bluematt.me", "testnet-seed.alexykot.me"
+    "testnet-seed.darkcoin.qa"
+//    "testnet-seed.bitcoin.petertodd.org", "testnet-seed.bluematt.me", "testnet-seed.alexykot.me"
 };
 
 #else // main net
@@ -89,9 +90,10 @@ static const struct { uint32_t height; char *hash; time_t timestamp; uint32_t ta
     { 342720, "00000000000000000f9cfece8494800d3dcbf9583232825da640c8703bcd27e7", 1423496415, 0x1818BB87u }
 };
 
-static const char *dns_seeds[] = {
-    "seed.bitcoin.sipa.be", "dnsseed.bluematt.me", "dnsseed.bitcoin.dashjr.org", "seed.bitcoinstats.com",
-    "seed.bitnodes.io"
+static const char *dns_seeds[] = { //need to find some seeds for dash
+    "dnsseed.darkcoin.qa","dnsseed.dashpay.io"
+//    "seed.bitcoin.sipa.be", "dnsseed.bluematt.me", "dnsseed.bitcoin.dashjr.org", "seed.bitcoinstats.com",
+//    "seed.bitnodes.io"
 };
 
 #endif
@@ -231,14 +233,15 @@ static const char *dns_seeds[] = {
             return _peers;
 #endif
             if (_peers.count < PEER_MAX_CONNECTIONS) {
+                NSAssert(FALSE, @"we need to do this");
                 // if DNS peer discovery fails, fall back on a hard coded list of peers (list taken from satoshi client)
-                for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
-                                           pathForResource:FIXED_PEERS ofType:@"plist"]]) {
-                    // give hard coded peers a timestamp between 7 and 14 days ago
-                    [_peers addObject:[[BRPeer alloc] initWithAddress:address.intValue port:DASH_STANDARD_PORT
-                                       timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
-                                       services:NODE_NETWORK]];
-                }
+//                for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
+//                                           pathForResource:FIXED_PEERS ofType:@"plist"]]) {
+//                    // give hard coded peers a timestamp between 7 and 14 days ago
+//                    [_peers addObject:[[BRPeer alloc] initWithAddress:address.intValue port:DASH_STANDARD_PORT
+//                                       timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
+//                                       services:NODE_NETWORK]];
+//                }
             }
             
             [self sortPeers];
@@ -396,7 +399,6 @@ static const char *dns_seeds[] = {
 
 - (void)connect
 {
-    return; //don't connect just yet
     if ([[BRWalletManager sharedInstance] noWallet]) return; // check to make sure the wallet has been created
     if (self.connectFailures >= MAX_CONNECT_FAILURES) self.connectFailures = 0; // this attempt is a manual retry
     
