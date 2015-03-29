@@ -58,6 +58,8 @@
 #define MSG_MERKLEBLOCK @"merkleblock"
 #define MSG_ALERT       @"alert"
 #define MSG_REJECT      @"reject" // described in BIP61: https://github.com/bitcoin/bips/blob/master/bip-0061.mediawiki
+#define MSG_DSEEP       @"dseep"
+#define MSG_DSEE       @"dsee"
 
 @class BRPeer, BRTransaction, BRMerkleBlock;
 

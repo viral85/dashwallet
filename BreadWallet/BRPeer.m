@@ -30,8 +30,9 @@
 #import "NSData+Dash.h"
 #import <arpa/inet.h>
 #import "Reachability.h"
+#import "Log.h"
 
-#define USERAGENT [NSString stringWithFormat:@"/ioswallet:%@/",\
+#define USERAGENT [NSString stringWithFormat:@"/ios:%@/",\
                    NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"]]
 
 #define HEADER_LENGTH      24
@@ -198,6 +199,7 @@ services:(uint64_t)services
 
 - (void)disconnectWithError:(NSError *)error
 {
+    NSLog(@"Disconnected with error %@",error);
     [NSObject cancelPreviousPerformRequestsWithTarget:self]; // cancel connect timeout
     
     _status = BRPeerStatusDisconnected;
@@ -299,6 +301,7 @@ services:(uint64_t)services
     [msg appendString:USERAGENT]; // user agent
     [msg appendUInt32:0]; // last block received
     [msg appendUInt8:0]; // relay transactions (no for SPV bloom filter mode)
+    //NSLog(@"sending message %@",msg);
     self.startTime = [NSDate timeIntervalSinceReferenceDate];
     [self sendMessage:msg type:MSG_VERSION];
 }
@@ -491,6 +494,8 @@ services:(uint64_t)services
         else if ([MSG_PONG isEqual:type]) [self acceptPongMessage:message];
         else if ([MSG_MERKLEBLOCK isEqual:type]) [self acceptMerkleblockMessage:message];
         else if ([MSG_REJECT isEqual:type]) [self acceptRejectMessage:message];
+        else if ([MSG_DSEEP isEqual:type]) [self acceptDSeepMessage:message];
+        else if ([MSG_DSEE isEqual:type]) [self acceptDSeeMessage:message];
         else NSLog(@"%@:%u dropping %@, length %u, not implemented", self.host, self.port, type, (int)message.length);
     });
     CFRunLoopWakeUp([self.runLoop getCFRunLoop]);
@@ -934,6 +939,17 @@ services:(uint64_t)services
     }
 }
 
+- (void)acceptDSeepMessage:(NSData *)message
+{
+    //todo implement instant transactions
+}
+
+- (void)acceptDSeeMessage:(NSData *)message
+{
+    //todo implement instant transactions
+}
+
+
 #pragma mark - hash
 
 #define FNV32_PRIME  0x01000193u
@@ -966,9 +982,11 @@ services:(uint64_t)services
 {
     switch (eventCode) {
         case NSStreamEventOpenCompleted:
+#if LOG_STREAM_CONNECTED
             NSLog(@"%@:%u %@ stream connected in %fs", self.host, self.port,
                   (aStream == self.inputStream) ? @"input" : (aStream == self.outputStream ? @"output" : @"unkown"),
                   [NSDate timeIntervalSinceReferenceDate] - self.startTime);
+#endif
 
             if (aStream == self.outputStream) {
                 self.startTime = [NSDate timeIntervalSinceReferenceDate]; // don't count connect time in ping time
@@ -1011,10 +1029,11 @@ services:(uint64_t)services
                     }
                     
                     self.msgHeader.length = headerLen + l;
-                    
+                    UInt32 msgMagicNumber = [self.msgHeader UInt32AtOffset:0];
+                    UInt32 dashMagicNumber = DASH_MAGIC_NUMBER;
                     // consume one byte at a time, up to the magic number that starts a new message header
                     while (self.msgHeader.length >= sizeof(uint32_t) &&
-                           [self.msgHeader UInt32AtOffset:0] != DASH_MAGIC_NUMBER) {
+                           msgMagicNumber != dashMagicNumber) {
 #if DEBUG
                         printf("%c", *(const char *)self.msgHeader.bytes);
 #endif

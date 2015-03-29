@@ -26,9 +26,9 @@
 #import <Foundation/Foundation.h>
 
 #if DASH_TESTNET
-#define DASH_MAGIC_NUMBER 0x0709110b
+#define DASH_MAGIC_NUMBER 0xffcae2ce
 #else
-#define DASH_MAGIC_NUMBER 0xd9b4bef9
+#define DASH_MAGIC_NUMBER 0xbd6b0cbf
 #endif
 
 CFAllocatorRef SecureAllocator();

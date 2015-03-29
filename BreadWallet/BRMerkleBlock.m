@@ -107,7 +107,7 @@
     [d appendUInt32:_timestamp + NSTimeIntervalSince1970 + 0.1];
     [d appendUInt32:_target];
     [d appendUInt32:_nonce];
-    _blockHash = d.SHA256_2;
+    _blockHash = d.x11;
 
     return self;
 }
