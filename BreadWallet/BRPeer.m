@@ -31,18 +31,18 @@
 #import <arpa/inet.h>
 #import "Reachability.h"
 
-#define USERAGENT [NSString stringWithFormat:@"/breadwallet:%@/",\
+#define USERAGENT [NSString stringWithFormat:@"/ioswallet:%@/",\
                    NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"]]
 
 #define HEADER_LENGTH      24
 #define MAX_MSG_LENGTH     0x02000000
 #define MAX_GETDATA_HASHES 50000
 #define ENABLED_SERVICES   0     // we don't provide full blocks to remote nodes
-#define PROTOCOL_VERSION   70002
+#define PROTOCOL_VERSION   70066
 #if TX_FEE_0_8_RULES
-#define MIN_PROTO_VERSION  70001 // peers earlier than this protocol version not supported (SPV mode required)
+#define MIN_PROTO_VERSION  70066 // peers earlier than this protocol version not supported (Version 11.1.25)
 #else
-#define MIN_PROTO_VERSION  70002 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
+#define MIN_PROTO_VERSION  70066 // peers earlier than this protocol version not supported (need v0.9 txFee relay rules)
 #endif
 #define LOCAL_HOST         0x7f000001
 #define ZERO_HASH          [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH]
@@ -884,7 +884,7 @@ services:(uint64_t)services
 
 - (void)acceptMerkleblockMessage:(NSData *)message
 {
-    // Bitcoin nodes don't support querying arbitrary transactions, only transactions not yet accepted in a block. After
+    // Dash nodes don't support querying arbitrary transactions, only transactions not yet accepted in a block. After
     // a merkleblock message, the remote node is expected to send tx messages for the tx referenced in the block. When a
     // non-tx message is received we should have all the tx in the merkleblock.
     BRMerkleBlock *block = [BRMerkleBlock blockWithMessage:message];
