@@ -67,7 +67,7 @@ void secp256k1_mod_mul(void *r, const void *a, const void *b)
     secp256k1_scalar_clear(&rs);
 }
 
-// add secp256k1 points
+// add secp256k1 ec-points
 int secp256k1_point_add(void *r, const void *a, const void *b, int compressed)
 {
     secp256k1_ge_t ap, bp, rp;
@@ -88,7 +88,7 @@ int secp256k1_point_add(void *r, const void *a, const void *b, int compressed)
     return size;
 }
 
-// multiply point by 256bit big endian
+// multiply ec-point by 256bit BE int
 int secp256k1_point_mul(void *r, const void *p, const void *i, int compressed)
 {
     static dispatch_once_t onceToken = 0;
@@ -257,11 +257,11 @@ int secp256k1_point_mul(void *r, const void *p, const void *i, int compressed)
 - (NSData *)sign:(NSData *)md
 {
     if (self.seckey.length != SECKEY_LENGTH) {
-        NSLog(@"%s:%d: %s: can't sign with a public key", __FILE__, __LINE__,  __func__);
+        NSLog(@"%s: can't sign with a public key", __func__);
         return nil;
     }
     else if (md.length != CC_SHA256_DIGEST_LENGTH) {
-        NSLog(@"%s:%d: %s: Only 256bit message digests can be signed", __FILE__, __LINE__,  __func__);
+        NSLog(@"%s: Only 256bit message digests can be signed", __func__);
         return nil;
     }
 
@@ -284,7 +284,7 @@ int secp256k1_point_mul(void *r, const void *p, const void *i, int compressed)
 - (BOOL)verify:(NSData *)md signature:(NSData *)sig
 {
     if (md.length != CC_SHA256_DIGEST_LENGTH) {
-        NSLog(@"%s:%d: %s: Only 256bit message digests can be verified", __FILE__, __LINE__,  __func__);
+        NSLog(@"%s: Only 256bit message digests can be verified", __func__);
         return NO;
     }
 

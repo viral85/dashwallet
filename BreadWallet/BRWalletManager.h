@@ -26,6 +26,8 @@
 #import <Foundation/Foundation.h>
 #import "BRWallet.h"
 
+@protocol BRMnemonic;
+
 #define WALLET_NEEDS_BACKUP_KEY @"WALLET_NEEDS_BACKUP"
 #define BRWalletManagerSeedChangedNotification @"BRWalletManagerSeedChangedNotification"
 
@@ -33,7 +35,8 @@
 
 @property (nonatomic, readonly) BRWallet *wallet;
 @property (nonatomic, readonly) BOOL noWallet; // true if keychain is available and we know that no wallet exists on it
-@property (nonatomic, readonly) id<BRKeySequence> sequence;
+@property (nonatomic, strong) id<BRKeySequence> sequence;
+@property (nonatomic, strong) id<BRMnemonic> mnemonic;
 @property (nonatomic, readonly) NSData *masterPublicKey; // master public key used to generate wallet addresses
 @property (nonatomic, copy) NSString *seedPhrase; // requesting seedPhrase will trigger authentication
 @property (nonatomic, readonly) NSTimeInterval seedCreationTime; // interval since refrence date, 00:00:00 01/01/01 GMT
