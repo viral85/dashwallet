@@ -61,8 +61,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 // true if the given tx hash is known to be included in the block
 - (BOOL)containsTxHash:(NSData *)txHash;
 
-// Verifies the block difficulty target is correct for the block's position in the chain. Transition time may be 0 if
-// height is not a multiple of BLOCK_DIFFICULTY_INTERVAL.
-- (BOOL)verifyDifficultyFromPreviousBlock:(BRMerkleBlock*)previous andTransitionTime:(NSTimeInterval)time;
+// Verifies the block difficulty target is correct for the block's position in the chain. Uses DGW
+- (BOOL)verifyDifficultyWithPreviousBlocks:(NSDictionary*)previousBlocks;
 
 @end

@@ -63,8 +63,8 @@
             queue:nil usingBlock:^(NSNotification *note) {
                 if (self.selectorType == 0) {
                     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyPrice],
-                                                     [m stringForAmount:DUFFS/m.localCurrencyPrice]];
+                                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyBitcoinPrice],
+                                                     [m stringForAmount:DUFFS/m.localCurrencyBitcoinPrice]];
                 }
             }];
     }
@@ -154,16 +154,16 @@
     NSUInteger digits = (((m.format.maximumFractionDigits - 2)/3 + 1) % 3)*3 + 2;
     
     if (digits == 5) {
-        m.format.currencyCode = @"mBTC";
-        m.format.currencySymbol = @"m" BTC NARROW_NBSP;
+        m.format.currencyCode = @"mDASH";
+        m.format.currencySymbol = @"m" DASH NARROW_NBSP;
     }
     else if (digits == 8) {
-        m.format.currencyCode = @"BTC";
-        m.format.currencySymbol = BTC NARROW_NBSP;
+        m.format.currencyCode = @"DASH";
+        m.format.currencySymbol = DASH NARROW_NBSP;
     }
     else {
-        m.format.currencyCode = @"XBT";
-        m.format.currencySymbol = BITS NARROW_NBSP;
+        m.format.currencyCode = @"XDC";
+        m.format.currencySymbol = DITS NARROW_NBSP;
     }
 
     m.format.maximumFractionDigits = digits;
@@ -171,8 +171,8 @@
     [[NSUserDefaults standardUserDefaults] setInteger:digits forKey:SETTINGS_MAX_DIGITS_KEY];
     m.localCurrencyCode = m.localCurrencyCode; // force balance notification
     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyPrice],
-                                     [m stringForAmount:DUFFS/m.localCurrencyPrice]];
+                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyBitcoinPrice],
+                                     [m stringForAmount:DUFFS/m.localCurrencyBitcoinPrice]];
 }
 
 #pragma mark - UITableViewDataSource
@@ -393,8 +393,8 @@
                     i = [m.currencyCodes indexOfObject:m.localCurrencyCode];
                     if (i < options.count) self.selectedOption = options[i];
                     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyPrice],
-                                                     [m stringForAmount:DUFFS/m.localCurrencyPrice]];
+                                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyBitcoinPrice],
+                                                     [m stringForAmount:DUFFS/m.localCurrencyBitcoinPrice]];
                     [self.navigationController pushViewController:self.selectorController animated:YES];
                     [self.selectorController.tableView reloadData];
                     

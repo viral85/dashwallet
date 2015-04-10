@@ -216,7 +216,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                   stringByReplacingCharactersInRange:[self.format.positiveFormat rangeOfString:@"#"]
                                   withString:@"-#"];
     self.format.currencyCode = @"XDC";
-    self.format.currencySymbol = BITS NARROW_NBSP;
+    self.format.currencySymbol = DITS NARROW_NBSP;
     self.format.maximumFractionDigits = 2;
     self.format.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
     self.format.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.format.maximumFractionDigits));
@@ -768,14 +768,25 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     
     if (i == NSNotFound) code = DEFAULT_CURRENCY_CODE, i = [_currencyCodes indexOfObject:DEFAULT_CURRENCY_CODE];
     _localCurrencyCode = [code copy];
-    _localCurrencyPrice = (i < _currencyPrices.count) ? [_currencyPrices[i] doubleValue] : DEFAULT_CURRENCY_PRICE;
+    _localCurrencyBitcoinPrice = (i < _currencyPrices.count) ? [_currencyPrices[i] doubleValue] : DEFAULT_CURRENCY_PRICE;
     self.localFormat.currencyCode = _localCurrencyCode;
-    self.localFormat.maximum = @((MAX_MONEY/DUFFS)*_localCurrencyPrice);
+    self.localFormat.maximum = @((MAX_MONEY/DUFFS)*_localCurrencyBitcoinPrice);
     
     if ([self.localCurrencyCode isEqual:[[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode]]) {
         [defs removeObjectForKey:LOCAL_CURRENCY_CODE_KEY];
     }
     else [defs setObject:self.localCurrencyCode forKey:LOCAL_CURRENCY_CODE_KEY];
+    
+    if (! _wallet) return;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletBalanceChangedNotification object:nil];
+    });
+}
+
+- (void)setBitcoinDashPrice:(double)bitcoinDashPrice {
+    
+    _bitcoinDashPrice = bitcoinDashPrice;
     
     if (! _wallet) return;
     
@@ -803,15 +814,18 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                }
                                NSError *error = nil;
                                NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-                               NSString * lastTradePriceString = [json objectForKey:@"lasttradeprice"];
+                               NSString * lastTradePriceString = [[[[json objectForKey:@"return"] objectForKey:@"markets"] objectForKey:@"DRK"] objectForKey:@"lasttradeprice"];
                                if (lastTradePriceString) {
                                    NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
                                    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
                                    NSNumber *lastTradePriceNumber = [numberFormatter numberFromString:lastTradePriceString];
+                                   [self setBitcoinDashPrice:[lastTradePriceNumber doubleValue]];
                                    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
                                    [defs setObject:lastTradePriceNumber forKey:DASH_BTC_PRICE_KEY];
                                    [defs synchronize];
                                }
+                               NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:DUFFS],
+                                     [self stringForAmount:DUFFS]);
                            }
      ];
 }
@@ -1027,10 +1041,10 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 // local currency. They will need to be revisited when that is no longer a safe assumption.
 - (int64_t)amountForLocalCurrencyString:(NSString *)string
 {
-    if (self.localCurrencyPrice <= DBL_EPSILON) return 0;
+    if (self.localCurrencyBitcoinPrice <= DBL_EPSILON) return 0;
     if ([string hasPrefix:@"<"]) string = [string substringFromIndex:1];
 
-    double price = self.localCurrencyPrice*pow(10.0, self.localFormat.maximumFractionDigits),
+    double price = self.localCurrencyBitcoinPrice*pow(10.0, self.localFormat.maximumFractionDigits),
            amt = [[self.localFormat numberFromString:string] doubleValue]*
                  pow(10.0, self.localFormat.maximumFractionDigits);
     int64_t local = amt + DBL_EPSILON*amt, overflowbits = 0;
@@ -1052,7 +1066,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
 
-    double local = self.localCurrencyPrice*amount/DUFFS;
+    double local = self.localCurrencyBitcoinPrice*self.bitcoinDashPrice*amount/DUFFS;
     NSString *ret = [self.localFormat stringFromNumber:@(local + DBL_EPSILON*local)];
 
     // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"

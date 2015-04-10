@@ -28,7 +28,7 @@
 #import "NSData+Dash.h"
 
 #define MAX_TIME_DRIFT    (2*60*60)     // the furthest in the future a block is allowed to be timestamped
-#define MAX_PROOF_OF_WORK 0x1d00ffffu   // highest value for difficulty target (higher values are less difficult)
+#define MAX_PROOF_OF_WORK 0x1e0ffff0u   // highest value for difficulty target (higher values are less difficult)
 
 // from https://en.bitcoin.it/wiki/Protocol_specification#Merkle_Trees
 // Merkle trees are binary trees of hashes. Merkle trees in darkcoin use x11, a cobined hash of 11 of the NIST
@@ -150,16 +150,25 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         } :^id (id left, id right) {
             [d setData:left];
             [d appendData:(right) ? right : left]; // if right branch is missing, duplicate left branch
-            return d.x11;
+            return d.SHA256_2;
         }];
     
-    if (_totalTransactions > 0 && ! [merkleRoot isEqual:_merkleRoot]) return NO; // merkle root check failed
+    if (_totalTransactions > 0 && ! [merkleRoot isEqual:_merkleRoot]) {
+        NSLog(@"Merkle root is not valid : check failed");
+        return NO; // merkle root check failed
+    }
     
     //TODO: use estimated network time instead of system time (avoids timejacking attacks and misconfigured time)
-    if (_timestamp > [NSDate timeIntervalSinceReferenceDate] + MAX_TIME_DRIFT) return NO; // timestamp too far in future
+    if (_timestamp > [NSDate timeIntervalSinceReferenceDate] + MAX_TIME_DRIFT) {
+        NSLog(@"Merkle root is not valid : timestamp too far in the future");
+        return NO; // timestamp too far in future
+    }
     
     // check if proof-of-work target is out of range
-    if (target == 0 || target & 0x00800000u || size > maxsize || (size == maxsize && target > maxtarget)) return NO;
+    if (target == 0 || target & 0x00800000u || size > maxsize || (size == maxsize && target > maxtarget)) {
+        NSLog(@"Merkle root is not valid : proof of work target is out of range");
+        return NO;
+    }
 
     d = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
     if (size > 3) *(uint32_t *)((uint8_t *)d.mutableBytes + size - 3) = CFSwapInt32HostToLittle(target);
@@ -226,42 +235,90 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 // targeted time between transitions (14*24*60*60 seconds). If the new difficulty is more than 4x or less than 1/4 of
 // the previous difficulty, the change is limited to either 4x or 1/4. There is also a minimum difficulty value
 // intuitively named MAX_PROOF_OF_WORK... since larger values are less difficult.
-- (BOOL)verifyDifficultyFromPreviousBlock:(BRMerkleBlock *)previous andTransitionTime:(NSTimeInterval)time
+- (BOOL)verifyDifficultyWithPreviousBlocks:(NSMutableDictionary *)previousBlocks
 {
-    return YES;
-//    if (! [_prevBlock isEqual:previous.blockHash] || _height != previous.height + 1) return NO;
-//    if ((_height % BLOCK_DIFFICULTY_INTERVAL) == 0 && time == 0) return NO;
-//
-//#if DASH_TESTNET
-//    //TODO: implement testnet difficulty rule check
-//    return YES; // don't worry about difficulty on testnet for now
-//#endif
-//
-//    if ((_height % BLOCK_DIFFICULTY_INTERVAL) != 0) return (_target == previous.target) ? YES : NO;
-//
-//    // target is in "compact" format, explained in isValid:
-//    static const uint32_t maxsize = MAX_PROOF_OF_WORK >> 24, maxtarget = MAX_PROOF_OF_WORK & 0x00ffffffu;
-//    uint32_t size = previous.target >> 24;
-//    double target = previous.target & 0x00ffffffu;
-//    int32_t timespan = (int32_t)((int64_t)(previous.timestamp + DBL_EPSILON*previous.timestamp) -
-//                                 (int64_t)(time + DBL_EPSILON*time));
-//
-//    // limit difficulty transition to -75% or +400%
-//    if (timespan < TARGET_TIMESPAN/4) timespan = TARGET_TIMESPAN/4;
-//    if (timespan > TARGET_TIMESPAN*4) timespan = TARGET_TIMESPAN*4;
-//
-//    target *= timespan;
-//    target /= TARGET_TIMESPAN;
-//    
-//    // normalize target for "compact" format
-//    while ((uint32_t)(target + DBL_EPSILON*target) < 0x00080000u) target *= 256, size--;
-//    while ((uint32_t)(target + DBL_EPSILON*target) > 0x007fffffu) target /= 256, size++;
-//    
-//    // limit to MAX_PROOF_OF_WORK
-//    if (size > maxsize || (size == maxsize && target > maxtarget)) target = maxtarget, size = maxsize;
-//    
-//    return (_target == ((uint32_t)(target + DBL_EPSILON*target) | size << 24)) ? YES : NO;
+    
+    if (self.height == 217753) {
+        NSLog(@"here");
+    }
+    uint32_t darkGravityWaveTarget = [self darkGravityWaveTargetWithPreviousBlocks:previousBlocks];
+    int32_t diff = abs((self.target & 0x00ffffffu) - darkGravityWaveTarget);
+    NSLog(@"%d %d",self.height,diff);
+    return (diff < 5); //improve this later
 }
+
+-(int32_t)darkGravityWaveTargetWithPreviousBlocks:(NSMutableDictionary *)previousBlocks {
+    /* current difficulty formula, darkcoin - DarkGravity v3, original work done by evan duffield, modified for iOS */
+    BRMerkleBlock *previousBlock = previousBlocks[self.prevBlock];
+    
+    int64_t nActualTimespan = 0;
+    int64_t lastBlockTime = 0;
+    int64_t pastBlocksMin = 24;
+    int64_t pastBlocksMax = 24;
+    int64_t blockCount = 0;
+    int32_t pastDifficultyAverage = 0;
+    int32_t pastDifficultyAveragePrev = 0;
+    
+    if (_prevBlock == NULL || previousBlock.height == 0 || previousBlock.height < pastBlocksMin) {
+        // This is the first block or the height is < PastBlocksMin
+        // Return minimal required work. (1e0ffff0)
+        return MAX_PROOF_OF_WORK & 0x00ffffffu;
+    }
+    
+    BRMerkleBlock *currentBlock = previousBlock;
+    // loop over the past n blocks, where n == PastBlocksMax
+    for (unsigned int i = 1; currentBlock && currentBlock.height > 0 && i<=pastBlocksMax; i++) {
+        blockCount++;
+        
+        // Calculate average difficulty based on the blocks we iterate over in this for loop
+        if(blockCount <= pastBlocksMin) {
+            uint32_t currentTarget = currentBlock.target & 0x00ffffffu;
+            if (blockCount == 1) { pastDifficultyAverage = currentTarget; }
+            else { pastDifficultyAverage = (int32_t)((pastDifficultyAveragePrev * blockCount)+ currentTarget) / (blockCount+1); }
+            pastDifficultyAveragePrev = pastDifficultyAverage;
+        }
+        
+        // If this is the second iteration (LastBlockTime was set)
+        if(lastBlockTime > 0){
+            // Calculate time difference between previous block and current block
+            int64_t currentBlockTime = currentBlock.timestamp;
+            int64_t diff = ((lastBlockTime + DBL_EPSILON*lastBlockTime) - (currentBlockTime + DBL_EPSILON*currentBlockTime));
+            // Increment the actual timespan
+            nActualTimespan += diff;
+        }
+        // Set LasBlockTime to the block time for the block in current iteration
+        lastBlockTime = currentBlock.timestamp;
+        
+        if (previousBlock == NULL) { assert(currentBlock); break; }
+        currentBlock = previousBlocks[currentBlock.prevBlock];
+    }
+    
+    // darkTarget is the difficulty
+    int64_t darkTarget = pastDifficultyAverage;
+    
+    // nTargetTimespan is the time that the CountBlocks should have taken to be generated.
+    int64_t nTargetTimespan = blockCount* (2.5*60);
+    
+    // Limit the re-adjustment to 3x or 0.33x
+    // We don't want to increase/decrease diff too much.
+    if (nActualTimespan < nTargetTimespan/3)
+        nActualTimespan = nTargetTimespan/3;
+    if (nActualTimespan > nTargetTimespan*3)
+        nActualTimespan = nTargetTimespan*3;
+    
+    // Calculate the new difficulty based on actual and target timespan.
+    darkTarget *= nActualTimespan;
+    darkTarget /= nTargetTimespan;
+    
+    // If calculated difficulty is lower than the minimal diff, set the new difficulty to be the minimal diff.
+    if (darkTarget > MAX_PROOF_OF_WORK){
+        darkTarget = MAX_PROOF_OF_WORK;
+    }
+    
+    // Return the new diff.
+    return (uint32_t)darkTarget;
+}
+
 
 // recursively walks the merkle tree in depth first order, calling leaf(hash, flag) for each stored hash, and
 // branch(left, right) with the result from each branch

@@ -496,6 +496,7 @@ services:(uint64_t)services
         else if ([MSG_REJECT isEqual:type]) [self acceptRejectMessage:message];
         else if ([MSG_DSEEP isEqual:type]) [self acceptDSeepMessage:message];
         else if ([MSG_DSEE isEqual:type]) [self acceptDSeeMessage:message];
+        else if ([MSG_DSQ isEqual:type]) [self acceptDSqMessage:message];
         else NSLog(@"%@:%u dropping %@, length %u, not implemented", self.host, self.port, type, (int)message.length);
     });
     CFRunLoopWakeUp([self.runLoop getCFRunLoop]);
@@ -945,6 +946,11 @@ services:(uint64_t)services
 }
 
 - (void)acceptDSeeMessage:(NSData *)message
+{
+    //todo implement instant transactions
+}
+
+- (void)acceptDSqMessage:(NSData *)message
 {
     //todo implement instant transactions
 }

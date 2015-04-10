@@ -45,7 +45,8 @@
 @property (nonatomic, readonly) NSNumberFormatter *format; // bitcoin currency formatter
 @property (nonatomic, readonly) NSNumberFormatter *localFormat; // local currency formatter
 @property (nonatomic, copy) NSString *localCurrencyCode; // local currency ISO code
-@property (nonatomic, readonly) double localCurrencyPrice; // exchange rate in local currency units per bitcoin
+@property (nonatomic, readonly) double localCurrencyBitcoinPrice; // exchange rate in local currency units per bitcoin
+@property (nonatomic, readonly) double bitcoinDashPrice; // exchange rate in bitcoin per dash
 @property (nonatomic, readonly) NSArray *currencyCodes; // list of supported local currency codes
 @property (nonatomic, readonly) NSArray *currencyNames; // names for local currency codes
 @property (nonatomic, assign) size_t averageBlockSize; // set this to enable basic floating fee calculation

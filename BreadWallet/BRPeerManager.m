@@ -1055,26 +1055,22 @@ static const char *dns_seeds[] = {
 
     block.height = prev.height + 1;
     txTimestamp = (block.timestamp + prev.timestamp)/2;
-
-//    if ((block.height % BLOCK_DIFFICULTY_INTERVAL) == 0) { // hit a difficulty transition, find previous transition time
-//        BRMerkleBlock *b = block;
-//
-//        for (uint32_t i = 0; b && i < BLOCK_DIFFICULTY_INTERVAL; i++) {
-//            b = self.blocks[b.prevBlock];
-//        }
-//
-//        transitionTime = b.timestamp;
-//
-//        while (b) { // free up some memory
-//            b = self.blocks[b.prevBlock];
-//            if (b) [self.blocks removeObjectForKey:b.blockHash];
-//        }
+    
+//    BRMerkleBlock *b = block;
+//    
+//    for (uint32_t i = 0; b && i < 2100; i++) {
+//        b = self.blocks[b.prevBlock];
+//    }
+//    
+//    while (b) { // free up some memory
+//        b = self.blocks[b.prevBlock];
+//        if (b) [self.blocks removeObjectForKey:b.blockHash];
 //    }
 
-    // verify block difficulty
-    if (! [block verifyDifficultyFromPreviousBlock:prev andTransitionTime:transitionTime]) {
-        NSLog(@"%@:%d relayed block with invalid difficulty target %x, blockHash: %@", peer.host, peer.port,
-              block.target, block.blockHash);
+    // verify block difficulty if block is past last checkpoint
+    if (block.height > checkpoint_array[CHECKPOINT_COUNT - 1].height && ![block verifyDifficultyWithPreviousBlocks:self.blocks]) {
+        NSLog(@"%@:%d relayed block with invalid difficulty height %d target %x, blockHash: %@", peer.host, peer.port,
+              block.height,block.target, block.blockHash);
         [self peerMisbehavin:peer];
         return;
     }
