@@ -174,10 +174,10 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 @interface BRWalletManager()
 
 @property (nonatomic, strong) BRWallet *wallet;
-@property (nonatomic, strong) id<BRKeySequence> sequence;
 @property (nonatomic, strong) Reachability *reachability;
 @property (nonatomic, strong) NSArray *currencyPrices;
-@property (nonatomic, assign) BOOL sweepFee;
+@property (nonatomic, strong) NSNumber *localPrice;
+@property (nonatomic, assign) BOOL sweepFee, didPresent;
 @property (nonatomic, strong) NSString *sweepKey;
 @property (nonatomic, strong) void (^sweepCompletion)(BRTransaction *tx, uint64_t fee, NSError *error);
 @property (nonatomic, strong) UIAlertView *alertView;
@@ -207,11 +207,13 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 
     [NSManagedObject setConcurrencyType:NSPrivateQueueConcurrencyType];
     self.sequence = [BRBIP32Sequence new];
+    self.mnemonic = [BRBIP39Mnemonic new];
     self.reachability = [Reachability reachabilityForInternetConnection];
     self.failedPins = [NSMutableSet set];
     _format = [NSNumberFormatter new];
     self.format.lenient = YES;
     self.format.numberStyle = NSNumberFormatterCurrencyStyle;
+    self.format.generatesDecimalNumbers = YES;
     self.format.negativeFormat = [self.format.positiveFormat
                                   stringByReplacingCharactersInRange:[self.format.positiveFormat rangeOfString:@"#"]
                                   withString:@"-#"];
@@ -223,6 +225,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     _localFormat = [NSNumberFormatter new];
     self.localFormat.lenient = YES;
     self.localFormat.numberStyle = NSNumberFormatterCurrencyStyle;
+    self.localFormat.generatesDecimalNumbers = YES;
     self.localFormat.negativeFormat = self.format.negativeFormat;
 
     self.protectedObserver =
@@ -333,7 +336,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         NSString *phrase = getKeychainString(MNEMONIC_KEY, nil);
         
         if (phrase.length == 0) return nil;
-        return [[BRBIP39Mnemonic sharedInstance] deriveKeyFromPhrase:phrase withPassphrase:nil];
+        return [self.mnemonic deriveKeyFromPhrase:phrase withPassphrase:nil];
     }
 }
 
@@ -346,9 +349,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (void)setSeedPhrase:(NSString *)seedPhrase
 {
     @autoreleasepool { // @autoreleasepool ensures sensitive data will be dealocated immediately
-        BRBIP39Mnemonic *m = [BRBIP39Mnemonic sharedInstance];
-        
-        if (seedPhrase) seedPhrase = [m encodePhrase:[m decodePhrase:seedPhrase]];
+        if (seedPhrase) seedPhrase = [self.mnemonic encodePhrase:[self.mnemonic decodePhrase:seedPhrase]];
 
         [[NSManagedObject context] performBlockAndWait:^{
             [BRAddressEntity deleteObjects:[BRAddressEntity allObjects]];
@@ -375,8 +376,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             return;
         }
         
-        NSData *masterPubKey = (seedPhrase) ? [self.sequence masterPublicKeyFromSeed:[m deriveKeyFromPhrase:seedPhrase
-                                                                                      withPassphrase:nil]] : nil;
+        NSData *masterPubKey = (seedPhrase) ? [self.sequence masterPublicKeyFromSeed:[self.mnemonic
+                                               deriveKeyFromPhrase:seedPhrase withPassphrase:nil]] : nil;
         
         setKeychainData(masterPubKey, MASTER_PUBKEY_KEY, NO);
         _wallet = nil;
@@ -436,7 +437,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         
         SecRandomCopyBytes(kSecRandomDefault, entropy.length, entropy.mutableBytes);
         
-        NSString *phrase = [[BRBIP39Mnemonic sharedInstance] encodePhrase:entropy];
+        NSString *phrase = [self.mnemonic encodePhrase:entropy];
         
         self.seedPhrase = phrase;
         
@@ -552,8 +553,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                 self.alertView.cancelButtonIndex = 1;
             }
             
-            [self.pinField resignFirstResponder];
-            [self.alertView setValue:nil forKey:@"accessoryView"];
+            [_pinField resignFirstResponder];
+            [self.alertView setNilValueForKey:@"accessoryView"];
             self.alertView.title = NSLocalizedString(@"wallet disabled", nil);
             self.alertView.message = [NSString stringWithFormat:NSLocalizedString(@"\ntry again in %d %@", nil),
                                       (int)wait, unit];
@@ -568,6 +569,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     }
 
     //TODO: replace all alert views with darkened initial warning screen type dialog
+    self.didPresent = NO;
     self.alertView = [[UIAlertView alloc]
                       initWithTitle:[NSString stringWithFormat:CIRCLE @"\t" CIRCLE @"\t" CIRCLE @"\t" CIRCLE @"\n%@",
                                      (title) ? title : @""] message:message delegate:self
@@ -578,7 +580,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     [self.pinField becomeFirstResponder];
     
     for (;;) {
-        while (self.alertView.visible && self.pinField.text.length < 4) {
+        while ((! self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
         
@@ -588,9 +590,13 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             self.pinField.text = nil;
             [self.failedPins removeAllObjects];
             self.didAuthenticate = YES;
-            setKeychainInt(0, PIN_FAIL_COUNT_KEY, NO);
-            setKeychainInt(0, PIN_FAIL_HEIGHT_KEY, NO);
-            if (self.spendingLimit > 0) setKeychainInt(self.wallet.totalSent + self.spendingLimit, SPEND_LIMIT_KEY, NO);
+
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                setKeychainInt(0, PIN_FAIL_COUNT_KEY, NO);
+                setKeychainInt(0, PIN_FAIL_HEIGHT_KEY, NO);
+                if (self.spendingLimit>0) setKeychainInt(self.wallet.totalSent+self.spendingLimit, SPEND_LIMIT_KEY, NO);
+            });
+
             return YES;
         }
 
@@ -661,6 +667,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         }];
     }
     else {
+        self.didPresent = NO;
         self.alertView = [[UIAlertView alloc] initWithTitle:title message:@" " delegate:self cancelButtonTitle:nil
                           otherButtonTitles:nil];
         self.pinField = nil; // reset pinField so a new one is created
@@ -670,7 +677,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     }
     
     for (;;) {
-        while (self.alertView.visible && self.pinField.text.length < 4) {
+        while ((! self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
     
@@ -728,9 +735,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     // it's ok to store this in userdefaults because increasing the value only takes effect after successful pin entry
     if (! [[NSUserDefaults standardUserDefaults] objectForKey:SPEND_LIMIT_AMOUNT_KEY]) return DUFFS;
 
-    double limit = [[NSUserDefaults standardUserDefaults] doubleForKey:SPEND_LIMIT_AMOUNT_KEY];
-    
-    return limit + DBL_EPSILON*limit;
+    return [[NSUserDefaults standardUserDefaults] doubleForKey:SPEND_LIMIT_AMOUNT_KEY];
 }
 
 - (void)setSpendingLimit:(uint64_t)spendingLimit
@@ -760,6 +765,11 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 
 #pragma mark - exchange rate
 
+- (double)localCurrencyPrice
+{
+    return self.localPrice.doubleValue;
+}
+
 // local currency ISO code
 - (void)setLocalCurrencyCode:(NSString *)code
 {
@@ -771,6 +781,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     _localCurrencyBitcoinPrice = (i < _currencyPrices.count) ? [_currencyPrices[i] doubleValue] : DEFAULT_CURRENCY_PRICE;
     self.localFormat.currencyCode = _localCurrencyCode;
     self.localFormat.maximum = @((MAX_MONEY/DUFFS)*_localCurrencyBitcoinPrice);
+    
     
     if ([self.localCurrencyCode isEqual:[[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode]]) {
         [defs removeObjectForKey:LOCAL_CURRENCY_CODE_KEY];
@@ -883,7 +894,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         _currencyCodes = codes;
         _currencyNames = names;
         _currencyPrices = rates;
-        self.localCurrencyCode = _localCurrencyCode;
+        self.localCurrencyCode = _localCurrencyCode; // update localCurrencyPrice and localFormat.maximum
         [defs setObject:self.currencyCodes forKey:CURRENCY_CODES_KEY];
         [defs setObject:self.currencyNames forKey:CURRENCY_NAMES_KEY];
         [defs setObject:self.currencyPrices forKey:CURRENCY_PRICES_KEY];
@@ -1016,25 +1027,15 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 
 - (int64_t)amountForString:(NSString *)string
 {
-    double amt = [[self.format numberFromString:string] doubleValue]*pow(10.0, self.format.maximumFractionDigits);
-
-    return amt + DBL_EPSILON*amt;
+    if (! string.length) return 0;
+    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.format numberFromString:string] decimalValue]]
+             decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits] longLongValue];
 }
 
 - (NSString *)stringForAmount:(int64_t)amount
 {
-    NSUInteger min = self.format.minimumFractionDigits;
-
-    if (amount == 0) {
-        self.format.minimumFractionDigits =
-            (self.format.maximumFractionDigits > 4) ? 4 : self.format.maximumFractionDigits;
-    }
-
-    double amt = amount/pow(10.0, self.format.maximumFractionDigits);
-    NSString *r = [self.format stringFromNumber:@(amt + DBL_EPSILON*amt)];
-
-    self.format.minimumFractionDigits = min;
-    return r;
+    return [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+            decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
 }
 
 // NOTE: For now these local currency methods assume that a satoshi has a smaller value than the smallest unit of any
@@ -1056,6 +1057,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
             amount = (min + max)/2, p = 10;
 
     while (overflowbits > 0) local *= 2, min *= 2, max *= 2, amount *= 2, overflowbits--;
+
     if (amount >= MAX_MONEY) return (local < 0) ? -MAX_MONEY : MAX_MONEY;
     while ((amount/p)*p >= min && p <= INT64_MAX/10) p *= 10; // lowest decimal precision matching local currency string
     p /= 10;
@@ -1066,18 +1068,20 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
 
-    double local = self.localCurrencyBitcoinPrice*self.bitcoinDashPrice*amount/DUFFS;
-    NSString *ret = [self.localFormat stringFromNumber:@(local + DBL_EPSILON*local)];
 
+    NSNumber * local = [NSNumber numberWithDouble:self.localCurrencyBitcoinPrice*self.bitcoinDashPrice*amount/DUFFS];
+
+    
+    NSDecimalNumber *n = [[[NSDecimalNumber decimalNumberWithDecimal:local.decimalValue]
+                           decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:llabs(amount)]]
+                          decimalNumberByDividingBy:(id)[NSDecimalNumber numberWithLongLong:DUFFS]],
+                     *min = [[NSDecimalNumber one]
+                             decimalNumberByMultiplyingByPowerOf10:-self.localFormat.maximumFractionDigits];
+    
     // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
-    if (amount > 0 && local < 0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
-        ret = [self.localFormat stringFromNumber:@(1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
-    }
-    else if (amount < 0 && local > -0.9/pow(10.0, self.localFormat.maximumFractionDigits)) {
-        ret = [self.localFormat stringFromNumber:@(-1.0/pow(10.0, self.localFormat.maximumFractionDigits))];
-    }
-
-    return ret;
+    if ([n compare:min] == NSOrderedAscending) n = min;
+    if (amount < 0) n = [n decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithInt:-1]];
+    return [self.localFormat stringFromNumber:n];
 }
 
 #pragma mark - UITextFieldDelegate
@@ -1105,18 +1109,16 @@ replacementString:(NSString *)string
 
 - (void)textViewDidChange:(UITextView *)textView
 {
-    BRBIP39Mnemonic *m = [BRBIP39Mnemonic sharedInstance];
-    
     @autoreleasepool { // @autoreleasepool ensures sensitive data will be dealocated immediately
         if ([textView.text rangeOfString:@"\n"].location != NSNotFound) {
-            textView.text = [m normalizePhrase:textView.text];
+            textView.text = [self.mnemonic normalizePhrase:textView.text];
             
-            if (! [m phraseIsValid:[m normalizePhrase:textView.text]]) {
+            if (! [self.mnemonic phraseIsValid:[self.mnemonic normalizePhrase:textView.text]]) {
                 self.alertView.title = NSLocalizedString(@"bad recovery phrase", nil);
                 [self.alertView performSelector:@selector(setTitle:)
                  withObject:NSLocalizedString(@"recovery phrase", nil) afterDelay:3.0];
             }
-            else if (! [[m normalizePhrase:textView.text] isEqual:getKeychainString(MNEMONIC_KEY, nil)]) {
+            else if (! [[self.mnemonic normalizePhrase:textView.text] isEqual:getKeychainString(MNEMONIC_KEY, nil)]) {
                 self.alertView.title = NSLocalizedString(@"recovery phrase doesn't match", nil);
                 [self.alertView performSelector:@selector(setTitle:)
                  withObject:NSLocalizedString(@"recovery phrase", nil) afterDelay:3.0];
@@ -1142,11 +1144,18 @@ replacementString:(NSString *)string
 
 #pragma mark - UIAlertViewDelegate
 
+- (void)didPresentAlertView:(UIAlertView *)alertView
+{
+    self.didPresent = YES;
+    if (_pinField && ! _pinField.isFirstResponder) [_pinField becomeFirstResponder]; // fix for iOS 7 missing keyboard
+}
+
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:alertView];
     if (alertView == self.alertView) self.alertView = nil;
-    if (self.pinField.isFirstResponder) [self hideKeyboard];
+    if (_pinField.isFirstResponder) [self hideKeyboard];
+    _pinField = nil;
     
     if (buttonIndex == alertView.cancelButtonIndex) {
         if ([[alertView buttonTitleAtIndex:buttonIndex] isEqual:@"abort"]) abort();

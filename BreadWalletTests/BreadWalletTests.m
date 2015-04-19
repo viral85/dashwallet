@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 
 #import "BreadWalletTests.h"
-#import "BRWallet.h"
+#import "BRWalletManager.h"
 #import "BRBIP32Sequence.h"
 #import "BRBIP39Mnemonic.h"
 #import "BRTransaction.h"
@@ -158,7 +158,7 @@
     XCTAssertEqualObjects(@"00263b999714e756fa5d02814b842a2634dd31ac".hexToData, d, @"[NSData RMD160]");
 
     d = [@"1234567890123456789012345678901234567890123456789012345678901234"
-         dataUsingEncoding:NSUTF8StringEncoding].RMD160;
+         dataUsingEncoding:NSUTF8StringEncoding].RMD160; // a message exactly 64bytes long (internal buffer size)
     XCTAssertEqualObjects(@"fa8c1a78eb763bb97d5ea14ce9303d1ce2f33454".hexToData, d, @"[NSData RMD160]");
 
     d = [NSData data].RMD160; // empty

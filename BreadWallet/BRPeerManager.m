@@ -46,6 +46,7 @@
 
 #if DASH_TESTNET
 
+
 static const struct { uint32_t height; char *hash; time_t timestamp; uint32_t target; } checkpoint_array[] = {
     {      261, "00000c26026d0815a7e2ce4fa270775f61403c040647ff2c3091f99e894a4618", 1296688602, 0x1d00ffffu }
 };
@@ -199,7 +200,8 @@ static const char *dns_seeds[] = {
 
         [self sortPeers];
 
-        if (_peers.count < PEER_MAX_CONNECTIONS || [_peers[PEER_MAX_CONNECTIONS - 1] timestamp] < now - 3*24*60*60) {
+        if (_peers.count < PEER_MAX_CONNECTIONS ||
+            [(BRPeer *)_peers[PEER_MAX_CONNECTIONS - 1] timestamp] < now - 3*24*60*60) {
             for (int i = 0; i < sizeof(dns_seeds)/sizeof(*dns_seeds); i++) { // DNS peer discovery
                 NSLog(@"DNS lookup %s", dns_seeds[i]);
                 
@@ -222,6 +224,7 @@ static const char *dns_seeds[] = {
             if (_peers.count < PEER_MAX_CONNECTIONS) {
                 NSAssert(FALSE, @"we need to do this");
                 // if DNS peer discovery fails, fall back on a hard coded list of peers (list taken from satoshi client)
+
 //                for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
 //                                           pathForResource:FIXED_PEERS ofType:@"plist"]]) {
 //                    // give hard coded peers a timestamp between 7 and 14 days ago
@@ -251,9 +254,8 @@ static const char *dns_seeds[] = {
             NSData *hash = [NSString stringWithUTF8String:checkpoint_array[i].hash].hexToData.reverse;
 
             _blocks[hash] = [[BRMerkleBlock alloc] initWithBlockHash:hash version:1 prevBlock:nil merkleRoot:nil
-                             timestamp:checkpoint_array[i].timestamp - NSTimeIntervalSince1970
-                             target:checkpoint_array[i].target nonce:0 totalTransactions:0 hashes:nil flags:nil
-                             height:checkpoint_array[i].height];
+                             timestamp:checkpoint_array[i].timestamp target:checkpoint_array[i].target nonce:0
+                             totalTransactions:0 hashes:nil flags:nil height:checkpoint_array[i].height];
             self.checkpoints[@(checkpoint_array[i].height)] = hash;
         }
 
@@ -276,7 +278,7 @@ static const char *dns_seeds[] = {
 - (NSArray *)blockLocatorArray
 {
     // append 10 most recent block hashes, decending, then continue appending, doubling the step back each time,
-    // finishing with the genisis block (top, -1, -2, -3, -4, -5, -6, -7, -8, -9, -11, -15, -23, -39, -71, -135, ..., 0)
+    // finishing with the genesis block (top, -1, -2, -3, -4, -5, -6, -7, -8, -9, -11, -15, -23, -39, -71, -135, ..., 0)
     NSMutableArray *locators = [NSMutableArray array];
     int32_t step = 1, start = 0;
     BRMerkleBlock *b = self.lastBlock;
@@ -307,11 +309,10 @@ static const char *dns_seeds[] = {
 
     // if we don't have any blocks yet, use the latest checkpoint that's at least a week older than earliestKeyTime
     for (int i = CHECKPOINT_COUNT - 1; ! _lastBlock && i >= 0; i--) {
-        if (i == 0 || checkpoint_array[i].timestamp + 7*24*60*60 - NSTimeIntervalSince1970 < self.earliestKeyTime) {
+        if (i == 0 || checkpoint_array[i].timestamp + 7*24*60*60 < self.earliestKeyTime + NSTimeIntervalSince1970) {
             _lastBlock = [[BRMerkleBlock alloc]
                           initWithBlockHash:[NSString stringWithUTF8String:checkpoint_array[i].hash].hexToData.reverse
-                          version:1 prevBlock:nil merkleRoot:nil
-                          timestamp:checkpoint_array[i].timestamp - NSTimeIntervalSince1970
+                          version:1 prevBlock:nil merkleRoot:nil timestamp:checkpoint_array[i].timestamp
                           target:checkpoint_array[i].target nonce:0 totalTransactions:0 hashes:nil flags:nil
                           height:checkpoint_array[i].height];
         }
@@ -328,7 +329,8 @@ static const char *dns_seeds[] = {
 - (uint32_t)estimatedBlockHeight
 {
     if (self.downloadPeer.lastblock > self.lastBlockHeight) return self.downloadPeer.lastblock;
-    return self.lastBlockHeight + ([NSDate timeIntervalSinceReferenceDate] - self.lastBlock.timestamp)/(10*60);
+    return self.lastBlockHeight + ([NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 -
+                                   self.lastBlock.timestamp)/(10*60);
 }
 
 - (double)syncProgress
@@ -354,11 +356,13 @@ static const char *dns_seeds[] = {
 {
     if (_bloomFilter) return _bloomFilter;
 
+    BRWalletManager *m = [BRWalletManager sharedInstance];
+    
     // every time a new wallet address is added, the bloom filter has to be rebuilt, and each address is only used for
     // one transaction, so here we generate some spare addresses to avoid rebuilding the filter each time a wallet
-    // transaction is encountered during the blockchain download (generates 5x the external gap limit for both chains)
-    [[[BRWalletManager sharedInstance] wallet] addressesWithGapLimit:SEQUENCE_GAP_LIMIT_EXTERNAL*5 internal:NO];
-    [[[BRWalletManager sharedInstance] wallet] addressesWithGapLimit:SEQUENCE_GAP_LIMIT_EXTERNAL*5 internal:YES];
+    // transaction is encountered during the blockchain download
+    [m.wallet addressesWithGapLimit:SEQUENCE_GAP_LIMIT_EXTERNAL + 100 internal:NO];
+    [m.wallet addressesWithGapLimit:SEQUENCE_GAP_LIMIT_INTERNAL + 100 internal:YES];
 
     [self.orphans removeAllObjects]; // clear out orphans that may have been received on an old filter
     self.lastOrphan = nil;
@@ -366,11 +370,9 @@ static const char *dns_seeds[] = {
     self.fpRate = BLOOM_DEFAULT_FALSEPOSITIVE_RATE;
     if (self.lastBlockHeight + 500 < self.estimatedBlockHeight) self.fpRate = BLOOM_REDUCED_FALSEPOSITIVE_RATE;
 
-    BRWalletManager *m = [BRWalletManager sharedInstance];
     NSUInteger elemCount = m.wallet.addresses.count + m.wallet.unspentOutputs.count;
     BRBloomFilter *filter = [[BRBloomFilter alloc] initWithFalsePositiveRate:self.fpRate
-                             forElementCount:(elemCount < 200 ? elemCount*1.5 : elemCount + 100)
-                             tweak:self.tweak flags:BLOOM_UPDATE_ALL];
+                             forElementCount:elemCount + 100 tweak:self.tweak flags:BLOOM_UPDATE_ALL];
 
     for (NSString *address in m.wallet.addresses) { // add addresses to watch for any tx receiveing money to the wallet
         NSData *hash = address.addressToHash160;
@@ -393,8 +395,15 @@ static const char *dns_seeds[] = {
         if (self.syncStartHeight == 0) self.syncStartHeight = self.lastBlockHeight;
 
         if (self.taskId == UIBackgroundTaskInvalid) { // start a background task for the chain sync
-            // TODO: XXXX handle task expiration cleanly
-            self.taskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];
+            self.taskId =
+                [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+                    dispatch_async(self.q, ^{
+                        [self saveBlocks];
+                        [BRMerkleBlockEntity saveContext];
+                    });
+
+                    [self syncStopped];
+                }];
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -454,7 +463,7 @@ static const char *dns_seeds[] = {
 
         // start the chain download from the most recent checkpoint that's at least a week older than earliestKeyTime
         for (int i = CHECKPOINT_COUNT - 1; ! _lastBlock && i >= 0; i--) {
-            if (i == 0 || checkpoint_array[i].timestamp + 7*24*60*60 - NSTimeIntervalSince1970 < self.earliestKeyTime) {
+            if (i == 0 || checkpoint_array[i].timestamp + 7*24*60*60 < self.earliestKeyTime + NSTimeIntervalSince1970) {
                 _lastBlock = self.blocks[[NSString stringWithUTF8String:checkpoint_array[i].hash].hexToData.reverse];
             }
         }
@@ -504,6 +513,8 @@ static const char *dns_seeds[] = {
         for (BRPeer *p in peers) {
             [p sendInvMessageWithTxHashes:txHashes];
             [p sendPingMessageWithPongHandler:^(BOOL success) {
+                //TODO: XXXX have peer:requestedTransaction: send getdata, and only send getdata here if the tx wasn't
+                // requested, then ping again, and if pong comes back before the tx, we know the tx was refused
                 if (success) [p sendGetdataMessageWithTxHashes:txHashes andBlockHashes:nil];
             }];
         }
@@ -521,10 +532,10 @@ static const char *dns_seeds[] = {
 // BUG: this just doesn't work very well... we need to start storing tx metadata
 - (NSTimeInterval)timestampForBlockHeight:(uint32_t)blockHeight
 {
-    if (blockHeight == TX_UNCONFIRMED) return self.lastBlock.timestamp + 10*60; // assume next block
+    if (blockHeight == TX_UNCONFIRMED) return (self.lastBlock.timestamp - NSTimeIntervalSince1970) + 10*60; //next block
 
     if (blockHeight > self.lastBlockHeight) { // future block, assume 10 minutes per block after last block
-        return self.lastBlock.timestamp + (blockHeight - self.lastBlockHeight)*10*60;
+        return (self.lastBlock.timestamp - NSTimeIntervalSince1970) + (blockHeight - self.lastBlockHeight)*10*60;
     }
 
     if (_blocks.count > 0) {
@@ -532,13 +543,12 @@ static const char *dns_seeds[] = {
             BRMerkleBlock *block = self.lastBlock;
 
             while (block && block.height > blockHeight) block = self.blocks[block.prevBlock];
-            if (block) return block.timestamp;
+            if (block) return block.timestamp - NSTimeIntervalSince1970;
         }
     }
     else [[BRMerkleBlockEntity context] performBlock:^{ [self blocks]; }];
 
-    uint32_t h = self.lastBlockHeight;
-    NSTimeInterval t = self.lastBlock.timestamp + NSTimeIntervalSince1970;
+    uint32_t h = self.lastBlockHeight, t = self.lastBlock.timestamp;
 
     for (int i = CHECKPOINT_COUNT - 1; i >= 0; i--) { // estimate from checkpoints
         if (checkpoint_array[i].height <= blockHeight) {
@@ -730,9 +740,9 @@ static const char *dns_seeds[] = {
 
 - (void)sortPeers
 {
-    [_peers sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-        if ([obj1 timestamp] > [obj2 timestamp]) return NSOrderedAscending;
-        if ([obj1 timestamp] < [obj2 timestamp]) return NSOrderedDescending;
+    [_peers sortUsingComparator:^NSComparisonResult(BRPeer *p1, BRPeer *p2) {
+        if (p1.timestamp > p2.timestamp) return NSOrderedAscending;
+        if (p1.timestamp < p2.timestamp) return NSOrderedDescending;
         return NSOrderedSame;
     }];
 }
@@ -765,24 +775,25 @@ static const char *dns_seeds[] = {
 
 - (void)saveBlocks
 {
-    NSMutableSet *blockHashes = [NSMutableSet set];
+    NSMutableDictionary *blocks = [NSMutableDictionary dictionary];
     BRMerkleBlock *b = self.lastBlock;
 
     while (b) {
-        [blockHashes addObject:b.blockHash];
+        blocks[b.blockHash] = b;
         b = self.blocks[b.prevBlock];
     }
 
     [[BRMerkleBlockEntity context] performBlock:^{
-        [BRMerkleBlockEntity deleteObjects:[BRMerkleBlockEntity objectsMatching:@"! (blockHash in %@)", blockHashes]];
+        [BRMerkleBlockEntity deleteObjects:[BRMerkleBlockEntity objectsMatching:@"! (blockHash in %@)",
+                                            blocks.allKeys]];
 
-        for (BRMerkleBlockEntity *e in [BRMerkleBlockEntity objectsMatching:@"blockHash in %@", blockHashes]) {
-            [e setAttributesFromBlock:self.blocks[e.blockHash]];
-            [blockHashes removeObject:e.blockHash];
+        for (BRMerkleBlockEntity *e in [BRMerkleBlockEntity objectsMatching:@"blockHash in %@", blocks.allKeys]) {
+            [e setAttributesFromBlock:blocks[e.blockHash]];
+            [blocks removeObjectForKey:e.blockHash];
         }
 
-        for (NSData *hash in blockHashes) {
-            [[BRMerkleBlockEntity managedObject] setAttributesFromBlock:self.blocks[hash]];
+        for (BRMerkleBlock *b in blocks.allValues) {
+            [[BRMerkleBlockEntity managedObject] setAttributesFromBlock:b];
         }
     }];
 }
@@ -841,7 +852,7 @@ static const char *dns_seeds[] = {
             dispatch_async(self.q, ^{
                 // request just block headers up to a week before earliestKeyTime, and then merkleblocks after that
                 // BUG: XXXX headers can timeout on slow connections (each message is over 160k)
-                if (self.lastBlock.timestamp + 7*24*60*60 >= self.earliestKeyTime) {
+                if (self.lastBlock.timestamp + 7*24*60*60 >= self.earliestKeyTime + NSTimeIntervalSince1970) {
                     [peer sendGetblocksMessageWithLocators:[self blockLocatorArray] andHashStop:nil];
                 }
                 else [peer sendGetheadersMessageWithLocators:[self blockLocatorArray] andHashStop:nil];
@@ -916,7 +927,7 @@ static const char *dns_seeds[] = {
     NSTimeInterval t = [NSDate timeIntervalSinceReferenceDate] - 3*60*60;
 
     // remove peers more than 3 hours old, or until there are only 1000 left
-    while (self.peers.count > 1000 && [self.peers.lastObject timestamp] < t) {
+    while (self.peers.count > 1000 && [(BRPeer *)self.peers.lastObject timestamp] < t) {
         [self.peers removeObject:self.peers.lastObject];
     }
 
@@ -1005,7 +1016,8 @@ static const char *dns_seeds[] = {
 - (void)peer:(BRPeer *)peer relayedBlock:(BRMerkleBlock *)block
 {
     // ignore block headers that are newer than one week before earliestKeyTime (headers have 0 totalTransactions)
-    if (block.totalTransactions == 0 && block.timestamp + 7*24*60*60 > self.earliestKeyTime + 2*60*60) return;
+    if (block.totalTransactions == 0 &&
+        block.timestamp + 7*24*60*60 > self.earliestKeyTime + NSTimeIntervalSince1970 + 2*60*60) return;
 
     // track the observed bloom filter false positive rate using a low pass filter to smooth out variance
     if (peer == self.downloadPeer && block.totalTransactions > 0) {
@@ -1033,14 +1045,14 @@ static const char *dns_seeds[] = {
     }
 
     BRMerkleBlock *prev = self.blocks[block.prevBlock];
-    NSTimeInterval transitionTime = 0, txTimestamp = 0;
+    uint32_t transitionTime = 0, txTime = 0;
 
     if (! prev) { // block is an orphan
         NSLog(@"%@:%d relayed orphan block %@, previous %@, last block is %@, height %d", peer.host, peer.port,
               block.blockHash, block.prevBlock, self.lastBlock.blockHash, self.lastBlockHeight);
 
         // ignore orphans older than one week ago
-        if (block.timestamp < [NSDate timeIntervalSinceReferenceDate] - 7*24*60*60) return;
+        if (block.timestamp < [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 - 7*24*60*60) return;
 
         // call getblocks, unless we already did with the previous block, or we're still downloading the chain
         if (self.lastBlockHeight >= peer.lastblock && ! [self.lastOrphan.blockHash isEqual:block.prevBlock]) {
@@ -1054,7 +1066,7 @@ static const char *dns_seeds[] = {
     }
 
     block.height = prev.height + 1;
-    txTimestamp = (block.timestamp + prev.timestamp)/2;
+    txTime = (block.timestamp + prev.timestamp)/2;
     
 //    BRMerkleBlock *b = block;
 //    
@@ -1090,7 +1102,7 @@ static const char *dns_seeds[] = {
 
         self.blocks[block.blockHash] = block;
         self.lastBlock = block;
-        [self setBlockHeight:block.height andTimestamp:txTimestamp forTxHashes:block.txHashes];
+        [self setBlockHeight:block.height andTimestamp:txTime - NSTimeIntervalSince1970 forTxHashes:block.txHashes];
         if (peer == self.downloadPeer) self.lastRelayTime = [NSDate timeIntervalSinceReferenceDate];
         self.downloadPeer.currentBlockHeight = block.height;
 
@@ -1109,7 +1121,7 @@ static const char *dns_seeds[] = {
         while (b && b.height > block.height) b = self.blocks[b.prevBlock]; // check if block is in main chain
 
         if ([b.blockHash isEqual:block.blockHash]) { // if it's not on a fork, set block heights for its transactions
-            [self setBlockHeight:block.height andTimestamp:txTimestamp forTxHashes:block.txHashes];
+            [self setBlockHeight:block.height andTimestamp:txTime - NSTimeIntervalSince1970 forTxHashes:block.txHashes];
             if (block.height == self.lastBlockHeight) self.lastBlock = block;
         }
     }
@@ -1152,9 +1164,9 @@ static const char *dns_seeds[] = {
         b = block;
 
         while (b.height > b2.height) { // set transaction heights for new main chain
-            [self setBlockHeight:b.height andTimestamp:txTimestamp forTxHashes:b.txHashes];
+            [self setBlockHeight:b.height andTimestamp:txTime - NSTimeIntervalSince1970 forTxHashes:b.txHashes];
             b = self.blocks[b.prevBlock];
-            txTimestamp = (b.timestamp + [self.blocks[b.prevBlock] timestamp])/2;
+            txTime = b.timestamp/2 + [(BRMerkleBlock *)self.blocks[b.prevBlock] timestamp]/2;
         }
 
         self.lastBlock = block;

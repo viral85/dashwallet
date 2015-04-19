@@ -86,7 +86,7 @@
     off += CC_SHA256_DIGEST_LENGTH;
     _merkleRoot = [message hashAtOffset:off];
     off += CC_SHA256_DIGEST_LENGTH;
-    _timestamp = [message UInt32AtOffset:off] - NSTimeIntervalSince1970;
+    _timestamp = [message UInt32AtOffset:off];
     off += sizeof(uint32_t);
     _target = [message UInt32AtOffset:off];
     off += sizeof(uint32_t);
@@ -104,7 +104,7 @@
     [d appendUInt32:_version];
     [d appendData:_prevBlock];
     [d appendData:_merkleRoot];
-    [d appendUInt32:_timestamp + NSTimeIntervalSince1970 + 0.1];
+    [d appendUInt32:_timestamp];
     [d appendUInt32:_target];
     [d appendUInt32:_nonce];
     _blockHash = d.x11;
@@ -113,7 +113,7 @@
 }
 
 - (instancetype)initWithBlockHash:(NSData *)blockHash version:(uint32_t)version prevBlock:(NSData *)prevBlock
-merkleRoot:(NSData *)merkleRoot timestamp:(NSTimeInterval)timestamp target:(uint32_t)target nonce:(uint32_t)nonce
+merkleRoot:(NSData *)merkleRoot timestamp:(uint32_t)timestamp target:(uint32_t)target nonce:(uint32_t)nonce
 totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSData *)flags height:(uint32_t)height
 {
     if (! (self = [self init])) return nil;
@@ -158,8 +158,9 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         return NO; // merkle root check failed
     }
     
+    // check if timestamp is too far in future
     //TODO: use estimated network time instead of system time (avoids timejacking attacks and misconfigured time)
-    if (_timestamp > [NSDate timeIntervalSinceReferenceDate] + MAX_TIME_DRIFT) {
+    if (_timestamp > [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 + MAX_TIME_DRIFT) {
         NSLog(@"Merkle root is not valid : timestamp too far in the future");
         return NO; // timestamp too far in future
     }
@@ -189,7 +190,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     [d appendUInt32:_version];
     [d appendData:_prevBlock];
     [d appendData:_merkleRoot];
-    [d appendUInt32:_timestamp + NSTimeIntervalSince1970 + 0.1];
+    [d appendUInt32:_timestamp];
     [d appendUInt32:_target];
     [d appendUInt32:_nonce];
     [d appendUInt32:_totalTransactions];
@@ -330,7 +331,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     
     (*flagIdx)++;
     
-    if (! flag || depth == (int)(ceil(log2(_totalTransactions)) + DBL_EPSILON*_totalTransactions)) {
+    if (! flag || depth == (int)(ceil(log2(_totalTransactions)))) {
         NSData *hash = [_hashes hashAtOffset:(*hashIdx)*CC_SHA256_DIGEST_LENGTH];
         
         (*hashIdx)++;
