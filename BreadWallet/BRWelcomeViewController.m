@@ -37,7 +37,7 @@
 @property (nonatomic, strong) UINavigationController *seedNav;
 
 @property (nonatomic, strong) IBOutlet UIView *paralax, *wallpaper;
-@property (nonatomic, strong) IBOutlet UILabel *startLabel, *warningLabel;
+@property (nonatomic, strong) IBOutlet UILabel *startLabel, *recoverLabel, *warningLabel;
 @property (nonatomic, strong) IBOutlet UIButton *generateButton, *showButton;
 @property (nonatomic, strong) IBOutlet NSLayoutConstraint *logoXCenter, *walletXCenter, *restoreXCenter, *paralaxXLeft;
 
@@ -128,6 +128,7 @@
 //    [segue.destinationViewController setModalPresentationStyle:UIModalPresentationCustom];
     
     self.startLabel = (id)[[segue.destinationViewController view] viewWithTag:4];
+    self.recoverLabel = (id)[[segue.destinationViewController view] viewWithTag:5];
     self.warningLabel = (id)[[segue.destinationViewController view] viewWithTag:2];
     self.generateButton = (id)[[segue.destinationViewController view] viewWithTag:1];
     [self.generateButton addTarget:self action:@selector(generate:) forControlEvents:UIControlEventTouchUpInside];
@@ -145,6 +146,17 @@
         noKey.image = [UIImage imageNamed:@"no-key"];
         [s replaceCharactersInRange:[s.string rangeOfString:@"%no-key%"]
          withAttributedString:[NSAttributedString attributedStringWithAttachment:noKey]];
+        
+        [s replaceCharactersInRange:[s.string rangeOfString:@"WARNING"] withString:NSLocalizedString(@"WARNING", nil)];
+        [s replaceCharactersInRange:[s.string rangeOfString:@"DO NOT let anyone see your recovery\n"
+                                     "      phrase or they can spend your bitcoins."]
+         withString:NSLocalizedString(@"DO NOT let anyone see your recovery\n"
+                                      "      phrase or they can spend your bitcoins.", nil)];
+        [s replaceCharactersInRange:[s.string rangeOfString:@"NEVER type your recovery phrase into\n"
+                                     "      password managers or elsewhere. Other\n      devices may be infected."]
+         withString:NSLocalizedString(@"NEVER type your recovery phrase into\n"
+                                      "      password managers or elsewhere. Other\n      devices may be infected.",
+                                      nil)];
         self.warningLabel.attributedText = s;
     }
 }
@@ -168,7 +180,7 @@
         NSArray *a = self.wallpaper.superview.constraints;
         
         [self.wallpaper.superview
-         removeConstraints:[a objectsAtIndexes:[a indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
+        removeConstraints:[a objectsAtIndexes:[a indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
             return ([obj firstItem] == self.wallpaper || [obj secondItem] == self.wallpaper) ? YES : NO;
         }]]];
         
@@ -208,7 +220,7 @@
     [UIView animateWithDuration:0.5 animations:^{
         self.warningLabel.alpha = self.showButton.alpha = 1.0;
         self.navigationController.navigationBar.topItem.titleView.alpha = 0.33*0.5;
-        self.startLabel.alpha = 0.33;
+        self.startLabel.alpha = self.recoverLabel.alpha = 0.33;
         self.generateButton.alpha = 0.33;
     }];
 }
