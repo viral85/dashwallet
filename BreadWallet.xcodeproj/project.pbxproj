@@ -65,6 +65,16 @@
 		75D5F3F1191EC270004AB296 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 75D5F3EF191EC270004AB296 /* InfoPlist.strings */; };
 		75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 75D5F3F2191EC270004AB296 /* BreadWalletTests.m */; };
 		84F68C8A1975E9E2002FC300 /* BRScanViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F68C891975E9E2002FC300 /* BRScanViewController.m */; };
+		FB6C29BB1AE3785600CEB807 /* darksend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29B91AE3785600CEB807 /* darksend.cpp */; };
+		FB6C29BC1AE3785600CEB807 /* darksend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29B91AE3785600CEB807 /* darksend.cpp */; };
+		FB6C29BF1AE7FCE500CEB807 /* DCDarksendPool.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29BE1AE7FCE500CEB807 /* DCDarksendPool.m */; };
+		FB6C29C01AE7FCE500CEB807 /* DCDarksendPool.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29BE1AE7FCE500CEB807 /* DCDarksendPool.m */; };
+		FB6C29C31AE7FFAE00CEB807 /* DCDarksendTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29C21AE7FFAE00CEB807 /* DCDarksendTransaction.m */; };
+		FB6C29C41AE7FFAE00CEB807 /* DCDarksendTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29C21AE7FFAE00CEB807 /* DCDarksendTransaction.m */; };
+		FB6C29C71AE8004C00CEB807 /* DCDarksendService.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29C61AE8004C00CEB807 /* DCDarksendService.m */; };
+		FB6C29C81AE8004C00CEB807 /* DCDarksendService.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29C61AE8004C00CEB807 /* DCDarksendService.m */; };
+		FB6C29CB1AE801D100CEB807 /* DCDarksendScript.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29CA1AE801D100CEB807 /* DCDarksendScript.m */; };
+		FB6C29CC1AE801D100CEB807 /* DCDarksendScript.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29CA1AE801D100CEB807 /* DCDarksendScript.m */; };
 		FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
@@ -88,6 +98,9 @@
 		FBE689DC1AC07BFF00467F4C /* NSData+Simd.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DA1AC07BFF00467F4C /* NSData+Simd.m */; };
 		FBE689DF1AC07C1800467F4C /* NSData+Skein.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DE1AC07C1800467F4C /* NSData+Skein.m */; };
 		FBE689E01AC07C1800467F4C /* NSData+Skein.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DE1AC07C1800467F4C /* NSData+Skein.m */; };
+		FBFB9AF81AE80473008D2249 /* DCDarksendTxIn.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9AF71AE80473008D2249 /* DCDarksendTxIn.m */; };
+		FBFB9AFC1AE804FF008D2249 /* DCMasternode.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9AFB1AE804FF008D2249 /* DCMasternode.m */; };
+		FBFB9AFF1AE8085F008D2249 /* DCDataStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9AFE1AE8085F008D2249 /* DCDataStream.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -242,6 +255,16 @@
 		75F27B0619DE2AB20047FC62 /* ccMemory.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ccMemory.h; sourceTree = SOURCE_ROOT; };
 		84F68C881975E9E2002FC300 /* BRScanViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRScanViewController.h; sourceTree = "<group>"; };
 		84F68C891975E9E2002FC300 /* BRScanViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRScanViewController.m; sourceTree = "<group>"; };
+		FB6C29B91AE3785600CEB807 /* darksend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = darksend.cpp; sourceTree = "<group>"; };
+		FB6C29BA1AE3785600CEB807 /* darksend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = darksend.h; sourceTree = "<group>"; };
+		FB6C29BD1AE7FCE500CEB807 /* DCDarksendPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendPool.h; sourceTree = "<group>"; };
+		FB6C29BE1AE7FCE500CEB807 /* DCDarksendPool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendPool.m; sourceTree = "<group>"; };
+		FB6C29C11AE7FFAE00CEB807 /* DCDarksendTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendTransaction.h; sourceTree = "<group>"; };
+		FB6C29C21AE7FFAE00CEB807 /* DCDarksendTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendTransaction.m; sourceTree = "<group>"; };
+		FB6C29C51AE8004C00CEB807 /* DCDarksendService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendService.h; sourceTree = "<group>"; };
+		FB6C29C61AE8004C00CEB807 /* DCDarksendService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendService.m; sourceTree = "<group>"; };
+		FB6C29C91AE801D100CEB807 /* DCDarksendScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendScript.h; sourceTree = "<group>"; };
+		FB6C29CA1AE801D100CEB807 /* DCDarksendScript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendScript.m; sourceTree = "<group>"; };
 		FB84DDF91AC80E5400A80499 /* Log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		FBBFEF631ABD796000CA937F /* aes_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes_helper.c; sourceTree = "<group>"; };
 		FBE4D98A1ABD652B007C3BA6 /* sph_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_types.h; sourceTree = "<group>"; };
@@ -267,6 +290,12 @@
 		FBE689DA1AC07BFF00467F4C /* NSData+Simd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Simd.m"; sourceTree = "<group>"; };
 		FBE689DD1AC07C1800467F4C /* NSData+Skein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Skein.h"; sourceTree = "<group>"; };
 		FBE689DE1AC07C1800467F4C /* NSData+Skein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Skein.m"; sourceTree = "<group>"; };
+		FBFB9AF61AE80473008D2249 /* DCDarksendTxIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendTxIn.h; sourceTree = "<group>"; };
+		FBFB9AF71AE80473008D2249 /* DCDarksendTxIn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendTxIn.m; sourceTree = "<group>"; };
+		FBFB9AFA1AE804FF008D2249 /* DCMasternode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCMasternode.h; sourceTree = "<group>"; };
+		FBFB9AFB1AE804FF008D2249 /* DCMasternode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCMasternode.m; sourceTree = "<group>"; };
+		FBFB9AFD1AE8085F008D2249 /* DCDataStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDataStream.h; sourceTree = "<group>"; };
+		FBFB9AFE1AE8085F008D2249 /* DCDataStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDataStream.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -504,6 +533,8 @@
 		75D5F3C7191EC270004AB296 /* BreadWallet */ = {
 			isa = PBXGroup;
 			children = (
+				FBFB9AF91AE804E7008D2249 /* Masternodes */,
+				FB6C29B41AE36FC000CEB807 /* Darksend */,
 				FBE4D97E1ABD64F3007C3BA6 /* Hash Utils */,
 				752E289C19234A4700DB5A3C /* Models */,
 				752E289B19234A3F00DB5A3C /* Views */,
@@ -554,6 +585,25 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		FB6C29B41AE36FC000CEB807 /* Darksend */ = {
+			isa = PBXGroup;
+			children = (
+				FB6C29B91AE3785600CEB807 /* darksend.cpp */,
+				FB6C29BA1AE3785600CEB807 /* darksend.h */,
+				FB6C29BD1AE7FCE500CEB807 /* DCDarksendPool.h */,
+				FB6C29BE1AE7FCE500CEB807 /* DCDarksendPool.m */,
+				FB6C29C11AE7FFAE00CEB807 /* DCDarksendTransaction.h */,
+				FB6C29C21AE7FFAE00CEB807 /* DCDarksendTransaction.m */,
+				FB6C29C51AE8004C00CEB807 /* DCDarksendService.h */,
+				FB6C29C61AE8004C00CEB807 /* DCDarksendService.m */,
+				FB6C29C91AE801D100CEB807 /* DCDarksendScript.h */,
+				FB6C29CA1AE801D100CEB807 /* DCDarksendScript.m */,
+				FBFB9AF61AE80473008D2249 /* DCDarksendTxIn.h */,
+				FBFB9AF71AE80473008D2249 /* DCDarksendTxIn.m */,
+			);
+			name = Darksend;
+			sourceTree = "<group>";
+		};
 		FBE4D97E1ABD64F3007C3BA6 /* Hash Utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -583,6 +633,17 @@
 				FBBFEF631ABD796000CA937F /* aes_helper.c */,
 			);
 			name = "Hash Utils";
+			sourceTree = "<group>";
+		};
+		FBFB9AF91AE804E7008D2249 /* Masternodes */ = {
+			isa = PBXGroup;
+			children = (
+				FBFB9AFA1AE804FF008D2249 /* DCMasternode.h */,
+				FBFB9AFB1AE804FF008D2249 /* DCMasternode.m */,
+				FBFB9AFD1AE8085F008D2249 /* DCDataStream.h */,
+				FBFB9AFE1AE8085F008D2249 /* DCDataStream.m */,
+			);
+			name = Masternodes;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -728,15 +789,19 @@
 				752E28AE19234AE300DB5A3C /* BRTxInputEntity.m in Sources */,
 				752E28AF19234AE300DB5A3C /* BRTxOutputEntity.m in Sources */,
 				758DBD0E1980634900389E2A /* BRTxDetailViewController.m in Sources */,
+				FB6C29BB1AE3785600CEB807 /* darksend.cpp in Sources */,
 				7548CF3719556FD700EF827F /* BRCopyLabel.m in Sources */,
 				75767C421A0EC6F9003E7DE9 /* UIImage+Blur.m in Sources */,
 				752E28D119234C3600DB5A3C /* BRKey.m in Sources */,
 				84F68C8A1975E9E2002FC300 /* BRScanViewController.m in Sources */,
 				752E28D219234C3600DB5A3C /* BRKey+BIP38.m in Sources */,
 				752E28D919234C3600DB5A3C /* BRTransaction.m in Sources */,
+				FB6C29BF1AE7FCE500CEB807 /* DCDarksendPool.m in Sources */,
 				752E28CE19234C3600DB5A3C /* BRBIP32Sequence.m in Sources */,
 				752E28CF19234C3600DB5A3C /* BRBIP39Mnemonic.m in Sources */,
+				FB6C29C71AE8004C00CEB807 /* DCDarksendService.m in Sources */,
 				FBE689D31AC07BCD00467F4C /* NSData+Luffa.m in Sources */,
+				FB6C29CB1AE801D100CEB807 /* DCDarksendScript.m in Sources */,
 				FBE689DB1AC07BFF00467F4C /* NSData+Simd.m in Sources */,
 				752E28DA19234C3600DB5A3C /* BRWallet.m in Sources */,
 				752E28DB19234C3600DB5A3C /* BRWalletManager.m in Sources */,
@@ -753,16 +818,19 @@
 				FBE689CB1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
 				75878BC1192AEC3F002505AB /* BRReceiveViewController.m in Sources */,
 				75878BBF192ACD46002505AB /* BRAmountViewController.m in Sources */,
+				FB6C29C31AE7FFAE00CEB807 /* DCDarksendTransaction.m in Sources */,
 				759816E719357D6F005060EA /* BRBubbleView.m in Sources */,
 				75878BC6192B1AF0002505AB /* BRTxHistoryViewController.m in Sources */,
 				757BE7E3192C0E9D0061CB20 /* BRRestoreViewController.m in Sources */,
 				757BE7E6192C1FF70061CB20 /* BRWelcomeViewController.m in Sources */,
 				757BE7E9192D4E880061CB20 /* BRSeedViewController.m in Sources */,
 				FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */,
+				FBFB9AF81AE80473008D2249 /* DCDarksendTxIn.m in Sources */,
 				752E28E719234DA200DB5A3C /* NSData+Dash.m in Sources */,
 				752E28E919234DA200DB5A3C /* NSManagedObject+Sugar.m in Sources */,
 				FBE689DF1AC07C1800467F4C /* NSData+Skein.m in Sources */,
 				FBE689BC1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */,
+				FBFB9AFC1AE804FF008D2249 /* DCMasternode.m in Sources */,
 				752E28EA19234DA200DB5A3C /* NSMutableData+Bitcoin.m in Sources */,
 				752E28EB19234DA200DB5A3C /* NSString+Bitcoin.m in Sources */,
 				757C89521A2FCE420076B373 /* BRSettingsViewController.m in Sources */,
@@ -773,6 +841,7 @@
 				759FBB37193290F600AB4465 /* BRSendViewController.m in Sources */,
 				FBE689C31ABF9A1B00467F4C /* NSData+Echo.m in Sources */,
 				752E28F119234E8100DB5A3C /* Reachability.m in Sources */,
+				FBFB9AFF1AE8085F008D2249 /* DCDataStream.m in Sources */,
 				75D5F3CE191EC270004AB296 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -783,7 +852,11 @@
 			files = (
 				FBE689CC1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
 				FBE689BD1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */,
+				FB6C29C81AE8004C00CEB807 /* DCDarksendService.m in Sources */,
+				FB6C29CC1AE801D100CEB807 /* DCDarksendScript.m in Sources */,
 				FBE689C41ABF9A1B00467F4C /* NSData+Echo.m in Sources */,
+				FB6C29C41AE7FFAE00CEB807 /* DCDarksendTransaction.m in Sources */,
+				FB6C29BC1AE3785600CEB807 /* darksend.cpp in Sources */,
 				75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */,
 				FBE689D81AC07BE400467F4C /* NSData+Shavite.m in Sources */,
 				FBE689B91ABF160000467F4C /* NSData+Blake.m in Sources */,
@@ -793,6 +866,7 @@
 				FBE689D01AC07BB500467F4C /* NSData+Keccak.m in Sources */,
 				FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */,
 				FBE689E01AC07C1800467F4C /* NSData+Skein.m in Sources */,
+				FB6C29C01AE7FCE500CEB807 /* DCDarksendPool.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

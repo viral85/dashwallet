@@ -494,9 +494,17 @@ services:(uint64_t)services
         else if ([MSG_PONG isEqual:type]) [self acceptPongMessage:message];
         else if ([MSG_MERKLEBLOCK isEqual:type]) [self acceptMerkleblockMessage:message];
         else if ([MSG_REJECT isEqual:type]) [self acceptRejectMessage:message];
+        
+        else if ([MSG_DSACCEPT isEqual:type]) [self acceptDarkSendAcceptMessage:message];
+        else if ([MSG_DSQUEUE isEqual:type]) [self acceptDarkSendQueueMessage:message];
+        else if ([MSG_DSVIN isEqual:type]) [self acceptDarkSendVInMessage:message];
+        else if ([MSG_DSSTATUSUPDATE isEqual:type]) [self acceptDarkSendStatusUpdateMessage:message];
+        else if ([MSG_DSSIGNFINALTX isEqual:type]) [self acceptDarkSendSignFinalTXMessage:message];
+        else if ([MSG_DSFINALTX isEqual:type]) [self acceptDarkSendFinalTXMessage:message];
+        else if ([MSG_DSCOMPLETE isEqual:type]) [self acceptDarkSendCompleteMessage:message];
+        
         else if ([MSG_DSEEP isEqual:type]) [self acceptDSeepMessage:message];
         else if ([MSG_DSEE isEqual:type]) [self acceptDSeeMessage:message];
-        else if ([MSG_DSQ isEqual:type]) [self acceptDSqMessage:message];
         else NSLog(@"%@:%u dropping %@, length %u, not implemented", self.host, self.port, type, (int)message.length);
     });
     CFRunLoopWakeUp([self.runLoop getCFRunLoop]);
@@ -940,6 +948,65 @@ services:(uint64_t)services
     }
 }
 
+#pragma mark - Darksend
+
+
+- (void)acceptDarkSendAcceptMessage:(NSData *)message
+{
+    //todo implement
+}
+
+- (void)acceptDarkSendQueueMessage:(NSData *)message
+{
+    //todo implement
+}
+
+- (void)acceptDarkSendVInMessage:(NSData *)message
+{
+    //todo implement
+}
+
+- (void)acceptDarkSendStatusUpdateMessage:(NSData *)message
+{
+    //todo implement
+}
+
+- (void)acceptDarkSendSignFinalTXMessage:(NSData *)message
+{
+    //todo implement
+}
+
+- (void)acceptDarkSendFinalTXMessage:(NSData *)message
+{
+    if (self.version < MIN_PROTO_VERSION) {
+        return;
+    }
+    
+    if((CNetAddr)darkSendPool.submittedToMasternode != self.address){
+        //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", darkSendPool.submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
+        return;
+    }
+    
+    int sessionID;
+    CTransaction txNew;
+    vRecv >> sessionID >> txNew;
+    
+    if(darkSendPool.sessionID != sessionID){
+        if (fDebug) LogPrintf("dsf - message doesn't match current darksend session %d %d\n", darkSendPool.sessionID, sessionID);
+        return;
+    }
+    
+    //check to see if input is spent already? (and probably not confirmed)
+    darkSendPool.SignFinalTransaction(txNew, pfrom);
+}
+
+- (void)acceptDarkSendCompleteMessage:(NSData *)message
+{
+    //todo implement
+}
+
+#pragma mark - InstantX
+
 - (void)acceptDSeepMessage:(NSData *)message
 {
     //todo implement instant transactions
@@ -950,10 +1017,6 @@ services:(uint64_t)services
     //todo implement instant transactions
 }
 
-- (void)acceptDSqMessage:(NSData *)message
-{
-    //todo implement instant transactions
-}
 
 
 #pragma mark - hash
