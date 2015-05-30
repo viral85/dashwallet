@@ -10,6 +10,7 @@
 #import "DCDarksendTransaction.h"
 #import "DCDarksendService.h"
 #import "DCDarksendScript.h"
+#import "BRTransaction.h"
 
 #define POOL_MAX_TRANSACTIONS                  3 // wait for X transactions to merge and publish
 #define POOL_STATUS_UNKNOWN                    0 // waiting for update
@@ -37,7 +38,7 @@
     // masternode entries
     NSMutableArray * entries; //Array of DarkSendEntry
     // the finalized transaction ready for signing
-    DCDarksendTransaction * finalTransaction;
+    BRTransaction * finalTransaction;
     
     int64_t lastTimeChanged;
     int64_t lastAutoDenomination;

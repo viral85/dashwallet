@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "BRTransaction.h"
 
-@interface DCDarksendTransaction : NSObject
+@interface DCDarksendTransaction : BRTransaction
 
 @end
