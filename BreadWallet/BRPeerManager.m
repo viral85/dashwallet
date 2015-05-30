@@ -38,7 +38,6 @@
 #import <netdb.h>
 
 #define FIXED_PEERS          @"FixedPeers"
-#define NODE_NETWORK         1  // services value indicating a node offers full blocks, not just headers
 #define PROTOCOL_TIMEOUT     20.0
 #define MAX_CONNECT_FAILURES 20 // notify user of network problems after this many connect failures in a row
 #define CHECKPOINT_COUNT     (sizeof(checkpoint_array)/sizeof(*checkpoint_array))
@@ -61,7 +60,7 @@ static const struct { uint32_t height; char *hash; uint32_t timestamp; uint32_t 
 };
 
 static const char *dns_seeds[] = {
-    "testnet-seed.bitcoin.petertodd.org", "testnet-seed.bluematt.me", "testnet-seed.alexykot.me"
+    "testnet-seed.bitcoin.petertodd.org.", "testnet-seed.bluematt.me.", "testnet-seed.alexykot.me."
 };
 
 #else // main net
@@ -90,8 +89,8 @@ static const struct { uint32_t height; char *hash; uint32_t timestamp; uint32_t 
 };
 
 static const char *dns_seeds[] = {
-    "seed.bitcoin.sipa.be", "dnsseed.bluematt.me", "dnsseed.bitcoin.dashjr.org", "seed.bitcoinstats.com",
-    "seed.bitnodes.io"
+    "seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.", "dnsseed.bitcoin.dashjr.org.", "seed.bitcoinstats.com.",
+    "seed.bitnodes.io."
 };
 
 #endif
@@ -212,18 +211,26 @@ static const char *dns_seeds[] = {
 
         if (_peers.count < PEER_MAX_CONNECTIONS ||
             [(BRPeer *)_peers[PEER_MAX_CONNECTIONS - 1] timestamp] < now - 3*24*60*60) {
+            
+            struct addrinfo hints = { 0, AF_UNSPEC, SOCK_STREAM, 0, 0, 0, NULL, NULL }, *servinfo, *p;
+            NSString *servname = [@(BITCOIN_STANDARD_PORT) stringValue];
+            
             for (int i = 0; i < sizeof(dns_seeds)/sizeof(*dns_seeds); i++) { // DNS peer discovery
                 NSLog(@"DNS lookup %s", dns_seeds[i]);
+                if (getaddrinfo(dns_seeds[i], [servname UTF8String], &hints, &servinfo) != 0) continue;
                 
-                struct hostent *h = gethostbyname(dns_seeds[i]);
-
-                for (int j = 0; h != NULL && h->h_addr_list[j] != NULL; j++) {
-                    uint32_t addr = CFSwapInt32BigToHost(((struct in_addr *)h->h_addr_list[j])->s_addr);
-
+                for (p = servinfo; p != NULL; p = p->ai_next) {
+                    if (p->ai_addr->sa_family != AF_INET) continue;
+                
+                    uint32_t addr = CFSwapInt32BigToHost(((struct sockaddr_in *)p->ai_addr)->sin_addr.s_addr);
+                    uint16_t port = CFSwapInt16BigToHost(((struct sockaddr_in *)p->ai_addr)->sin_port);
+                    
                     // give dns peers a timestamp between 3 and 7 days ago
-                    [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:BITCOIN_STANDARD_PORT
-                     timestamp:now - (3*24*60*60 + arc4random_uniform(4*24*60*60)) services:NODE_NETWORK]];
+                    [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:port
+                     timestamp:now - (3*24*60*60 + arc4random_uniform(4*24*60*60)) services:SERVICES_NODE_NETWORK]];
                 }
+
+                freeaddrinfo(servinfo);
             }
 
 #if BITCOIN_TESTNET
@@ -237,7 +244,7 @@ static const char *dns_seeds[] = {
                     // give hard coded peers a timestamp between 7 and 14 days ago
                     [_peers addObject:[[BRPeer alloc] initWithAddress:address.unsignedIntValue
                      port:BITCOIN_STANDARD_PORT timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
-                     services:NODE_NETWORK]];
+                     services:SERVICES_NODE_NETWORK]];
                 }
             }
             
@@ -310,7 +317,7 @@ static const char *dns_seeds[] = {
     NSFetchRequest *req = [BRMerkleBlockEntity fetchRequest];
 
     req.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"height" ascending:NO]];
-    req.predicate = [NSPredicate predicateWithFormat:@"height >= 0 && height != %d", BLOCK_UNKOWN_HEIGHT];
+    req.predicate = [NSPredicate predicateWithFormat:@"height >= 0 && height != %d", BLOCK_UNKNOWN_HEIGHT];
     req.fetchLimit = 1;
     _lastBlock = [[BRMerkleBlockEntity fetchObjects:req].lastObject merkleBlock];
 
@@ -333,11 +340,10 @@ static const char *dns_seeds[] = {
     return self.lastBlock.height;
 }
 
+// last block height reported by current download peer
 - (uint32_t)estimatedBlockHeight
 {
-    if (self.downloadPeer.lastblock > self.lastBlockHeight) return self.downloadPeer.lastblock;
-    return self.lastBlockHeight + ([NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 -
-                                   self.lastBlock.timestamp)/(10*60);
+    return (self.downloadPeer.lastblock > self.lastBlockHeight) ? self.downloadPeer.lastblock : self.lastBlockHeight;
 }
 
 - (double)syncProgress
@@ -387,8 +393,10 @@ static const char *dns_seeds[] = {
         if (hash && ! [filter containsData:hash]) [filter insertData:hash];
     }
 
-    // add unspent outputs to watch for tx sending money from the wallet
-    for (NSData *utxo in m.wallet.unspentOutputs) if (! [filter containsData:utxo]) [filter insertData:utxo];
+    for (NSData *utxo in m.wallet.unspentOutputs) { // add unspent outputs to watch for tx sending money from the wallet
+        if (! [filter containsData:utxo]) [filter insertData:utxo];
+    }
+
     _bloomFilter = filter;
     return _bloomFilter;
 }
@@ -449,8 +457,8 @@ static const char *dns_seeds[] = {
             [self syncStopped];
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSError *error = [NSError errorWithDomain:@"BreadWallet" code:1 userInfo:@{NSLocalizedDescriptionKey:
-                                  NSLocalizedString(@"no peers found", nil)}];
+                NSError *error = [NSError errorWithDomain:@"BreadWallet" code:1
+                                  userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"no peers found", nil)}];
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:BRPeerManagerSyncFailedNotification
                  object:nil userInfo:@{@"error":error}];
@@ -495,7 +503,7 @@ static const char *dns_seeds[] = {
         
         return;
     }
-    else if (! self.connected) {
+    else if (! self.connected && self.connectFailures >= MAX_CONNECT_FAILURES) {
         if (completion) {
             completion([NSError errorWithDomain:@"BreadWallet" code:-1009 userInfo:@{NSLocalizedDescriptionKey:
                         NSLocalizedString(@"not connected to the bitcoin network", nil)}]);
@@ -536,12 +544,11 @@ static const char *dns_seeds[] = {
 
 // seconds since reference date, 00:00:00 01/01/01 GMT
 // NOTE: this is only accurate for the last two weeks worth of blocks, other timestamps are estimated from checkpoints
-// BUG: this just doesn't work very well... we need to start storing tx metadata
 - (NSTimeInterval)timestampForBlockHeight:(uint32_t)blockHeight
 {
     if (blockHeight == TX_UNCONFIRMED) return (self.lastBlock.timestamp - NSTimeIntervalSince1970) + 10*60; //next block
 
-    if (blockHeight > self.lastBlockHeight) { // future block, assume 10 minutes per block after last block
+    if (blockHeight >= self.lastBlockHeight) { // future block, assume 10 minutes per block after last block
         return (self.lastBlock.timestamp - NSTimeIntervalSince1970) + (blockHeight - self.lastBlockHeight)*10*60;
     }
 
@@ -627,15 +634,24 @@ static const char *dns_seeds[] = {
         self.taskId = UIBackgroundTaskInvalid;
         
         if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateBackground) {
+            NSArray *txHashes = self.publishedTx.allKeys;
+
             for (BRPeer *p in self.connectedPeers) { // after syncing, load filters and get mempools from other peers
                 if (p != self.downloadPeer) [p sendFilterloadMessage:self.bloomFilter.data];
-                [p sendInvMessageWithTxHashes:self.publishedTx.allKeys]; // publish unconfirmed tx
+                [p sendInvMessageWithTxHashes:txHashes]; // publish unconfirmed tx
                 [p sendMempoolMessage];
                 [p sendPingMessageWithPongHandler:^(BOOL success) {
                     if (! success) return;
                     p.synced = YES;
                     [p sendGetaddrMessage]; // request a list of other bitcoin peers
-                    [self removeUnrelayedTransactions];
+
+                    if (txHashes.count > 0) {
+                        [p sendGetdataMessageWithTxHashes:txHashes andBlockHashes:nil];
+                        [p sendPingMessageWithPongHandler:^(BOOL success) {
+                            if (success) [self removeUnrelayedTransactions];
+                        }];
+                    }
+                    else [self removeUnrelayedTransactions];
                 }];
             }
         }
@@ -678,6 +694,9 @@ static const char *dns_seeds[] = {
             }
             
             [m.wallet removeTransaction:tx.txHash];
+        }
+        else if ([self.txRelays[tx.txHash] count] < PEER_MAX_CONNECTIONS) { // set timestamp 0 to mark as unverified
+            [m.wallet setBlockHeight:TX_UNCONFIRMED andTimestamp:0 forTxHashes:@[tx.txHash]];
         }
     }
     
@@ -815,7 +834,8 @@ static const char *dns_seeds[] = {
     self.connectFailures = 0;
     NSLog(@"%@:%d connected with lastblock %d", peer.host, peer.port, peer.lastblock);
     
-    if (peer.lastblock + 10 < self.lastBlockHeight) { // drop peers that aren't synced yet, we can't help them
+    // drop peers that don't carry full blocks, or aren't synced yet
+    if (! (peer.services & SERVICES_NODE_NETWORK) || peer.lastblock + 10 < self.lastBlockHeight) {
         [peer disconnect];
         return;
     }
@@ -849,6 +869,15 @@ static const char *dns_seeds[] = {
     [peer sendFilterloadMessage:self.bloomFilter.data];
     peer.currentBlockHeight = self.lastBlockHeight;
     
+    NSArray *txHashes = self.publishedCallback.allKeys;
+    
+    if (txHashes.count > 0) { // publish pending transactions
+        [peer sendInvMessageWithTxHashes:txHashes];
+        [peer sendPingMessageWithPongHandler:^(BOOL success) {
+            if (success) [peer sendGetdataMessageWithTxHashes:txHashes andBlockHashes:nil];
+        }];
+    }
+    
     if (self.lastBlockHeight < peer.lastblock) { // start blockchain sync
         self.lastRelayTime = 0;
 
@@ -858,7 +887,7 @@ static const char *dns_seeds[] = {
 
             dispatch_async(self.q, ^{
                 // request just block headers up to a week before earliestKeyTime, and then merkleblocks after that
-                // BUG: XXXX headers can timeout on slow connections (each message is over 160k)
+                // BUG: XXX headers can timeout on slow connections (each message is over 160k)
                 if (self.lastBlock.timestamp + 7*24*60*60 >= self.earliestKeyTime + NSTimeIntervalSince1970) {
                     [peer sendGetblocksMessageWithLocators:[self blockLocatorArray] andHashStop:nil];
                 }
@@ -961,6 +990,12 @@ static const char *dns_seeds[] = {
         [self.txRelays[txHash] addObject:peer];
         if (callback) [self.publishedCallback removeObjectForKey:txHash];
 
+        if ([self.txRelays[txHash] count] >= PEER_MAX_CONNECTIONS &&
+            [[m.wallet transactionForHash:txHash] blockHeight] == TX_UNCONFIRMED) { // set timestamp when tx is verified
+            [m.wallet setBlockHeight:TX_UNCONFIRMED andTimestamp:[NSDate timeIntervalSinceReferenceDate]
+             forTxHashes:@[txHash]];
+        }
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(txTimeout:) object:txHash];
             [[NSNotificationCenter defaultCenter] postNotificationName:BRPeerManagerTxStatusNotification object:nil];
@@ -1000,6 +1035,12 @@ static const char *dns_seeds[] = {
         if (! self.txRelays[txHash]) self.txRelays[txHash] = [NSMutableSet set];
         [self.txRelays[txHash] addObject:peer];
         if (callback) [self.publishedCallback removeObjectForKey:txHash];
+
+        if ([self.txRelays[txHash] count] >= PEER_MAX_CONNECTIONS &&
+            [[m.wallet transactionForHash:txHash] blockHeight] == TX_UNCONFIRMED) { // set timestamp when tx is verified
+            [m.wallet setBlockHeight:TX_UNCONFIRMED andTimestamp:[NSDate timeIntervalSinceReferenceDate]
+             forTxHashes:@[txHash]];
+        }
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(txTimeout:) object:txHash];
@@ -1011,8 +1052,14 @@ static const char *dns_seeds[] = {
 
 - (void)peer:(BRPeer *)peer rejectedTransaction:(NSData *)txHash withCode:(uint8_t)code
 {
+    BRWalletManager *m = [BRWalletManager sharedInstance];
+    
     if ([self.txRelays[txHash] containsObject:peer]) {
         [self.txRelays[txHash] removeObject:peer];
+
+        if ([[m.wallet transactionForHash:txHash] blockHeight] == TX_UNCONFIRMED) { // set timestamp to 0 for unverified
+            [m.wallet setBlockHeight:TX_UNCONFIRMED andTimestamp:0 forTxHashes:@[txHash]];
+        }
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:BRPeerManagerTxStatusNotification object:nil];

@@ -64,7 +64,7 @@
     NSString *s = [NSString base58WithData:[BTC @"#&$@*^(*#!^" base58ToData]];
 
     XCTAssertTrue(s.length == 0, @"[NSString base58WithData:]");
-
+    
     s = [NSString base58WithData:[@"" base58ToData]];
     XCTAssertEqualObjects(@"", s, @"[NSString base58WithData:]");
 
@@ -83,6 +83,12 @@
     s = [NSString base58WithData:[@"z" base58ToData]];
     XCTAssertEqualObjects(@"z", s, @"[NSString base58WithData:]");
     
+    s = [NSString base58checkWithData:nil];
+    XCTAssertTrue(s == nil, @"[NSString base58checkWithData:]");
+
+    s = [NSString base58checkWithData:@"".hexToData];
+    XCTAssertEqualObjects([NSData data], [s base58checkToData], @"[NSString base58checkWithData:]");
+
     s = [NSString base58checkWithData:@"000000000000000000000000000000000000000000".hexToData];
     XCTAssertEqualObjects(@"000000000000000000000000000000000000000000".hexToData, [s base58checkToData],
                           @"[NSString base58checkWithData:]");
@@ -379,9 +385,9 @@
 
 #pragma mark - testPaymentRequest
 
-//TODO: test valid request with unkown arguments
+//TODO: test valid request with unknown arguments
 //TODO: test invalid bitcoin address
-//TODO: test invalid request with unkown required arguments
+//TODO: test invalid request with unknown required arguments
 
 - (void)testPaymentRequest
 {
@@ -1172,7 +1178,9 @@
 
     // test that the x509 certs are valid, but the payment request is expired
     XCTAssertFalse([req isValid], @"[BRPaymentProtocolRequest isValid]");
-    XCTAssertEqualObjects(req.errorMessage, @"request expired", @"[BRPaymentProtocolRequest isValid]");
+    XCTAssertEqualObjects(req.errorMessage,
+                          @"untrusted certificate - One or more certificates have expired or are not valid yet.",
+                          @"[BRPaymentProtocolRequest isValid]");
 
     NSLog(@"commonName:%@", req.commonName);
     XCTAssertEqualObjects(req.commonName, @"bitpay.com",  @"[BRPaymentProtocolRequest commonName]");

@@ -95,7 +95,7 @@
              showInView:[[UIApplication sharedApplication] keyWindow]];
         }
         else if (seedPhrase) {
-            [[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"recovery phrase doesn't match", nil)
+            [[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"recovery phrase doesn't match", nil)
               delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
         }
         else [self.textView becomeFirstResponder];
@@ -169,22 +169,22 @@
         else if (incorrect) {
             textView.selectedRange = [[textView.text lowercaseString] rangeOfString:incorrect];
         
-            [[[UIAlertView alloc] initWithTitle:nil
+            [[[UIAlertView alloc] initWithTitle:@""
               message:[NSString stringWithFormat:NSLocalizedString(@"\"%@\" is not a recovery phrase word", nil),
                        incorrect] delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil]
              show];
         }
         else if (a.count != PHRASE_LENGTH) {
-            [[[UIAlertView alloc] initWithTitle:nil
+            [[[UIAlertView alloc] initWithTitle:@""
               message:[NSString stringWithFormat:NSLocalizedString(@"recovery phrase must have %d words", nil),
                        PHRASE_LENGTH] delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil)
               otherButtonTitles:nil] show];
         }
         else if (! [m.mnemonic phraseIsValid:phrase]) {
-            [[[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"bad recovery phrase", nil) delegate:nil
+            [[[UIAlertView alloc] initWithTitle:@"" message:NSLocalizedString(@"bad recovery phrase", nil) delegate:nil
               cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
         }
-        else if (m.wallet) {
+        else if (! m.noWallet) {
             [self.textView resignFirstResponder];
             [self performSelector:@selector(wipeWithPhrase:) withObject:s afterDelay:0.0];
         }

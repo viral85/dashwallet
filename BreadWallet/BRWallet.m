@@ -401,28 +401,27 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 // sign any inputs in the given transaction that can be signed using private keys from the wallet
 - (BOOL)signTransaction:(BRTransaction *)transaction withPrompt:(NSString *)authprompt
 {
+    int64_t amount = [self amountSentByTransaction:transaction] - [self amountReceivedFromTransaction:transaction];
+    NSMutableOrderedSet *externalIndexes = [NSMutableOrderedSet orderedSet],
+                        *internalIndexes = [NSMutableOrderedSet orderedSet];
+
+    for (NSString *addr in transaction.inputAddresses) {
+        [internalIndexes addObject:@([self.internalAddresses indexOfObject:addr])];
+        [externalIndexes addObject:@([self.externalAddresses indexOfObject:addr])];
+    }
+
+    [internalIndexes removeObject:@(NSNotFound)];
+    [externalIndexes removeObject:@(NSNotFound)];
+
     @autoreleasepool { // @autoreleasepool ensures sensitive data will be dealocated immediately
-        int64_t amount = [self amountSentByTransaction:transaction] - [self amountReceivedFromTransaction:transaction];
+        NSMutableArray *privkeys = [NSMutableArray array];
         NSData *seed = self.seed(authprompt, (amount > 0) ? amount : 0);
-        NSMutableArray *pkeys = [NSMutableArray array];
-        NSMutableOrderedSet *externalIndexes = [NSMutableOrderedSet orderedSet],
-                            *internalIndexes = [NSMutableOrderedSet orderedSet];
 
         if (! seed) return YES; // user canceled authentication
+        [privkeys addObjectsFromArray:[self.sequence privateKeys:[externalIndexes array] internal:NO fromSeed:seed]];
+        [privkeys addObjectsFromArray:[self.sequence privateKeys:[internalIndexes array] internal:YES fromSeed:seed]];
         
-        for (NSString *addr in transaction.inputAddresses) {
-            [internalIndexes addObject:@([self.internalAddresses indexOfObject:addr])];
-            [externalIndexes addObject:@([self.externalAddresses indexOfObject:addr])];
-        }
-        
-        [internalIndexes removeObject:@(NSNotFound)];
-        [externalIndexes removeObject:@(NSNotFound)];
-        [pkeys addObjectsFromArray:[self.sequence privateKeys:[externalIndexes array] internal:NO fromSeed:seed]];
-        [pkeys addObjectsFromArray:[self.sequence privateKeys:[internalIndexes array] internal:YES fromSeed:seed]];
-        
-        [transaction signWithPrivateKeys:pkeys];
-        
-        return [transaction isSigned];
+        return [transaction signWithPrivateKeys:privkeys];
     }
 }
 
@@ -506,6 +505,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 - (BOOL)transactionIsValid:(BRTransaction *)transaction
 {
     //TODO: XXX attempted double spends should cause conflicted tx to remain unverified until they're confirmed
+    //TODO: XXX conflicted tx with the same wallet outputs should be presented as the same tx to the user
     if (transaction.blockHeight != TX_UNCONFIRMED) return YES;
     if (self.allTx[transaction.txHash] != nil) return ([self.invalidTx containsObject:transaction.txHash]) ? NO : YES;
 
