@@ -34,7 +34,7 @@
 #define DASH_TIMEOUT_CODE           1001
 
 #define SERVICES_NODE_NETWORK 1 // services value indicating a node carries full blocks, not just headers
-#define USER_AGENT            [NSString stringWithFormat:@"/breadwallet:%@/",\
+#define USER_AGENT            [NSString stringWithFormat:@"/dashwallet:%@/",\
                                NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"]]
 
 // explanation of message types at: https://en.bitcoin.it/wiki/Protocol_specification

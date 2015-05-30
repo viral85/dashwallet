@@ -515,7 +515,7 @@ sph_blake512_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
     sph_blake512(&ctx_blake, self.bytes, self.length);
     void * dest = malloc(64*sizeof(Byte));
     sph_blake512_close(&ctx_blake, dest);
-    return [NSData dataWithBytes:dest length:64];
+    return [NSData dataWithBytesNoCopy:dest length:64 freeWhenDone:TRUE];
 }
 
 

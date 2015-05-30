@@ -121,7 +121,7 @@
 
 - (IBAction)about:(id)sender
 {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://breadwallet.com"]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://dashpay.io"]];
 }
 
 - (IBAction)touchIdLimit:(id)sender

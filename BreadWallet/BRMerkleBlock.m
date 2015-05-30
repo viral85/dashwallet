@@ -30,6 +30,7 @@
 #define MAX_TIME_DRIFT    (2*60*60)     // the furthest in the future a block is allowed to be timestamped
 #define MAX_PROOF_OF_WORK 0x1e0ffff0u   // highest value for difficulty target (higher values are less difficult)
 
+
 // from https://en.bitcoin.it/wiki/Protocol_specification#Merkle_Trees
 // Merkle trees are binary trees of hashes. Merkle trees in darkcoin use x11, a cobined hash of 11 of the NIST
 // SHA-3 finalists. If, when forming a row in the tree (other than the root of the tree), it would have an odd
@@ -93,6 +94,9 @@
     _nonce = [message UInt32AtOffset:off];
     off += sizeof(uint32_t);
     _totalTransactions = [message UInt32AtOffset:off];
+    if (_totalTransactions) {
+        NSLog(@"there were %d transactions",_totalTransactions);
+    }
     off += sizeof(uint32_t);
     len = (NSUInteger)[message varIntAtOffset:off length:&l]*CC_SHA256_DIGEST_LENGTH;
     off += l;
@@ -144,18 +148,21 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     const uint32_t *b = _blockHash.bytes, size = _target >> 24, target = _target & 0x00ffffffu;
     NSMutableData *d = [NSMutableData data];
     int hashIdx = 0, flagIdx = 0;
-    NSData *merkleRoot =
+
+    
+    if (_totalTransactions > 0) { // no need to check if only getting headers
+        NSData *merkleRoot =
         [self _walk:&hashIdx :&flagIdx :0 :^id (NSData *hash, BOOL flag) {
             return hash;
         } :^id (id left, id right) {
             [d setData:left];
             [d appendData:(right) ? right : left]; // if right branch is missing, duplicate left branch
-            return d.SHA256_2;
+            return d.SHA256_2; //this is right for dash, it should not be x11
         }];
-    
-    if (_totalTransactions > 0 && ! [merkleRoot isEqual:_merkleRoot]) {
-        NSLog(@"Merkle root is not valid : check failed");
-        return NO; // merkle root check failed
+        if (![merkleRoot isEqual:_merkleRoot]) {
+            NSLog(@"Merkle root is not valid : check failed");
+            return NO; // merkle root check failed
+        }
     }
     
     // check if timestamp is too far in future
@@ -239,13 +246,15 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
 - (BOOL)verifyDifficultyWithPreviousBlocks:(NSMutableDictionary *)previousBlocks
 {
     
-    if (self.height == 217753) {
+    if (self.height == 246499) {
         NSLog(@"here");
     }
     uint32_t darkGravityWaveTarget = [self darkGravityWaveTargetWithPreviousBlocks:previousBlocks];
-    int32_t diff = abs((self.target & 0x00ffffffu) - darkGravityWaveTarget);
-    NSLog(@"%d %d",self.height,diff);
-    return (diff < 5); //improve this later
+    int32_t diff = (self.target & 0x00ffffffu) - darkGravityWaveTarget;
+    if (diff) {
+        NSLog(@"%d %d",self.height,diff);
+    }
+    return (abs(diff) < 5); //improve this later, rounding errors on the long double, should be more precise
 }
 
 -(int32_t)darkGravityWaveTargetWithPreviousBlocks:(NSMutableDictionary *)previousBlocks {
@@ -254,13 +263,11 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     
     int64_t nActualTimespan = 0;
     int64_t lastBlockTime = 0;
-    int64_t pastBlocksMin = 24;
-    int64_t pastBlocksMax = 24;
     int64_t blockCount = 0;
-    int32_t pastDifficultyAverage = 0;
-    int32_t pastDifficultyAveragePrev = 0;
+    long double pastDifficultyAverage = 0;
+    long double pastDifficultyAveragePrev = 0;
     
-    if (_prevBlock == NULL || previousBlock.height == 0 || previousBlock.height < pastBlocksMin) {
+    if (_prevBlock == NULL || previousBlock.height == 0 || previousBlock.height < DGW_PAST_BLOCKS_MIN) {
         // This is the first block or the height is < PastBlocksMin
         // Return minimal required work. (1e0ffff0)
         return MAX_PROOF_OF_WORK & 0x00ffffffu;
@@ -268,14 +275,16 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     
     BRMerkleBlock *currentBlock = previousBlock;
     // loop over the past n blocks, where n == PastBlocksMax
-    for (unsigned int i = 1; currentBlock && currentBlock.height > 0 && i<=pastBlocksMax; i++) {
+    for (unsigned int i = 1; currentBlock && currentBlock.height > 0 && i<=DGW_PAST_BLOCKS_MAX; i++) {
         blockCount++;
         
         // Calculate average difficulty based on the blocks we iterate over in this for loop
-        if(blockCount <= pastBlocksMin) {
+        if(blockCount <= DGW_PAST_BLOCKS_MIN) {
             uint32_t currentTarget = currentBlock.target & 0x00ffffffu;
             if (blockCount == 1) { pastDifficultyAverage = currentTarget; }
-            else { pastDifficultyAverage = (int32_t)((pastDifficultyAveragePrev * blockCount)+ currentTarget) / (blockCount+1); }
+            else {
+                pastDifficultyAverage = ((pastDifficultyAveragePrev * (long double)blockCount)+ (long double)currentTarget) / (long double)(blockCount+1);
+            }
             pastDifficultyAveragePrev = pastDifficultyAverage;
         }
         
@@ -283,7 +292,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         if(lastBlockTime > 0){
             // Calculate time difference between previous block and current block
             int64_t currentBlockTime = currentBlock.timestamp;
-            int64_t diff = ((lastBlockTime + DBL_EPSILON*lastBlockTime) - (currentBlockTime + DBL_EPSILON*currentBlockTime));
+            int64_t diff = ((lastBlockTime) - (currentBlockTime));
             // Increment the actual timespan
             nActualTimespan += diff;
         }
@@ -295,21 +304,21 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     }
     
     // darkTarget is the difficulty
-    int64_t darkTarget = pastDifficultyAverage;
+    long double darkTarget = pastDifficultyAverage;
     
     // nTargetTimespan is the time that the CountBlocks should have taken to be generated.
-    int64_t nTargetTimespan = blockCount* (2.5*60);
+    long double nTargetTimespan = blockCount* (2.5*60);
     
     // Limit the re-adjustment to 3x or 0.33x
     // We don't want to increase/decrease diff too much.
-    if (nActualTimespan < nTargetTimespan/3)
-        nActualTimespan = nTargetTimespan/3;
-    if (nActualTimespan > nTargetTimespan*3)
-        nActualTimespan = nTargetTimespan*3;
+    if (nActualTimespan < nTargetTimespan/3.0f)
+        nActualTimespan = nTargetTimespan/3.0f;
+    if (nActualTimespan > nTargetTimespan*3.0f)
+        nActualTimespan = nTargetTimespan*3.0f;
     
     // Calculate the new difficulty based on actual and target timespan.
     darkTarget *= nActualTimespan;
-    darkTarget /= nTargetTimespan;
+    darkTarget = darkTarget / nTargetTimespan;
     
     // If calculated difficulty is lower than the minimal diff, set the new difficulty to be the minimal diff.
     if (darkTarget > MAX_PROOF_OF_WORK){

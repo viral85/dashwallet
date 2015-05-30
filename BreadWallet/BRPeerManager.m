@@ -76,7 +76,10 @@ static const struct { uint32_t height; char *hash; time_t timestamp; uint32_t ta
     { 137993, "00000000000cf69ce152b1bffdeddc59188d7a80879210d6e5c9503011929c3c", 1411014812, 0x1b1142abu },//dash
     { 167996, "000000000009486020a80f7f2cc065342b0c2fb59af5e090cd813dba68ab0fed", 1415730882, 0x1b112d94u },//dash
     { 207992, "00000000000d85c22be098f74576ef00b7aa00c05777e966aff68a270f1e01a5", 1422026638, 0x1b113c01u },//dash
-    { 217752, "00000000000a7baeb2148272a7e14edf5af99a64af456c0afc23d15a0918b704", 1423563332, 0x1b10c9b6u }//dash
+    { 217752, "00000000000a7baeb2148272a7e14edf5af99a64af456c0afc23d15a0918b704", 1423563332, 0x1b10c9b6u },//dash
+    { 227121, "00000000000455a2b3a2ed5dfb03990043ca0074568b939acec62820e89a6c45", 1425039295, 0x1b1261d6u },//dash
+    { 246209, "00000000000eec6f7871d3d70321ae98ef1007ab0812d876bda1208afcfb7d7d", 1428046505, 0x1b1a5e27u },//dash
+    //{ 273524, "00000000000bec4e6834d736b7a4d5f9f2b7a4308e6b9324d967a3e533daf551", 1432362681, 0x1b139922u },//dash
 };
 
 static const char *dns_seeds[] = {
@@ -1094,8 +1097,8 @@ static const char *dns_seeds[] = {
     uint32_t transitionTime = 0, txTime = 0;
 
     if (! prev) { // block is an orphan
-        NSLog(@"%@:%d relayed orphan block %@, previous %@, last block is %@, height %d", peer.host, peer.port,
-              block.blockHash, block.prevBlock, self.lastBlock.blockHash, self.lastBlockHeight);
+        NSLog(@"%@:%d relayed orphan block %@, height %d, previous %@, last block is %@, height %d", peer.host, peer.port,
+              block.blockHash,block.height, block.prevBlock, self.lastBlock.blockHash, self.lastBlockHeight);
 
         // ignore orphans older than one week ago
         if (block.timestamp < [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 - 7*24*60*60) return;
@@ -1114,24 +1117,27 @@ static const char *dns_seeds[] = {
     block.height = prev.height + 1;
     txTime = (block.timestamp + prev.timestamp)/2;
     
-//    BRMerkleBlock *b = block;
-//    
-//    for (uint32_t i = 0; b && i < 2100; i++) {
-//        b = self.blocks[b.prevBlock];
-//    }
-//    
-//    while (b) { // free up some memory
-//        b = self.blocks[b.prevBlock];
-//        if (b) [self.blocks removeObjectForKey:b.blockHash];
-//    }
-
-    // verify block difficulty if block is past last checkpoint
-    if (block.height > checkpoint_array[CHECKPOINT_COUNT - 1].height && ![block verifyDifficultyWithPreviousBlocks:self.blocks]) {
-        NSLog(@"%@:%d relayed block with invalid difficulty height %d target %x, blockHash: %@", peer.host, peer.port,
-              block.height,block.target, block.blockHash);
-        [self peerMisbehavin:peer];
-        return;
+    if ((block.height % 1000) == 0) { //free up some memory from time to time
+        
+        BRMerkleBlock *b = block;
+        
+        for (uint32_t i = 0; b && i < (DGW_PAST_BLOCKS_MAX + 50); i++) {
+            b = self.blocks[b.prevBlock];
+        }
+        
+        while (b) { // free up some memory
+            b = self.blocks[b.prevBlock];
+            if (b) [self.blocks removeObjectForKey:b.blockHash];
+        }
     }
+    
+    // verify block difficulty if block is past last checkpoint
+//    if (block.height > (checkpoint_array[CHECKPOINT_COUNT - 1].height + DGW_PAST_BLOCKS_MAX) && ![block verifyDifficultyWithPreviousBlocks:self.blocks]) {
+//        NSLog(@"%@:%d relayed block with invalid difficulty height %d target %x, blockHash: %@", peer.host, peer.port,
+//              block.height,block.target, block.blockHash);
+//        [self peerMisbehavin:peer];
+//        return;
+//    }
 
     // verify block chain checkpoints
     if (self.checkpoints[@(block.height)] && ! [block.blockHash isEqual:self.checkpoints[@(block.height)]]) {
@@ -1145,7 +1151,7 @@ static const char *dns_seeds[] = {
         if ((block.height % 500) == 0 || block.txHashes.count > 0 || block.height > peer.lastblock) {
             NSLog(@"adding block at height: %d, false positive rate: %f", block.height, self.fpRate);
         }
-
+        NSLog(@"adding block at height: %d, %@", block.height, block.blockHash);
         self.blocks[block.blockHash] = block;
         self.lastBlock = block;
         [self setBlockHeight:block.height andTimestamp:txTime - NSTimeIntervalSince1970 forTxHashes:block.txHashes];
@@ -1159,7 +1165,7 @@ static const char *dns_seeds[] = {
         if ((block.height % 500) == 0 || block.txHashes.count > 0 || block.height > peer.lastblock) {
             NSLog(@"%@:%d relayed existing block at height %d", peer.host, peer.port, block.height);
         }
-
+//NSLog(@"2 adding block at height: %d, false positive rate: %f", block.height, self.fpRate);
         self.blocks[block.blockHash] = block;
 
         BRMerkleBlock *b = self.lastBlock;

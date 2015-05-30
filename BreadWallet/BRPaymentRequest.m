@@ -28,7 +28,7 @@
 #import "NSString+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 
-#define USER_AGENT [NSString stringWithFormat:@"/breadwallet:%@/",\
+#define USER_AGENT [NSString stringWithFormat:@"/dashwallet:%@/",\
                     NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"]]
 
 // BIP21 bitcoin URI object https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki

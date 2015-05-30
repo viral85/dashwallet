@@ -65,15 +65,8 @@
 		75D5F3F1191EC270004AB296 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 75D5F3EF191EC270004AB296 /* InfoPlist.strings */; };
 		75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 75D5F3F2191EC270004AB296 /* BreadWalletTests.m */; };
 		84F68C8A1975E9E2002FC300 /* BRScanViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F68C891975E9E2002FC300 /* BRScanViewController.m */; };
-		FB6C29C31AE7FFAE00CEB807 /* DCDarksendTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29C21AE7FFAE00CEB807 /* DCDarksendTransaction.m */; };
-		FB6C29C41AE7FFAE00CEB807 /* DCDarksendTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29C21AE7FFAE00CEB807 /* DCDarksendTransaction.m */; };
-		FB6C29C71AE8004C00CEB807 /* DCDarksendService.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29C61AE8004C00CEB807 /* DCDarksendService.m */; };
-		FB6C29C81AE8004C00CEB807 /* DCDarksendService.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29C61AE8004C00CEB807 /* DCDarksendService.m */; };
-		FB6C29CB1AE801D100CEB807 /* DCDarksendScript.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29CA1AE801D100CEB807 /* DCDarksendScript.m */; };
-		FB6C29CC1AE801D100CEB807 /* DCDarksendScript.m in Sources */ = {isa = PBXBuildFile; fileRef = FB6C29CA1AE801D100CEB807 /* DCDarksendScript.m */; };
 		FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
-		FBC731651AEE74AF001355A4 /* DCDarksendQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = FBC731641AEE74AF001355A4 /* DCDarksendQueue.m */; };
 		FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
 		FBE689B91ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
 		FBE689BC1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689BB1ABF1F9B00467F4C /* NSData+Bmw.m */; };
@@ -95,7 +88,6 @@
 		FBE689DC1AC07BFF00467F4C /* NSData+Simd.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DA1AC07BFF00467F4C /* NSData+Simd.m */; };
 		FBE689DF1AC07C1800467F4C /* NSData+Skein.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DE1AC07C1800467F4C /* NSData+Skein.m */; };
 		FBE689E01AC07C1800467F4C /* NSData+Skein.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DE1AC07C1800467F4C /* NSData+Skein.m */; };
-		FBFB9AF81AE80473008D2249 /* DCDarksendTxIn.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9AF71AE80473008D2249 /* DCDarksendTxIn.m */; };
 		FBFB9AFC1AE804FF008D2249 /* DCMasternode.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9AFB1AE804FF008D2249 /* DCMasternode.m */; };
 		FBFB9AFF1AE8085F008D2249 /* DCDataStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9AFE1AE8085F008D2249 /* DCDataStream.m */; };
 		FBFB9B021AEBADA1008D2249 /* NSString+DCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9B011AEBADA1008D2249 /* NSString+DCAdditions.m */; };
@@ -277,21 +269,21 @@
 		75AA5F53194143D5003F23BD /* BRBouncyBurgerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRBouncyBurgerButton.h; sourceTree = "<group>"; };
 		75AA5F54194143D5003F23BD /* BRBouncyBurgerButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRBouncyBurgerButton.m; sourceTree = "<group>"; };
 		75BCC59A1946520700EC1A64 /* BreadWalletTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BreadWalletTests.h; sourceTree = "<group>"; };
-		75D5F3BE191EC270004AB296 /* breadwallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = breadwallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		75D5F3BE191EC270004AB296 /* dashwallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashwallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75D5F3C1191EC270004AB296 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		75D5F3C3191EC270004AB296 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		75D5F3C5191EC270004AB296 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		75D5F3C9191EC270004AB296 /* BreadWallet-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BreadWallet-Info.plist"; sourceTree = "<group>"; };
+		75D5F3C9191EC270004AB296 /* DashWallet-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DashWallet-Info.plist"; sourceTree = "<group>"; };
 		75D5F3CB191EC270004AB296 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		75D5F3CD191EC270004AB296 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		75D5F3CF191EC270004AB296 /* BreadWallet-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BreadWallet-Prefix.pch"; sourceTree = "<group>"; };
+		75D5F3CF191EC270004AB296 /* DashWallet-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DashWallet-Prefix.pch"; sourceTree = "<group>"; };
 		75D5F3D0191EC270004AB296 /* BRAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BRAppDelegate.h; sourceTree = "<group>"; };
 		75D5F3D1191EC270004AB296 /* BRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BRAppDelegate.m; sourceTree = "<group>"; };
 		75D5F3DD191EC270004AB296 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		75D5F3DF191EC270004AB296 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		75D5F3E5191EC270004AB296 /* BreadWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BreadWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		75D5F3E5191EC270004AB296 /* DashWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DashWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		75D5F3E6191EC270004AB296 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		75D5F3EE191EC270004AB296 /* BreadWalletTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "BreadWalletTests-Info.plist"; sourceTree = "<group>"; };
+		75D5F3EE191EC270004AB296 /* DashWalletTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DashWalletTests-Info.plist"; sourceTree = "<group>"; };
 		75D5F3F0191EC270004AB296 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		75D5F3F2191EC270004AB296 /* BreadWalletTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BreadWalletTests.m; sourceTree = "<group>"; };
 		75DE023F1B0EB7990027FF08 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Main.strings; sourceTree = "<group>"; };
@@ -568,7 +560,7 @@
 		75D5F3B5191EC270004AB296 = {
 			isa = PBXGroup;
 			children = (
-				75D5F3C7191EC270004AB296 /* BreadWallet */,
+				75D5F3C7191EC270004AB296 /* DashWallet */,
 				75D5F3EC191EC270004AB296 /* BreadWalletTests */,
 				75D5F3C0191EC270004AB296 /* Frameworks */,
 				75D5F3BF191EC270004AB296 /* Products */,
@@ -578,8 +570,8 @@
 		75D5F3BF191EC270004AB296 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				75D5F3BE191EC270004AB296 /* breadwallet.app */,
-				75D5F3E5191EC270004AB296 /* BreadWalletTests.xctest */,
+				75D5F3BE191EC270004AB296 /* dashwallet.app */,
+				75D5F3E5191EC270004AB296 /* DashWalletTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -596,7 +588,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		75D5F3C7191EC270004AB296 /* BreadWallet */ = {
+		75D5F3C7191EC270004AB296 /* DashWallet */ = {
 			isa = PBXGroup;
 			children = (
 				FBFB9AF91AE804E7008D2249 /* Masternodes */,
@@ -619,17 +611,18 @@
 				FBFB9B001AEBADA1008D2249 /* NSString+DCAdditions.h */,
 				FBFB9B011AEBADA1008D2249 /* NSString+DCAdditions.m */,
 			);
+			name = DashWallet;
 			path = BreadWallet;
 			sourceTree = "<group>";
 		};
 		75D5F3C8191EC270004AB296 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				75D5F3C9191EC270004AB296 /* BreadWallet-Info.plist */,
+				75D5F3C9191EC270004AB296 /* DashWallet-Info.plist */,
 				75D5F3CA191EC270004AB296 /* InfoPlist.strings */,
 				757E09971ADB8EEB006FD352 /* Localizable.strings */,
 				75D5F3CD191EC270004AB296 /* main.m */,
-				75D5F3CF191EC270004AB296 /* BreadWallet-Prefix.pch */,
+				75D5F3CF191EC270004AB296 /* DashWallet-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -647,7 +640,7 @@
 		75D5F3ED191EC270004AB296 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				75D5F3EE191EC270004AB296 /* BreadWalletTests-Info.plist */,
+				75D5F3EE191EC270004AB296 /* DashWalletTests-Info.plist */,
 				75D5F3EF191EC270004AB296 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -736,9 +729,9 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
-		75D5F3BD191EC270004AB296 /* breadwallet */ = {
+		75D5F3BD191EC270004AB296 /* dashwallet */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 75D5F3F6191EC270004AB296 /* Build configuration list for PBXNativeTarget "breadwallet" */;
+			buildConfigurationList = 75D5F3F6191EC270004AB296 /* Build configuration list for PBXNativeTarget "dashwallet" */;
 			buildPhases = (
 				75D5F3BA191EC270004AB296 /* Sources */,
 				75D5F3BB191EC270004AB296 /* Frameworks */,
@@ -749,14 +742,14 @@
 			dependencies = (
 				757FC2531ADA30D100A1FDF7 /* PBXTargetDependency */,
 			);
-			name = breadwallet;
+			name = dashwallet;
 			productName = BreadWallet;
-			productReference = 75D5F3BE191EC270004AB296 /* breadwallet.app */;
+			productReference = 75D5F3BE191EC270004AB296 /* dashwallet.app */;
 			productType = "com.apple.product-type.application";
 		};
-		75D5F3E4191EC270004AB296 /* BreadWalletTests */ = {
+		75D5F3E4191EC270004AB296 /* DashWalletTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 75D5F3F9191EC270004AB296 /* Build configuration list for PBXNativeTarget "BreadWalletTests" */;
+			buildConfigurationList = 75D5F3F9191EC270004AB296 /* Build configuration list for PBXNativeTarget "DashWalletTests" */;
 			buildPhases = (
 				75D5F3E1191EC270004AB296 /* Sources */,
 				75D5F3E2191EC270004AB296 /* Frameworks */,
@@ -767,9 +760,9 @@
 			dependencies = (
 				75D5F3EB191EC270004AB296 /* PBXTargetDependency */,
 			);
-			name = BreadWalletTests;
+			name = DashWalletTests;
 			productName = BreadWalletTests;
-			productReference = 75D5F3E5191EC270004AB296 /* BreadWalletTests.xctest */;
+			productReference = 75D5F3E5191EC270004AB296 /* DashWalletTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -786,7 +779,7 @@
 						CreatedOnToolsVersion = 6.1;
 					};
 					75D5F3BD191EC270004AB296 = {
-						DevelopmentTeam = 4R7S6N88W9;
+						DevelopmentTeam = 726K4AHK5D;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -801,7 +794,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 75D5F3B9191EC270004AB296 /* Build configuration list for PBXProject "BreadWallet" */;
+			buildConfigurationList = 75D5F3B9191EC270004AB296 /* Build configuration list for PBXProject "DashWallet" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -830,8 +823,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				75D5F3BD191EC270004AB296 /* breadwallet */,
-				75D5F3E4191EC270004AB296 /* BreadWalletTests */,
+				75D5F3BD191EC270004AB296 /* dashwallet */,
+				75D5F3E4191EC270004AB296 /* DashWalletTests */,
 				75001D3D1A1EE89500585F55 /* submodules */,
 			);
 		};
@@ -883,9 +876,7 @@
 				752E28D919234C3600DB5A3C /* BRTransaction.m in Sources */,
 				752E28CE19234C3600DB5A3C /* BRBIP32Sequence.m in Sources */,
 				752E28CF19234C3600DB5A3C /* BRBIP39Mnemonic.m in Sources */,
-				FB6C29C71AE8004C00CEB807 /* DCDarksendService.m in Sources */,
 				FBE689D31AC07BCD00467F4C /* NSData+Luffa.m in Sources */,
-				FB6C29CB1AE801D100CEB807 /* DCDarksendScript.m in Sources */,
 				FBE689DB1AC07BFF00467F4C /* NSData+Simd.m in Sources */,
 				752E28DA19234C3600DB5A3C /* BRWallet.m in Sources */,
 				752E28DB19234C3600DB5A3C /* BRWalletManager.m in Sources */,
@@ -903,21 +894,18 @@
 				FBE689CB1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
 				75878BC1192AEC3F002505AB /* BRReceiveViewController.m in Sources */,
 				75878BBF192ACD46002505AB /* BRAmountViewController.m in Sources */,
-				FB6C29C31AE7FFAE00CEB807 /* DCDarksendTransaction.m in Sources */,
 				759816E719357D6F005060EA /* BRBubbleView.m in Sources */,
 				75878BC6192B1AF0002505AB /* BRTxHistoryViewController.m in Sources */,
 				757BE7E3192C0E9D0061CB20 /* BRRestoreViewController.m in Sources */,
 				757BE7E6192C1FF70061CB20 /* BRWelcomeViewController.m in Sources */,
 				757BE7E9192D4E880061CB20 /* BRSeedViewController.m in Sources */,
 				FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */,
-				FBFB9AF81AE80473008D2249 /* DCDarksendTxIn.m in Sources */,
 				752E28E719234DA200DB5A3C /* NSData+Dash.m in Sources */,
 				752E28E919234DA200DB5A3C /* NSManagedObject+Sugar.m in Sources */,
 				FBE689DF1AC07C1800467F4C /* NSData+Skein.m in Sources */,
 				FBE689BC1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */,
 				FBFB9AFC1AE804FF008D2249 /* DCMasternode.m in Sources */,
 				752E28EA19234DA200DB5A3C /* NSMutableData+Bitcoin.m in Sources */,
-				FBC731651AEE74AF001355A4 /* DCDarksendQueue.m in Sources */,
 				752E28EB19234DA200DB5A3C /* NSString+Bitcoin.m in Sources */,
 				757C89521A2FCE420076B373 /* BRSettingsViewController.m in Sources */,
 				75D5F3D2191EC270004AB296 /* BRAppDelegate.m in Sources */,
@@ -938,10 +926,7 @@
 			files = (
 				FBE689CC1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
 				FBE689BD1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */,
-				FB6C29C81AE8004C00CEB807 /* DCDarksendService.m in Sources */,
-				FB6C29CC1AE801D100CEB807 /* DCDarksendScript.m in Sources */,
 				FBE689C41ABF9A1B00467F4C /* NSData+Echo.m in Sources */,
-				FB6C29C41AE7FFAE00CEB807 /* DCDarksendTransaction.m in Sources */,
 				75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */,
 				FBE689D81AC07BE400467F4C /* NSData+Shavite.m in Sources */,
 				FBE689B91ABF160000467F4C /* NSData+Blake.m in Sources */,
@@ -964,7 +949,7 @@
 		};
 		75D5F3EB191EC270004AB296 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 75D5F3BD191EC270004AB296 /* breadwallet */;
+			target = 75D5F3BD191EC270004AB296 /* dashwallet */;
 			targetProxy = 75D5F3EA191EC270004AB296 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -1141,19 +1126,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer:  Quantum Explorer(7CTQL8W8SC)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
+				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/secp256k1",
 					"$(SRCROOT)",
 				);
-				INFOPLIST_FILE = "BreadWallet/BreadWallet-Info.plist";
+				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "92683aa7-bd72-439f-96a8-223a3a38544a";
+				PROVISIONING_PROFILE = "4faa976f-0fd3-4578-a6ec-879290b5863f";
 				WRAPPER_EXTENSION = app;
 			};
 			name = GCov_Build;
@@ -1161,21 +1147,22 @@
 		754F4BCF194BBA94004AD9CA /* GCov_Build */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/breadwallet.app/breadwallet";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/dashwallet.app/dashwallet";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
+				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				GCC_WARN_PEDANTIC = NO;
-				INFOPLIST_FILE = "BreadWalletTests/BreadWalletTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				INFOPLIST_FILE = "BreadWalletTests/DashWalletTests-Info.plist";
+				PRODUCT_NAME = DashWalletTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -1265,19 +1252,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer:  Quantum Explorer(7CTQL8W8SC)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
+				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/secp256k1",
 					"$(SRCROOT)",
 				);
-				INFOPLIST_FILE = "BreadWallet/BreadWallet-Info.plist";
+				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "92683aa7-bd72-439f-96a8-223a3a38544a";
+				PROVISIONING_PROFILE = "4faa976f-0fd3-4578-a6ec-879290b5863f";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1288,19 +1276,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer:  Quantum Explorer(7CTQL8W8SC)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
+				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/secp256k1",
 					"$(SRCROOT)",
 				);
-				INFOPLIST_FILE = "BreadWallet/BreadWallet-Info.plist";
+				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "92683aa7-bd72-439f-96a8-223a3a38544a";
+				PROVISIONING_PROFILE = "4faa976f-0fd3-4578-a6ec-879290b5863f";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -1308,21 +1297,22 @@
 		75D5F3FA191EC270004AB296 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/breadwallet.app/breadwallet";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/dashwallet.app/dashwallet";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
+				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				GCC_WARN_PEDANTIC = NO;
-				INFOPLIST_FILE = "BreadWalletTests/BreadWalletTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				INFOPLIST_FILE = "BreadWalletTests/DashWalletTests-Info.plist";
+				PRODUCT_NAME = DashWalletTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -1331,17 +1321,18 @@
 		75D5F3FB191EC270004AB296 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/breadwallet.app/breadwallet";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/dashwallet.app/dashwallet";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
+				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = NO;
-				INFOPLIST_FILE = "BreadWalletTests/BreadWalletTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				INFOPLIST_FILE = "BreadWalletTests/DashWalletTests-Info.plist";
+				PRODUCT_NAME = DashWalletTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -1360,7 +1351,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		75D5F3B9191EC270004AB296 /* Build configuration list for PBXProject "BreadWallet" */ = {
+		75D5F3B9191EC270004AB296 /* Build configuration list for PBXProject "DashWallet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				75D5F3F4191EC270004AB296 /* Debug */,
@@ -1370,7 +1361,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		75D5F3F6191EC270004AB296 /* Build configuration list for PBXNativeTarget "breadwallet" */ = {
+		75D5F3F6191EC270004AB296 /* Build configuration list for PBXNativeTarget "dashwallet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				75D5F3F7191EC270004AB296 /* Debug */,
@@ -1380,7 +1371,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		75D5F3F9191EC270004AB296 /* Build configuration list for PBXNativeTarget "BreadWalletTests" */ = {
+		75D5F3F9191EC270004AB296 /* Build configuration list for PBXNativeTarget "DashWalletTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				75D5F3FA191EC270004AB296 /* Debug */,

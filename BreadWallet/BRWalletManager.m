@@ -32,7 +32,7 @@
 #import "BRTransactionEntity.h"
 #import "BRAddressEntity.h"
 #import "NSString+Bitcoin.h"
-#import "NSData+Bitcoin.h"
+#import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
 #import "Reachability.h"
@@ -46,7 +46,7 @@
 #define CRYPTSY_TICKER_URL  @"http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=155"
 
 #define SEED_ENTROPY_LENGTH    (128/8)
-#define SEC_ATTR_SERVICE       @"org.voisine.breadwallet"
+#define SEC_ATTR_SERVICE       @"org.dash.dashwallet"
 #define DEFAULT_CURRENCY_PRICE 3.0
 #define DEFAULT_CURRENCY_CODE  @"USD"
 #define DEFAULT_SPENT_LIMIT    DUFFS

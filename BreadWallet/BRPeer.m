@@ -47,6 +47,7 @@
 #define LOCAL_HOST         0x7f000001u
 #define ZERO_HASH          [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH]
 #define CONNECT_TIMEOUT    3.0
+#define DASH_ONLY_PULL_BLOCKS 1
 
 typedef enum {
     error = 0,
@@ -743,10 +744,10 @@ services:(uint64_t)services
     NSTimeInterval t = [message UInt32AtOffset:l + 81*(count - 1) + 68] - NSTimeIntervalSince1970;
 
     if (count >= 2000 || t + 7*24*60*60 >= self.earliestKeyTime - 2*60*60) {
-        NSData *firstHash = [message subdataWithRange:NSMakeRange(l, 80)].SHA256_2,
-               *lastHash = [message subdataWithRange:NSMakeRange(l + 81*(count - 1), 80)].SHA256_2;
+        NSData *firstHash = [message subdataWithRange:NSMakeRange(l, 80)].x11,
+               *lastHash = [message subdataWithRange:NSMakeRange(l + 81*(count - 1), 80)].x11;
 
-        if (t + 7*24*60*60 >= self.earliestKeyTime - 2*60*60) { // request blocks for the remainder of the chain
+        if ((t + 7*24*60*60 >= self.earliestKeyTime - 2*60*60) || DASH_ONLY_PULL_BLOCKS) { // request blocks for the remainder of the chain
             t = [message UInt32AtOffset:l + 81 + 68] - NSTimeIntervalSince1970;
 
             for (off = l; t > 0 && t + 7*24*60*60 < self.earliestKeyTime - 2*60*60;) {
@@ -754,7 +755,7 @@ services:(uint64_t)services
                 t = [message UInt32AtOffset:off + 81 + 68] - NSTimeIntervalSince1970;
             }
 
-            lastHash = [message subdataWithRange:NSMakeRange(off, 80)].SHA256_2;
+            lastHash = [message subdataWithRange:NSMakeRange(off, 80)].x11;
             NSLog(@"%@:%u calling getblocks with locators: %@", self.host, self.port, @[lastHash, firstHash]);
             [self sendGetblocksMessageWithLocators:@[lastHash, firstHash] andHashStop:nil];
         }
@@ -983,22 +984,22 @@ services:(uint64_t)services
         return;
     }
     
-    if((CNetAddr)darkSendPool.submittedToMasternode != self.address){
-        //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", darkSendPool.submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
-        return;
-    }
-    
-    int sessionID;
-    CTransaction txNew;
-    vRecv >> sessionID >> txNew;
-    
-    if(darkSendPool.sessionID != sessionID){
-        if (fDebug) LogPrintf("dsf - message doesn't match current darksend session %d %d\n", darkSendPool.sessionID, sessionID);
-        return;
-    }
-    
-    //check to see if input is spent already? (and probably not confirmed)
-    darkSendPool.SignFinalTransaction(txNew, pfrom);
+//    if((CNetAddr)darkSendPool.submittedToMasternode != self.address){
+//        //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", darkSendPool.submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
+//        return;
+//    }
+//    
+//    int sessionID;
+//    CTransaction txNew;
+//    vRecv >> sessionID >> txNew;
+//    
+//    if(darkSendPool.sessionID != sessionID){
+//        if (fDebug) LogPrintf("dsf - message doesn't match current darksend session %d %d\n", darkSendPool.sessionID, sessionID);
+//        return;
+//    }
+//    
+//    //check to see if input is spent already? (and probably not confirmed)
+//    darkSendPool.SignFinalTransaction(txNew, pfrom);
 }
 
 - (void)acceptDarkSendCompleteMessage:(NSData *)message

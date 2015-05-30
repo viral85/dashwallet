@@ -549,7 +549,7 @@ sph_bmw512_addbits_and_close(void *cc, unsigned ub, unsigned n, void *dst)
     sph_bmw512(&ctx_bmw, self.bytes, self.length);
     void * dest = malloc(64*sizeof(Byte));
     sph_bmw512_close(&ctx_bmw, dest);
-    return [NSData dataWithBytes:dest length:64];
+    return [NSData dataWithBytesNoCopy:dest length:64 freeWhenDone:TRUE];
 }
 
 

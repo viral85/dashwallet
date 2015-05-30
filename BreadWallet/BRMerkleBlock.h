@@ -25,7 +25,9 @@
 
 #import <Foundation/Foundation.h>
 
-#define BLOCK_UNKOWN_HEIGHT       INT32_MAX
+#define BLOCK_UNKNOWN_HEIGHT       INT32_MAX
+#define DGW_PAST_BLOCKS_MIN 24
+#define DGW_PAST_BLOCKS_MAX 24
 
 @interface BRMerkleBlock : NSObject
 
