@@ -31,9 +31,6 @@
 #import "Reachability.h"
 #import <arpa/inet.h>
 
-#define USERAGENT [NSString stringWithFormat:@"/breadwallet:%@/",\
-                   NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"]]
-
 #define HEADER_LENGTH      24
 #define MAX_MSG_LENGTH     0x02000000u
 #define MAX_GETDATA_HASHES 50000
@@ -296,7 +293,7 @@ services:(uint64_t)services
     [msg appendNetAddress:LOCAL_HOST port:BITCOIN_STANDARD_PORT services:ENABLED_SERVICES]; // address of local peer
     self.localNonce = (((uint64_t)arc4random() << 32) | (uint64_t)arc4random()); // random nonce
     [msg appendUInt64:self.localNonce];
-    [msg appendString:USERAGENT]; // user agent
+    [msg appendString:USER_AGENT]; // user agent
     [msg appendUInt32:0]; // last block received
     [msg appendUInt8:0]; // relay transactions (no for SPV bloom filter mode)
     self.startTime = [NSDate timeIntervalSinceReferenceDate];
@@ -576,6 +573,8 @@ services:(uint64_t)services
                                                                     sizeof(uint32_t) + 20));
         uint16_t port = CFSwapInt16BigToHost(*(const uint16_t *)((const uint8_t *)message.bytes + off +
                                                                  sizeof(uint32_t)*2 + 20));
+        
+        if (! (services & SERVICES_NODE_NETWORK)) continue; // skip peers that don't carry full blocks
         
         // if address time is more than 10 min in the future or older than reference date, set to 5 days old
         if (timestamp > now + 10*60 || timestamp < 0) timestamp = now - 5*24*60*60;
@@ -967,7 +966,7 @@ services:(uint64_t)services
     switch (eventCode) {
         case NSStreamEventOpenCompleted:
             NSLog(@"%@:%u %@ stream connected in %fs", self.host, self.port,
-                  (aStream == self.inputStream) ? @"input" : (aStream == self.outputStream ? @"output" : @"unkown"),
+                  (aStream == self.inputStream) ? @"input" : (aStream == self.outputStream ? @"output" : @"unknown"),
                   [NSDate timeIntervalSinceReferenceDate] - self.startTime);
 
             if (aStream == self.outputStream) {

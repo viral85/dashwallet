@@ -28,6 +28,9 @@
 #import "NSString+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 
+#define USER_AGENT [NSString stringWithFormat:@"/breadwallet:%@/",\
+                    NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"]]
+
 // BIP21 bitcoin URI object https://github.com/bitcoin/bips/blob/master/bip-0021.mediawiki
 @implementation BRPaymentRequest
 
@@ -87,27 +90,27 @@
     
     self.paymentAddress = url.host;
     
-    //TODO: correctly handle unkown but required url arguments (by reporting the request invalid)
+    //TODO: correctly handle unknown but required url arguments (by reporting the request invalid)
     for (NSString *arg in [url.query componentsSeparatedByString:@"&"]) {
-        NSArray *pair = [arg componentsSeparatedByString:@"="];
-        NSString *value = (pair.count > 1) ? [arg substringFromIndex:[pair[0] length] + 1] : nil;
+        NSArray *pair = [arg componentsSeparatedByString:@"="]; // if more than one '=', then pair[1] != value
+
+        if (pair.count < 2) continue;
         
+        NSString *value = [[[arg substringFromIndex:[pair[0] length] + 1]
+                            stringByReplacingOccurrencesOfString:@"+" withString:@" "]
+                           stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+
         if ([pair[0] isEqual:@"amount"]) {
             self.amount = [[[NSDecimalNumber decimalNumberWithString:value] decimalNumberByMultiplyingByPowerOf10:8]
                            unsignedLongLongValue];
         }
         else if ([pair[0] isEqual:@"label"]) {
-            self.label = [[value stringByReplacingOccurrencesOfString:@"+" withString:@"%20"]
-                          stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            self.label = value;
         }
         else if ([pair[0] isEqual:@"message"]) {
-            self.message = [[value stringByReplacingOccurrencesOfString:@"+" withString:@"%20"]
-                            stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            self.message = value;
         }
-        else if ([pair[0] isEqual:@"r"]) {
-            self.r = [[value stringByReplacingOccurrencesOfString:@"+" withString:@"%20"]
-                      stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        }
+        else if ([pair[0] isEqual:@"r"]) self.r = value;
     }
 }
 
@@ -187,11 +190,11 @@
     NSMutableData *script = [NSMutableData data];
     
     [script appendScriptPubKeyForAddress:self.paymentAddress];
+    if (! script.length) return nil;
     
     BRPaymentProtocolDetails *details =
         [[BRPaymentProtocolDetails alloc] initWithNetwork:network outputAmounts:@[@(self.amount)]
-         outputScripts:@[script] time:[[NSDate date] timeIntervalSinceReferenceDate]
-         expires:UINT32_MAX - NSTimeIntervalSince1970 memo:self.message paymentURL:nil merchantData:nil];
+         outputScripts:@[script] time:0 expires:0 memo:self.message paymentURL:nil merchantData:nil];
     BRPaymentProtocolRequest *request =
         [[BRPaymentProtocolRequest alloc] initWithVersion:1 pkiType:@"none" certs:(name ? @[name] : nil) details:details
          signature:nil];
@@ -206,49 +209,58 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
     if (! completion) return;
 
     NSURL *u = [NSURL URLWithString:url];
+    NSMutableURLRequest *req = (u) ? [NSMutableURLRequest requestWithURL:u
+                                      cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:timeout] : nil;
 
-    if (! u) {
-        completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
-                         NSLocalizedString(@"bad payment request URL", nil)}]);
+    [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
+    [req setValue:@"application/bitcoin-paymentrequest" forHTTPHeaderField:@"Accept"];
+//  [req addValue:@"text/uri-list" forHTTPHeaderField:@"Accept"]; // breaks some BIP72 implementations, notably bitpay's
+
+    if (! req || ! [NSURLConnection canHandleRequest:req]) {
+        completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417
+                         userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"bad payment request URL", nil)}]);
         return;
     }
 
-    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:u
-                                cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:timeout];
-
-    [req addValue:@"application/bitcoin-paymentrequest" forHTTPHeaderField:@"Accept"];
-
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
     completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        if (! [response.MIMEType.lowercaseString isEqual:@"application/bitcoin-paymentrequest"] || data.length > 50000){
-            completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
-                             [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]
-                            }]);
+        if (connectionError) {
+            completion(nil, connectionError);
             return;
         }
-
-        BRPaymentProtocolRequest *req = [BRPaymentProtocolRequest requestWithData:data];
+    
+        BRPaymentProtocolRequest *req = nil;
         NSString *network = @"main";
-
+        
 #ifdef BITCOIN_TESTNET
         network = @"test";
 #endif
-
+        
+        if ([response.MIMEType.lowercaseString isEqual:@"application/bitcoin-paymentrequest"] && data.length <= 50000) {
+            req = [BRPaymentProtocolRequest requestWithData:data];
+        }
+        else if ([response.MIMEType.lowercaseString isEqual:@"text/uri-list"] && data.length <= 50000) {
+            for (NSString *url in [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]
+                                   componentsSeparatedByString:@"\n"]) {
+                if ([url hasPrefix:@"#"]) continue; // skip comments
+                req = [[BRPaymentRequest requestWithString:url] protocolRequest]; // use first url and ignore the rest
+                break;
+            }
+        }
+        
         if (! req) {
+            NSLog(@"unexpected response from %@:\n%@", u.host,
+                  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
             completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                              [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]
                             }]);
-            return;
         }
-
-        if (! [req.details.network isEqual:network]) {
+        else if (! [req.details.network isEqual:network]) {
             completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                              [NSString stringWithFormat:NSLocalizedString(@"requested network \"%@\" instead of \"%@\"",
                                                                           nil), req.details.network, network]}]);
-            return;
         }
-
-        completion(req, nil);
+        else completion(req, nil);
     }];
 }
 
@@ -266,7 +278,8 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:u
                                 cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:timeout];
 
-    [req addValue:@"application/bitcoin-payment" forHTTPHeaderField:@"Content-Type"];
+    [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
+    [req setValue:@"application/bitcoin-payment" forHTTPHeaderField:@"Content-Type"];
     [req addValue:@"application/bitcoin-paymentack" forHTTPHeaderField:@"Accept"];
     [req setHTTPMethod:@"POST"];
     [req setHTTPBody:payment.data];
@@ -277,24 +290,21 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
             completion(nil, connectionError);
             return;
         }
-
-        if (! [response.MIMEType.lowercaseString isEqual:@"application/bitcoin-paymentack"] || data.length > 50000) {
-            completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
-                             [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]
-                            }]);
-            return;
+        
+        BRPaymentProtocolACK *ack = nil;
+        
+        if ([response.MIMEType.lowercaseString isEqual:@"application/bitcoin-paymentack"] && data.length <= 50000) {
+            ack = [BRPaymentProtocolACK ackWithData:data];
         }
 
-        BRPaymentProtocolACK *ack = [BRPaymentProtocolACK ackWithData:data];
-        
         if (! ack) {
+            NSLog(@"unexpected response from %@:\n%@", u.host,
+                  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
             completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                              [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]
                             }]);
-            return;
         }
-        
-        completion(ack, nil);
+        else completion(ack, nil);
      }];
 }
 

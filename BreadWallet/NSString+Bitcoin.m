@@ -38,6 +38,8 @@ static const UniChar base58chars[] = {
 
 + (NSString *)base58WithData:(NSData *)d
 {
+    if (! d) return nil;
+    
     size_t i, z = 0;
     
     while (z < d.length && ((const uint8_t *)d.bytes)[z] == 0) z++; // count leading zeroes
@@ -63,7 +65,7 @@ static const UniChar base58chars[] = {
 
     CFMutableStringRef s = CFStringCreateMutable(SecureAllocator(), z + sizeof(buf) - i);
     
-    while (z-- > 0) CFStringAppendCharacters(s, base58chars, 1);
+    while (z-- > 0) CFStringAppendCharacters(s, &base58chars[0], 1);
     while (i < sizeof(buf)) CFStringAppendCharacters(s, &base58chars[buf[i++]], 1);
     CC_XZEROMEM(buf, sizeof(buf));
     return CFBridgingRelease(s);
@@ -71,6 +73,8 @@ static const UniChar base58chars[] = {
 
 + (NSString *)base58checkWithData:(NSData *)d
 {
+    if (! d) return nil;
+    
     NSMutableData *data = [NSMutableData secureDataWithData:d];
 
     [data appendBytes:d.SHA256_2.bytes length:4];
@@ -79,6 +83,8 @@ static const UniChar base58chars[] = {
 
 + (NSString *)hexWithData:(NSData *)d
 {
+    if (! d) return nil;
+    
     const uint8_t *bytes = d.bytes;
     NSMutableString *hex = CFBridgingRelease(CFStringCreateMutable(SecureAllocator(), d.length*2));
     
@@ -171,7 +177,7 @@ static const UniChar base58chars[] = {
 {
     size_t i, z = 0;
     
-    while (z < self.length && [self characterAtIndex:z] == *base58chars) z++; // count leading zeroes
+    while (z < self.length && [self characterAtIndex:z] == base58chars[0]) z++; // count leading zeroes
     
     uint8_t buf[(self.length - z)*733/1000 + 1]; // log(58)/log(256), rounded up
     

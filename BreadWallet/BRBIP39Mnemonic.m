@@ -38,7 +38,7 @@
 
 - (NSString *)encodePhrase:(NSData *)data
 {
-    if ((data.length % 4) != 0) return nil; // data length must be a multiple of 32 bits
+    if (! data || (data.length % 4) != 0) return nil; // data length must be a multiple of 32 bits
 
     NSArray *words = [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle] pathForResource:WORDS ofType:@"plist"]];
     uint32_t n = (uint32_t)words.count, x;
@@ -106,7 +106,8 @@
 - (NSString *)normalizePhrase:(NSString *)phrase
 {
     NSMutableString *s = CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)phrase));
-        
+    
+    CFStringNormalize((CFMutableStringRef)s, kCFStringNormalizationFormKD);
     [s replaceOccurrencesOfString:@"." withString:@" " options:0 range:NSMakeRange(0, s.length)];
     [s replaceOccurrencesOfString:@"," withString:@" " options:0 range:NSMakeRange(0, s.length)];
     [s replaceOccurrencesOfString:@"\n" withString:@" " options:0 range:NSMakeRange(0, s.length)];
