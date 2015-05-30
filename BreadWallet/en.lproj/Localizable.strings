@@ -40,7 +40,7 @@
 /* No comment provided by engineer. */
 "\nDO NOT let anyone see your recovery phrase or they can spend your dashs.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nDO NOT let anyone see your recovery phrase or they can spend your dashs.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n";
 
-/* No comment provided by engineer. */
+
 "\nnetwork fee +%@ (%@)" = "\nnetwork fee +%1$@ (%2$@)";
 
 /* No comment provided by engineer. */
@@ -158,7 +158,7 @@
 "do it later" = "do it later";
 
 /* No comment provided by engineer. */
-"DO NOT let anyone see your recovery\n      phrase or they can spend your bitcoins." = "DO NOT let anyone see your recovery\n      phrase or they can spend your bitcoins.";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n";
 
 /* No comment provided by engineer. */
 "done" = "done";
@@ -227,7 +227,7 @@
 "moved" = "moved";
 
 /* No comment provided by engineer. */
-"NEVER type your recovery phrase into\n      password managers or elsewhere. Other\n      devices may be infected." = "NEVER type your recovery phrase into\n      password managers or elsewhere. Other\n      devices may be infected.";
+"\nNEVER type your recovery phrase into\npassword managers or elsewhere.\nOther devices may be infected.\n" = "\nNEVER type your recovery phrase into\npassword managers or elsewhere.\nOther devices may be infected.\n";
 
 /* No comment provided by engineer. */
 "new phrase" = "new phrase";
@@ -437,7 +437,7 @@
 "unexpected response from %@" = "unexpected response from %@";
 
 /* No comment provided by engineer. */
-"unkown address" = "unkown address";
+"unknown address" = "unknown address";
 
 /* No comment provided by engineer. */
 "unrecognized address" = "unrecognized address";

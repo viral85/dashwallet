@@ -36,16 +36,18 @@
 
 static NSString *dateFormat(NSString *template)
 {
-    NSString *format = [[[[[[[NSDateFormatter dateFormatFromTemplate:template options:0 locale:[NSLocale currentLocale]]
-                             stringByReplacingOccurrencesOfString:@", " withString:@" "]
-                            stringByReplacingOccurrencesOfString:@" a" withString:@"a"]
-                           stringByReplacingOccurrencesOfString:@"hh" withString:@"h"]
-                          stringByReplacingOccurrencesOfString:@" ha" withString:@"@ha"]
-                         stringByReplacingOccurrencesOfString:@"HH" withString:@"H"]
-                        stringByReplacingOccurrencesOfString:@"H " withString:@"H'h' "];
-
-    return [format stringByReplacingOccurrencesOfString:@"H" withString:@"H'h'"
-            options:NSBackwardsSearch|NSAnchoredSearch range:NSMakeRange(0, format.length)];
+    NSString *format = [NSDateFormatter dateFormatFromTemplate:template options:0 locale:[NSLocale currentLocale]];
+    
+    format = [format stringByReplacingOccurrencesOfString:@", " withString:@" "];
+    format = [format stringByReplacingOccurrencesOfString:@" a" withString:@"a"];
+    format = [format stringByReplacingOccurrencesOfString:@"hh" withString:@"h"];
+    format = [format stringByReplacingOccurrencesOfString:@" ha" withString:@"@ha"];
+    format = [format stringByReplacingOccurrencesOfString:@"HH" withString:@"H"];
+    format = [format stringByReplacingOccurrencesOfString:@"H 'h'" withString:@"H'h'"];
+    format = [format stringByReplacingOccurrencesOfString:@"H " withString:@"H'h' "];
+    format = [format stringByReplacingOccurrencesOfString:@"H" withString:@"H'h'"
+              options:NSBackwardsSearch|NSAnchoredSearch range:NSMakeRange(0, format.length)];
+    return format;
 }
 
 @interface BRTxHistoryViewController ()
@@ -135,8 +137,9 @@ static NSString *dateFormat(NSString *template)
         self.syncStartedObserver =
             [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncStartedNotification object:nil
             queue:nil usingBlock:^(NSNotification *note) {
-                if ([[BRPeerManager sharedInstance] lastBlockHeight] + 2016/2 <
-                    [[BRPeerManager sharedInstance] estimatedBlockHeight] &&
+                if ([[BRPeerManager sharedInstance]
+                     timestampForBlockHeight:[[BRPeerManager sharedInstance] lastBlockHeight]] + 60*60*24*7 <
+                    [NSDate timeIntervalSinceReferenceDate] &&
                     m.seedCreationTime + 60*60*24 < [NSDate timeIntervalSinceReferenceDate]) {
                     self.navigationItem.titleView = nil;
                     self.navigationItem.title = NSLocalizedString(@"syncing...", nil);
@@ -168,7 +171,7 @@ static NSString *dateFormat(NSString *template)
 - (void)viewWillDisappear:(BOOL)animated
 {
     if (self.isMovingFromParentViewController || self.navigationController.isBeingDismissed) {
-        //BUG: XXXX this isn't triggered from start/recover new wallet
+        //BUG: XXX this isn't triggered from start/recover new wallet
         if (self.backgroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.backgroundObserver];
         self.backgroundObserver = nil;
         if (self.balanceObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.balanceObserver];
@@ -206,16 +209,25 @@ static NSString *dateFormat(NSString *template)
     if (self.syncFailedObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.syncFailedObserver];
 }
 
+- (uint32_t)blockHeight
+{
+    static uint32_t height = 0;
+    uint32_t h = [[BRPeerManager sharedInstance] lastBlockHeight];
+    
+    if (h > height) height = h;
+    return height;
+}
+
 - (void)setTransactions:(NSArray *)transactions
 {
-    uint32_t height = [[BRPeerManager sharedInstance] lastBlockHeight];
+    uint32_t height = self.blockHeight;
 
     if (transactions.count <= 5) self.moreTx = NO;
     _transactions = [transactions subarrayWithRange:NSMakeRange(0, (self.moreTx) ? 5 : transactions.count)];
     if ([[BRWalletManager sharedInstance] didAuthenticate]) return;
     
     for (BRTransaction *tx in _transactions) {
-        if (tx.blockHeight > height - 5) continue;
+        if (tx.blockHeight == TX_UNCONFIRMED || (tx.blockHeight > height - 5 && tx.blockHeight <= height)) continue;
         _transactions = [transactions subarrayWithRange:NSMakeRange(0, [transactions indexOfObject:tx])];
         self.moreTx = YES;
         break;
@@ -399,9 +411,7 @@ static NSString *dateFormat(NSString *template)
                 uint64_t received = [m.wallet amountReceivedFromTransaction:tx],
                          sent = [m.wallet amountSentByTransaction:tx],
                          balance = [m.wallet balanceAfterTransaction:tx];
-                uint32_t height = [[BRPeerManager sharedInstance] lastBlockHeight],
-                         confirms = (tx.blockHeight == TX_UNCONFIRMED) ? 0 : (height - tx.blockHeight) + 1;
-                NSUInteger relayCount = [[BRPeerManager sharedInstance] relayCountForTransaction:tx.txHash];
+                uint32_t h = self.blockHeight, confirms = (tx.blockHeight > h) ? 0 : (h - tx.blockHeight) + 1;
 
                 sentLabel.hidden = YES;
                 unconfirmedLabel.hidden = NO;
@@ -414,17 +424,18 @@ static NSString *dateFormat(NSString *template)
                     unconfirmedLabel.text = NSLocalizedString(@"INVALID", nil);
                     unconfirmedLabel.backgroundColor = [UIColor redColor];
                 }
-                else if (confirms == 0 && [m.wallet transactionIsPostdated:tx atBlockHeight:height]) {
+                else if (confirms == 0 && [m.wallet transactionIsPostdated:tx atBlockHeight:h]) {
                     unconfirmedLabel.text = NSLocalizedString(@"post-dated", nil);
                     unconfirmedLabel.backgroundColor = [UIColor redColor];
                 }
-                else if (confirms == 0 && relayCount < PEER_MAX_CONNECTIONS) {
+                else if (confirms == 0 && tx.timestamp < 1) { // timestamp gets set when tx is first verified
                     unconfirmedLabel.text = NSLocalizedString(@"unverified", nil);
                 }
                 else if (confirms < 6) {
-                    unconfirmedLabel.text = (confirms == 1) ? NSLocalizedString(@"1 confirmation", nil) :
-                                            [NSString stringWithFormat:NSLocalizedString(@"%d confirmations", nil),
-                                             (int)confirms];
+                    if (confirms == 0) unconfirmedLabel.text = NSLocalizedString(@"0 confirmations", nil);
+                    else if (confirms == 1) unconfirmedLabel.text = NSLocalizedString(@"1 confirmation", nil);
+                    else unconfirmedLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d confirmations", nil),
+                                                  (int)confirms];
                 }
                 else {
                     unconfirmedLabel.text = nil;

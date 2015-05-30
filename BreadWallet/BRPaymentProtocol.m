@@ -67,7 +67,6 @@
 
     if (*off + len <= self.length) lenDelim = [self subdataWithRange:NSMakeRange(*off, len)];
     *off += len;
-
     return lenDelim;
 }
 
@@ -207,7 +206,6 @@ merchantData:(NSData *)data
     _expires = expires;
     _memo = memo;
     _paymentURL = url;
-
     return self;
 }
 
@@ -238,10 +236,8 @@ merchantData:(NSData *)data
     }
 
     if (scripts.count == 0) return nil; // one or more outputs required
-
     _outputAmounts = amounts;
     _outputScripts = scripts;
-
     return self;
 }
 
@@ -265,26 +261,25 @@ merchantData:(NSData *)data
 
 - (NSData *)toData
 {
-    NSMutableData *d = [NSMutableData data], *output;
+    NSMutableData *d = [NSMutableData data];
     NSUInteger i = 0;
-    uint64_t amount;
 
     if (_network) [d appendProtoBufString:_network withKey:details_network];
 
     for (NSData *script in _outputScripts) {
-        output = [NSMutableData data];
-        amount = [_outputAmounts[i++] unsignedLongLongValue];
+        NSMutableData *output = [NSMutableData data];
+        uint64_t amount = [_outputAmounts[i++] unsignedLongLongValue];
+
         if (amount != UINT64_MAX) [output appendProtoBufInt:amount withKey:output_amount];
         [output appendProtoBufData:script withKey:output_script];
         [d appendProtoBufData:output withKey:details_outputs];
     }
 
-    if (_time) [d appendProtoBufInt:_time + NSTimeIntervalSince1970 withKey:details_time];
-    if (_expires) [d appendProtoBufInt:_expires + NSTimeIntervalSince1970 withKey:details_expires];
+    if (_time >= 1) [d appendProtoBufInt:_time + NSTimeIntervalSince1970 withKey:details_time];
+    if (_expires >= 1) [d appendProtoBufInt:_expires + NSTimeIntervalSince1970 withKey:details_expires];
     if (_memo) [d appendProtoBufString:_memo withKey:details_memo];
     if (_paymentURL) [d appendProtoBufString:_paymentURL withKey:details_payment_url];
     if (_merchantData) [d appendProtoBufData:_merchantData withKey:details_merchant_data];
-
     return d;
 }
 
@@ -325,7 +320,6 @@ merchantData:(NSData *)data
     }
 
     if (! _details) return nil; // required
-
     return self;
 }
 
@@ -347,7 +341,6 @@ details:(BRPaymentProtocolDetails *)details signature:(NSData *)sig
     if (d.length > 0) _pkiData = d;
     _details = details;
     _signature = sig;
-
     return self;
 }
 
@@ -370,7 +363,6 @@ details:(BRPaymentProtocolDetails *)details signature:(NSData *)sig
     if (_pkiData) [d appendProtoBufData:_pkiData withKey:request_pki_data];
     [d appendProtoBufData:_details.data withKey:request_details];
     if (_signature) [d appendProtoBufData:_signature withKey:request_signature];
-
     return d;
 }
 
@@ -413,6 +405,13 @@ details:(BRPaymentProtocolDetails *)details signature:(NSData *)sig
         if (trustResult != kSecTrustResultUnspecified && trustResult != kSecTrustResultProceed) {
             _errorMessage = (certs.count > 0) ? NSLocalizedString(@"untrusted certificate", nil) :
                             NSLocalizedString(@"missing certificate", nil);
+
+            for (NSDictionary *property in CFBridgingRelease(SecTrustCopyProperties(trust))) {
+                if (property[@"type"] != kSecPropertyTypeError) continue;
+                _errorMessage = [_errorMessage stringByAppendingFormat:@" - %@", property[@"value"]];
+                break;
+            }
+            
             return NO;
         }
 
@@ -450,6 +449,12 @@ details:(BRPaymentProtocolDetails *)details signature:(NSData *)sig
 
 @end
 
+@interface BRPaymentProtocolPayment ()
+
+@property (nonatomic, strong) NSArray *refundToAmounts;
+
+@end
+
 @implementation BRPaymentProtocolPayment
 
 + (instancetype)paymentWithData:(NSData *)data
@@ -465,7 +470,7 @@ details:(BRPaymentProtocolDetails *)details signature:(NSData *)sig
     NSMutableArray *txs = [NSMutableArray array], *amounts = [NSMutableArray array], *scripts = [NSMutableArray array];
 
     while (off < data.length) {
-        uint64_t i = 0, amount = 0;
+        uint64_t i = 0, amount = UINT64_MAX;
         NSData *d = nil, *script = nil;
         BRTransaction *tx = nil;
         NSUInteger o = 0;
@@ -485,7 +490,6 @@ details:(BRPaymentProtocolDetails *)details signature:(NSData *)sig
     _transactions = txs;
     _refundToAmounts = amounts;
     _refundToScripts = scripts;
-
     return self;
 }
 
@@ -500,13 +504,25 @@ refundToAmounts:(NSArray *)amounts refundToScripts:(NSArray *)scripts memo:(NSSt
     _refundToAmounts = amounts;
     _refundToScripts = scripts;
     _memo = memo;
-
     return self;
+}
+
+- (NSArray *)refundToAmounts
+{
+    if (! [_refundToAmounts containsObject:@(UINT64_MAX)]) return _refundToAmounts;
+    
+    NSMutableArray *amounts = [NSMutableArray arrayWithArray:_refundToAmounts];
+    
+    while ([amounts containsObject:@(UINT64_MAX)]) {
+        [amounts replaceObjectAtIndex:[amounts indexOfObject:@(UINT64_MAX)] withObject:@(0)];
+    }
+    
+    return amounts;
 }
 
 - (NSData *)toData
 {
-    NSMutableData *d = [NSMutableData data], *output;
+    NSMutableData *d = [NSMutableData data];
     NSUInteger i = 0;
 
     if (_merchantData) [d appendProtoBufData:_merchantData withKey:payment_merchant_data];
@@ -516,14 +532,15 @@ refundToAmounts:(NSArray *)amounts refundToScripts:(NSArray *)scripts memo:(NSSt
     }
 
     for (NSData *script in _refundToScripts) {
-        output = [NSMutableData data];
-        [output appendProtoBufInt:[_refundToAmounts[i++] unsignedLongLongValue] withKey:output_amount];
+        NSMutableData *output = [NSMutableData data];
+        uint64_t amount = [_refundToAmounts[i++] unsignedLongLongValue];
+        
+        if (amount != UINT64_MAX) [output appendProtoBufInt:amount withKey:output_amount];
         [output appendProtoBufData:script withKey:output_script];
         [d appendProtoBufData:output withKey:payment_refund_to];
     }
 
     if (_memo) [d appendProtoBufString:_memo withKey:payment_memo];
-
     return d;
 }
 
@@ -554,7 +571,6 @@ refundToAmounts:(NSArray *)amounts refundToScripts:(NSArray *)scripts memo:(NSSt
     }
 
     if (! _payment) return nil; // required
-
     return self;
 }
 
@@ -565,7 +581,6 @@ refundToAmounts:(NSArray *)amounts refundToScripts:(NSArray *)scripts memo:(NSSt
 
     _payment = payment;
     _memo = memo;
-
     return self;
 }
 
@@ -575,7 +590,6 @@ refundToAmounts:(NSArray *)amounts refundToScripts:(NSArray *)scripts memo:(NSSt
 
     [d appendProtoBufData:_payment.data withKey:ack_payment];
     if (_memo) [d appendProtoBufString:_memo withKey:ack_memo];
-
     return d;
 }
 

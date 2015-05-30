@@ -26,10 +26,22 @@
 #import <Foundation/Foundation.h>
 #import "BRWallet.h"
 
-@protocol BRMnemonic;
+#define DUFFS           100000000
+#define MAX_MONEY          (21000000LL*DUFFS)
+#define DASH         @"\xC4\x90"     // capital D with stroke (utf-8)
+#define BTC          @"\xC9\x83"     // capital B with stroke (utf-8)
+#define DITS         @"\xC4\x91"     // lowercase d with stroke (utf-8)
+#define BITS         @"\xC6\x80"     // lowercase b with stroke (utf-8)
+#define NARROW_NBSP  @"\xE2\x80\xAF" // narrow no-break space (utf-8)
+#define LDQUOTE      @"\xE2\x80\x9C" // left double quote (utf-8)
+#define RDQUOTE      @"\xE2\x80\x9D" // right double quote (utf-8)
+#define DISPLAY_NAME [NSString stringWithFormat:LDQUOTE @"%@" RDQUOTE,\
+NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
 
-#define WALLET_NEEDS_BACKUP_KEY @"WALLET_NEEDS_BACKUP"
+#define WALLET_NEEDS_BACKUP_KEY                @"WALLET_NEEDS_BACKUP"
 #define BRWalletManagerSeedChangedNotification @"BRWalletManagerSeedChangedNotification"
+
+@protocol BRMnemonic;
 
 @interface BRWalletManager : NSObject<UIAlertViewDelegate, UITextFieldDelegate, UITextViewDelegate>
 
@@ -61,6 +73,10 @@
 - (NSString *)seedPhraseWithPrompt:(NSString *)authprompt; // authenticates user and returns seedPhrase
 - (BOOL)authenticateWithPrompt:(NSString *)authprompt andTouchId:(BOOL)touchId; // prompts user to authenticate
 - (BOOL)setPin; // prompts the user to set or change wallet pin and returns true if the pin was successfully set
+
+// queries chain.com and calls the completion block with unspent outputs for the given address
+- (void)utxosForAddress:(NSString *)address
+completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error))completion;
 
 // given a private key, queries chain.com for unspent outputs and calls the completion block with a signed transaction
 // that will sweep the balance into wallet (doesn't publish the tx)

@@ -173,6 +173,7 @@
     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
                                      [m localCurrencyStringForAmount:DUFFS/m.localCurrencyBitcoinPrice],
                                      [m stringForAmount:DUFFS/m.localCurrencyBitcoinPrice]];
+    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDataSource
@@ -349,6 +350,7 @@
         case 0:
             switch (indexPath.row) {
                 case 0: // about
+                    //TODO: XXXX add a link to support
                     c = [self.storyboard instantiateViewControllerWithIdentifier:@"AboutViewController"];
                     l = (id)[c.view viewWithTag:411];
                     s = [[NSMutableAttributedString alloc] initWithAttributedString:l.attributedText];
@@ -366,10 +368,19 @@
                     
                 case 1: // recovery phrase
                     [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"WARNING", nil)
-                      message:NSLocalizedString(@"\nDO NOT let anyone see your recovery phrase or they can spend your "
-                                                "bitcoins.\n\nNEVER type your recovery phrase into password managers "
-                                                "or elsewhere. Other devices may be infected.\n", nil) delegate:self
-                      cancelButtonTitle:NSLocalizedString(@"cancel", nil)
+                      message:[NSString stringWithFormat:@"\n%@\n\n%@\n\n%@\n",
+                               [NSLocalizedString(@"\nDO NOT let anyone see your recovery\n"
+                                                  "phrase or they can spend your bitcoins.\n", nil)
+                                stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]],
+                               [NSLocalizedString(@"\nNEVER type your recovery phrase into\n"
+                                                  "password managers or elsewhere.\n"
+                                                  "Other devices may be infected.\n", nil)
+                                stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]],
+                               [NSLocalizedString(@"\nDO NOT take a screenshot.\n"
+                                                  "Screenshots are visible to other apps\n"
+                                                  "and devices.\n", nil)
+                                stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]]]
+                      delegate:self cancelButtonTitle:NSLocalizedString(@"cancel", nil)
                       otherButtonTitles:NSLocalizedString(@"show", nil), nil] show];
                     break;
             }

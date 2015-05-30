@@ -32,6 +32,7 @@
 
 @property (nonatomic, strong) AVCaptureSession *session;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *preview;
+@property (nonatomic, assign) UIStatusBarStyle barStyle;
 
 @end
 
@@ -54,10 +55,13 @@
 {
     [super viewWillAppear:animated];
 
+    self.barStyle = [[UIApplication sharedApplication] statusBarStyle];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:animated];
+
     if ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo] == AVAuthorizationStatusDenied) {
         [[[UIAlertView alloc]
           initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%@ is not allowed to access the camera", nil),
-                         DISPLAY_NAME]
+                         NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
           message:[NSString stringWithFormat:NSLocalizedString(@"\nallow camera access in\n"
                                                                "Settings->Privacy->Camera->%@", nil),
                    NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]] delegate:nil
@@ -101,6 +105,13 @@
     dispatch_async(dispatch_queue_create("qrscanner", NULL), ^{
         [self.session startRunning];
     });
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [[UIApplication sharedApplication] setStatusBarStyle:self.barStyle animated:animated];
+    
+    [super viewWillDisappear:animated];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
