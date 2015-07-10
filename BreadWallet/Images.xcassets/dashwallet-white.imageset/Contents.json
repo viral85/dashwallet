@@ -1,13 +1,16 @@
 {
   "images" : [
     {
+      "idiom" : "universal"
+    },
+    {
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "breadwallet-white.png"
+      "filename" : "dashwallet-white.png"
     },
     {
       "idiom" : "universal",

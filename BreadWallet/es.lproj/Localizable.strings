@@ -113,7 +113,7 @@
 "choose passcode for %@" = "seleccionar código de acceso para %@";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid bitcoin address" = "el portapapeles no contiene ninguna dirección bitcoin válida";
+"clipboard doesn't contain a valid dash address" = "el portapapeles no contiene ninguna dirección dash válida";
 
 /* No comment provided by engineer. */
 "close app" = "cerrar app";

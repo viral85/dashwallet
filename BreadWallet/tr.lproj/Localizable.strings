@@ -113,7 +113,7 @@
 "choose passcode for %@" = "%@ için şifre seçin";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid bitcoin address" = "pano geçerli bir bitcoin adresi içermiyor";
+"clipboard doesn't contain a valid dash address" = "pano geçerli bir dash adresi içermiyor";
 
 /* No comment provided by engineer. */
 "close app" = "uygulamayı kapat";

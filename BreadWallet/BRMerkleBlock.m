@@ -94,9 +94,6 @@
     _nonce = [message UInt32AtOffset:off];
     off += sizeof(uint32_t);
     _totalTransactions = [message UInt32AtOffset:off];
-    if (_totalTransactions) {
-        NSLog(@"there were %d transactions",_totalTransactions);
-    }
     off += sizeof(uint32_t);
     len = (NSUInteger)[message varIntAtOffset:off length:&l]*CC_SHA256_DIGEST_LENGTH;
     off += l;

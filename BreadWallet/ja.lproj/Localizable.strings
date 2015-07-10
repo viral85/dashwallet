@@ -113,7 +113,7 @@
 "choose passcode for %@" = "%@ のパスコードを\nご指定下さい";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid bitcoin address" = "クリップボードには有効な\nビットコインアドレスが\n含まれていません。";
+"clipboard doesn't contain a valid dash address" = "クリップボードには有効な\nビットコインアドレスが\n含まれていません。";
 
 /* No comment provided by engineer. */
 "close app" = "アプリを閉じる";

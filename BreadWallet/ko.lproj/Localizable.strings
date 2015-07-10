@@ -113,7 +113,7 @@
 "choose passcode for %@" = "%@를 위한 암호 설정";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid bitcoin address" = "클립보드에 제대로 된 비트코인 주소가 없습니다";
+"clipboard doesn't contain a valid dash address" = "클립보드에 제대로 된 비트코인 주소가 없습니다";
 
 /* No comment provided by engineer. */
 "close app" = "앱 닫기";

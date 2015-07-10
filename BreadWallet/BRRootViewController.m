@@ -40,7 +40,7 @@
 
 #define BALANCE_TIP NSLocalizedString(@"This is your digital cash (DASH) balance. Dash is a currency. "\
                                        "The exchange rate changes with the market.", nil)
-#define BITS_TIP    NSLocalizedString(@"%@ is for 'bits'. %@ = 1 bitcoin.", nil)
+#define DITS_TIP    NSLocalizedString(@"%@ is for 'dits'. %@ = 1 dash.", nil)
 
 #define BACKUP_DIALOG_TIME_KEY @"BACKUP_DIALOG_TIME"
 
@@ -687,7 +687,7 @@
     if ([v.text hasPrefix:BALANCE_TIP]) {
         BRWalletManager *m = [BRWalletManager sharedInstance];
         UINavigationBar *b = self.navigationController.navigationBar;
-        NSString *text = [NSString stringWithFormat:BITS_TIP, m.format.currencySymbol, [m stringForAmount:DUFFS]];
+        NSString *text = [NSString stringWithFormat:DITS_TIP, m.format.currencySymbol, [m stringForAmount:DUFFS]];
         CGRect r = [self.navigationItem.title boundingRectWithSize:b.bounds.size options:0
                     attributes:b.titleTextAttributes context:nil];
 

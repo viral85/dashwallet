@@ -113,7 +113,7 @@
 "choose passcode for %@" = "vælg adgangskode for %@";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid bitcoin address" = "udklipsholder indeholder ikke en gyldig bitcoin-adresse";
+"clipboard doesn't contain a valid dash address" = "udklipsholder indeholder ikke en gyldig dash-adresse";
 
 /* No comment provided by engineer. */
 "close app" = "luk app";
