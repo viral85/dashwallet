@@ -1,8 +1,8 @@
 //
-//  BRReceiveViewController.h
+//  NSString+Dash.h
 //  DashWallet
 //
-//  Created by Aaron Voisine on 5/8/13.
+//  Created by Aaron Voisine on 5/13/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,19 +23,37 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-#import <MessageUI/MessageUI.h>
-#import "BRAmountViewController.h"
+#import <Foundation/Foundation.h>
 
-@class BRPaymentRequest;
+#define DASH_PUBKEY_ADDRESS      76
+#define DASH_SCRIPT_ADDRESS      16
+#define DASH_PUBKEY_ADDRESS_TEST 139
+#define DASH_SCRIPT_ADDRESS_TEST 19
+#define DASH_PRIVKEY             204
+#define DASH_PRIVKEY_TEST        239
 
-@interface BRReceiveViewController : UIViewController<UIActionSheetDelegate, BRAmountViewControllerDelegate,
-MFMessageComposeViewControllerDelegate, MFMailComposeViewControllerDelegate, UINavigationControllerDelegate,
-UIViewControllerTransitioningDelegate, UIViewControllerAnimatedTransitioning>
+#define BIP38_NOEC_PREFIX      0x0142
+#define BIP38_EC_PREFIX        0x0143
+#define BIP38_NOEC_FLAG        (0x80 | 0x40)
+#define BIP38_COMPRESSED_FLAG  0x20
+#define BIP38_LOTSEQUENCE_FLAG 0x04
+#define BIP38_INVALID_FLAG     (0x10 | 0x08 | 0x02 | 0x01)
 
-@property (nonatomic, strong) BRPaymentRequest *paymentRequest;
+@interface NSString (Dash)
 
-- (IBAction)tip:(id)sender;
-- (void)updateAddress;
++ (NSString *)base58WithData:(NSData *)d;
++ (NSString *)base58checkWithData:(NSData *)d;
++ (NSString *)hexWithData:(NSData *)d;
++ (NSString *)addressWithScriptPubKey:(NSData *)script;
++ (NSString *)addressWithScriptSig:(NSData *)script;
+
+- (NSData *)base58ToData;
+- (NSData *)base58checkToData;
+- (NSData *)hexToData;
+- (NSData *)addressToHash160;
+
+- (BOOL)isValidDigitalCashAddress;
+- (BOOL)isValidDigitalCashPrivateKey;
+- (BOOL)isValidDigitalCashBIP38Key; // BIP38 encrypted keys: https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki
 
 @end

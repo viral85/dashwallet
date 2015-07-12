@@ -1,6 +1,6 @@
 //
 //  BRScanViewController.h
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Administrator on 7/15/14.
 //  Copyright (c) 2014 Aaron Voisine <voisine@gmail.com>

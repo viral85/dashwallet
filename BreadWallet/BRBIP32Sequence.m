@@ -1,6 +1,6 @@
 //
 //  BRBIP32Sequence.m
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 7/19/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -25,7 +25,7 @@
 
 #import "BRBIP32Sequence.h"
 #import "BRKey.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import <CommonCrypto/CommonHMAC.h>

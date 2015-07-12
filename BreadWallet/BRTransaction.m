@@ -1,6 +1,6 @@
 //
 //  BRTransaction.m
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 5/16/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -25,7 +25,7 @@
 
 #import "BRTransaction.h"
 #import "BRKey.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Dash.h"
 #import <CommonCrypto/CommonHMAC.h>

@@ -1,6 +1,6 @@
 //
 //  BRTxDetailViewController.m
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 7/23/14.
 //  Copyright (c) 2014 Aaron Voisine <voisine@gmail.com>
@@ -28,7 +28,7 @@
 #import "BRWalletManager.h"
 #import "BRPeerManager.h"
 #import "BRCopyLabel.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "NSData+Dash.h"
 
 #define TRANSACTION_CELL_HEIGHT 75

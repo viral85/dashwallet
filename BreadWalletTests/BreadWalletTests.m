@@ -1,6 +1,6 @@
 //
-//  BreadWalletTests.m
-//  BreadWalletTests
+//  DashWalletTests.m
+//  DashWalletTests
 //
 //  Created by Aaron Voisine on 5/8/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -23,7 +23,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import "BreadWalletTests.h"
+#import "DashWalletTests.h"
 #import "BRWalletManager.h"
 #import "BRBIP32Sequence.h"
 #import "BRBIP39Mnemonic.h"
@@ -36,7 +36,7 @@
 #import "BRPaymentProtocol.h"
 #import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "NSData+Blake.h"
 #import "NSData+Bmw.h"
 #import "NSData+CubeHash.h"
@@ -45,7 +45,7 @@
 
 #define SKIP_BIP38 1
 
-@implementation BreadWalletTests
+@implementation DashWalletTests
 
 - (void)setUp
 {

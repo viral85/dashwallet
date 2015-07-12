@@ -1,6 +1,6 @@
 //
 //  BRKey+BIP38.m
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 4/9/14.
 //  Copyright (c) 2014 Aaron Voisine <voisine@gmail.com>
@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 
 #import "BRKey+BIP38.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "ccMemory.h"

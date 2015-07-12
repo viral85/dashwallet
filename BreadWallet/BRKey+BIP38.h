@@ -1,6 +1,6 @@
 //
 //  BRKey+BIP38.h
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 4/9/14.
 //  Copyright (c) 2014 Aaron Voisine <voisine@gmail.com>

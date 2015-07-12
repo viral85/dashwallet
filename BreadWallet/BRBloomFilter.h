@@ -1,6 +1,6 @@
 //
 //  BRBloomFilter.h
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 10/15/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>

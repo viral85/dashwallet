@@ -1,6 +1,6 @@
 //
-//  BreadWalletTests.h
-//  BreadWalletTests
+//  DashWalletTests.h
+//  DashWalletTests
 //
 //  Created by Aaron Voisine on 5/8/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -25,6 +25,6 @@
 
 #import <XCTest/XCTest.h>
 
-@interface BreadWalletTests : XCTestCase
+@interface DashWalletTests : XCTestCase
 
 @end

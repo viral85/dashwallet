@@ -1,6 +1,6 @@
 //
 //  NSMutableData+Bitcoin.m
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 5/20/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -25,7 +25,7 @@
 
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Dash.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "ccMemory.h"
 
 static void *secureAllocate(CFIndex allocSize, CFOptionFlags hint, void *info)

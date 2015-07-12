@@ -1,6 +1,6 @@
 //
 //  BRPaymentRequest.m
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 5/9/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -25,6 +25,7 @@
 
 #import "BRPaymentRequest.h"
 #import "BRPaymentProtocol.h"
+#import "NSString+Dash.h"
 #import "NSString+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 
@@ -83,9 +84,11 @@
     
     if (! url || ! url.scheme) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"bitcoin://%@", s]];
+        self.type = @"dash";
     }
     else if (! url.host && url.resourceSpecifier) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@", url.scheme, url.resourceSpecifier]];
+        self.type = url.scheme;
     }
     
     self.paymentAddress = url.host;
@@ -118,7 +121,7 @@
 {
     if (! self.paymentAddress) return nil;
 
-    NSMutableString *s = [NSMutableString stringWithFormat:@"bitcoin:%@", self.paymentAddress];
+    NSMutableString *s = [NSMutableString stringWithFormat:@"%@:%@",self.type, self.paymentAddress];
     NSMutableArray *q = [NSMutableArray array];
     
     if (self.amount > 0) {
@@ -174,7 +177,13 @@
 
 - (BOOL)isValid
 {
-    if (! [self.paymentAddress isValidDigitalCashAddress] && (! self.r || ! [NSURL URLWithString:self.r])) return NO;
+    if ([self.type isEqualToString:@"dash"]) {
+        if (![self.paymentAddress isValidDigitalCashAddress] && (! self.r || ! [NSURL URLWithString:self.r])) return NO;
+    } else if ([self.type isEqualToString:@"bitcoin"]) {
+        if (![self.paymentAddress isValidBitcoinAddress] && (! self.r || ! [NSURL URLWithString:self.r])) return NO;
+    } else {
+        return NO;
+    }
 
     return YES;
 }
@@ -217,7 +226,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
 //  [req addValue:@"text/uri-list" forHTTPHeaderField:@"Accept"]; // breaks some BIP72 implementations, notably bitpay's
 
     if (! req || ! [NSURLConnection canHandleRequest:req]) {
-        completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417
+        completion(nil, [NSError errorWithDomain:@"DashWallet" code:417
                          userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"bad payment request URL", nil)}]);
         return;
     }
@@ -236,7 +245,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
         network = @"test";
 #endif
         
-        if ([response.MIMEType.lowercaseString isEqual:@"application/bitcoin-paymentrequest"] && data.length <= 50000) {
+        if ([response.MIMEType.lowercaseString isEqual:@"application/dash-paymentrequest"] && data.length <= 50000) {
             req = [BRPaymentProtocolRequest requestWithData:data];
         }
         else if ([response.MIMEType.lowercaseString isEqual:@"text/uri-list"] && data.length <= 50000) {
@@ -251,12 +260,12 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
         if (! req) {
             NSLog(@"unexpected response from %@:\n%@", u.host,
                   [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
+            completion(nil, [NSError errorWithDomain:@"DashWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                              [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]
                             }]);
         }
         else if (! [req.details.network isEqual:network]) {
-            completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
+            completion(nil, [NSError errorWithDomain:@"DashWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                              [NSString stringWithFormat:NSLocalizedString(@"requested network \"%@\" instead of \"%@\"",
                                                                           nil), req.details.network, network]}]);
         }
@@ -270,7 +279,7 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
     NSURL *u = [NSURL URLWithString:paymentURL];
 
     if (! u) {
-        completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417
+        completion(nil, [NSError errorWithDomain:@"DashWallet" code:417
                          userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"bad payment URL", nil)}]);
         return;
     }
@@ -279,8 +288,8 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
                                 cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:timeout];
 
     [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
-    [req setValue:@"application/bitcoin-payment" forHTTPHeaderField:@"Content-Type"];
-    [req addValue:@"application/bitcoin-paymentack" forHTTPHeaderField:@"Accept"];
+    [req setValue:@"application/dash-payment" forHTTPHeaderField:@"Content-Type"];
+    [req addValue:@"application/dash-paymentack" forHTTPHeaderField:@"Accept"];
     [req setHTTPMethod:@"POST"];
     [req setHTTPBody:payment.data];
 
@@ -293,14 +302,14 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
         
         BRPaymentProtocolACK *ack = nil;
         
-        if ([response.MIMEType.lowercaseString isEqual:@"application/bitcoin-paymentack"] && data.length <= 50000) {
+        if ([response.MIMEType.lowercaseString isEqual:@"application/dash-paymentack"] && data.length <= 50000) {
             ack = [BRPaymentProtocolACK ackWithData:data];
         }
 
         if (! ack) {
             NSLog(@"unexpected response from %@:\n%@", u.host,
                   [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
+            completion(nil, [NSError errorWithDomain:@"DashWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                              [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]
                             }]);
         }

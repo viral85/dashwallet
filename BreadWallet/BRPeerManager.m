@@ -1,6 +1,6 @@
 //
 //  BRPeerManager.m
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 10/6/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -32,7 +32,7 @@
 #import "BRMerkleBlock.h"
 #import "BRMerkleBlockEntity.h"
 #import "BRWalletManager.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "NSData+Dash.h"
 #import "NSManagedObject+Sugar.h"
 #import <netdb.h>
@@ -452,7 +452,7 @@ static const char *dns_seeds[] = {
             [self syncStopped];
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSError *error = [NSError errorWithDomain:@"BreadWallet" code:1
+                NSError *error = [NSError errorWithDomain:@"DashWallet" code:1
                                   userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"no peers found", nil)}];
 
                 [[NSNotificationCenter defaultCenter] postNotificationName:BRPeerManagerSyncFailedNotification
@@ -492,7 +492,7 @@ static const char *dns_seeds[] = {
 {
     if (! [transaction isSigned]) {
         if (completion) {
-            completion([NSError errorWithDomain:@"BreadWallet" code:401 userInfo:@{NSLocalizedDescriptionKey:
+            completion([NSError errorWithDomain:@"DashWallet" code:401 userInfo:@{NSLocalizedDescriptionKey:
                         NSLocalizedString(@"bitcoin transaction not signed", nil)}]);
         }
         
@@ -500,7 +500,7 @@ static const char *dns_seeds[] = {
     }
     else if (! self.connected && self.connectFailures >= MAX_CONNECT_FAILURES) {
         if (completion) {
-            completion([NSError errorWithDomain:@"BreadWallet" code:-1009 userInfo:@{NSLocalizedDescriptionKey:
+            completion([NSError errorWithDomain:@"DashWallet" code:-1009 userInfo:@{NSLocalizedDescriptionKey:
                         NSLocalizedString(@"not connected to the bitcoin network", nil)}]);
         }
         
@@ -593,7 +593,7 @@ static const char *dns_seeds[] = {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(txTimeout:) object:txHash];
 
     if (callback) {
-        callback([NSError errorWithDomain:@"BreadWallet" code:DASH_TIMEOUT_CODE userInfo:@{NSLocalizedDescriptionKey:
+        callback([NSError errorWithDomain:@"DashWallet" code:DASH_TIMEOUT_CODE userInfo:@{NSLocalizedDescriptionKey:
                   NSLocalizedString(@"transaction canceled, network timeout", nil)}]);
     }
 }
@@ -904,7 +904,7 @@ static const char *dns_seeds[] = {
 {
     NSLog(@"%@:%d disconnected%@%@", peer.host, peer.port, (error ? @", " : @""), (error ? error : @""));
     
-    if ([error.domain isEqual:@"BreadWallet"] && error.code != DASH_TIMEOUT_CODE) {
+    if ([error.domain isEqual:@"DashWallet"] && error.code != DASH_TIMEOUT_CODE) {
         [self peerMisbehavin:peer]; // if it's protocol error other than timeout, the peer isn't following the rules
     }
     else if (error) { // timeout or some non-protocol related network error
@@ -1148,10 +1148,10 @@ static const char *dns_seeds[] = {
     }
 
     if ([block.prevBlock isEqual:self.lastBlock.blockHash]) { // new block extends main chain
-        if ((block.height % 500) == 0 || block.txHashes.count > 0 || block.height > peer.lastblock) {
-            NSLog(@"adding block at height: %d, false positive rate: %f", block.height, self.fpRate);
-        }
-        NSLog(@"adding block at height: %d, %@", block.height, block.blockHash);
+//        if ((block.height % 500) == 0 || block.txHashes.count > 0 || block.height > peer.lastblock) {
+//            NSLog(@"adding block at height: %d, false positive rate: %f", block.height, self.fpRate);
+//        }
+        //NSLog(@"adding block at height: %d, %@", block.height, block.blockHash);
         self.blocks[block.blockHash] = block;
         self.lastBlock = block;
         [self setBlockHeight:block.height andTimestamp:txTime - NSTimeIntervalSince1970 forTxHashes:block.txHashes];

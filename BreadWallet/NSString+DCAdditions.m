@@ -1,6 +1,6 @@
 //
 //  NSString+DCAdditions.m
-//  BreadWallet
+//  DashWallet
 //
 //  Created by  Quantum Exploreron 4/25/15.
 //  Copyright (c) 2015 Aaron Voisine. All rights reserved.

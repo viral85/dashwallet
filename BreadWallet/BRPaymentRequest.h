@@ -1,6 +1,6 @@
 //
 //  BRPaymentRequest.h
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 5/9/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -36,6 +36,7 @@
 @property (nonatomic, assign) uint64_t amount;
 @property (nonatomic, strong) NSString *r; // BIP72 URI: https://github.com/bitcoin/bips/blob/master/bip-0072.mediawiki
 @property (nonatomic, strong) NSString *string;
+@property (nonatomic, strong) NSString *type;
 @property (nonatomic, strong) NSData *data;
 @property (nonatomic, strong) NSURL *url;
 @property (nonatomic, readonly) BOOL isValid;

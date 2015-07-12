@@ -1,6 +1,6 @@
 //
 //  NSData+CubeHash.h
-//  BreadWallet
+//  DashWallet
 
 
 #import <Foundation/Foundation.h>

@@ -1,6 +1,6 @@
 //
 //  BRAmountViewController.h
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 6/4/13.
 //  Copyright (c) 2013 Aaron Voisine <voisine@gmail.com>
@@ -38,5 +38,7 @@
 
 @property (nonatomic, assign) id<BRAmountViewControllerDelegate> delegate;
 @property (nonatomic, strong) NSString *to;
+@property (nonatomic, assign) BOOL usingShapeshift;
+@property (nonatomic, strong) NSString * payeeCurrency;
 
 @end

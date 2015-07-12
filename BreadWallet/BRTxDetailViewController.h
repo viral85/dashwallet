@@ -1,6 +1,6 @@
 //
 //  BRTxDetailViewController.h
-//  BreadWallet
+//  DashWallet
 //
 //  Created by Aaron Voisine on 7/23/14.
 //  Copyright (c) 2014 Aaron Voisine <voisine@gmail.com>
