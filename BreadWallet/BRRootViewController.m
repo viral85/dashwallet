@@ -38,8 +38,7 @@
 #import <sys/stat.h>
 #import <mach-o/dyld.h>
 
-#define BALANCE_TIP NSLocalizedString(@"This is your digital cash (DASH) balance. Dash is a currency. "\
-                                       "The exchange rate changes with the market.", nil)
+#define BALANCE_TIP_START NSLocalizedString(@"This is your digital cash (DASH) balance.", nil)
 #define DITS_TIP    NSLocalizedString(@"%@ is for 'dits'. %@ = 1 dash.", nil)
 
 #define BACKUP_DIALOG_TIME_KEY @"BACKUP_DIALOG_TIME"
@@ -330,7 +329,7 @@
 #endif
 
     if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 5) {
-        m.format.currencyCode = @"mDRK";
+        m.format.currencyCode = @"mDASH";
         m.format.currencySymbol = @"m" DASH NARROW_NBSP;
         m.format.maximumFractionDigits = 5;
         m.format.maximum = @((MAX_MONEY/DUFFS)*1000);
@@ -684,7 +683,7 @@
     self.tipView = nil;
     [v popOut];
 
-    if ([v.text hasPrefix:BALANCE_TIP]) {
+    if ([v.text hasPrefix:BALANCE_TIP_START]) {
         BRWalletManager *m = [BRWalletManager sharedInstance];
         UINavigationBar *b = self.navigationController.navigationBar;
         NSString *text = [NSString stringWithFormat:DITS_TIP, m.format.currencySymbol, [m stringForAmount:DUFFS]];
@@ -738,7 +737,7 @@
     }
 
     UINavigationBar *b = self.navigationController.navigationBar;
-    NSString *tip = (self.percent.hidden) ? BALANCE_TIP :
+    NSString *tip = (self.percent.hidden) ? [NSString stringWithFormat:@"%@ \n 1%@ = %@%@ (%@)",BALANCE_TIP_START,DASH,@(m.bitcoinDashPrice),BTC,[m localCurrencyStringForAmount:DUFFS]] :
                     [NSString stringWithFormat:NSLocalizedString(@"block #%d of %d", nil),
                      [[BRPeerManager sharedInstance] lastBlockHeight],
                      [[BRPeerManager sharedInstance] estimatedBlockHeight]];
@@ -746,7 +745,7 @@
     self.tipView = [BRBubbleView viewWithText:tip
                     tipPoint:CGPointMake(b.center.x, b.frame.origin.y + b.frame.size.height - 10)
                     tipDirection:BRBubbleTipDirectionUp];
-    self.tipView.backgroundColor = [UIColor orangeColor];
+    self.tipView.backgroundColor = [UIColor lightGrayColor];
     self.tipView.font = [UIFont fontWithName:@"HelveticaNeue" size:15.0];
     self.tipView.userInteractionEnabled = NO;
     [self.view addSubview:[self.tipView popIn]];
