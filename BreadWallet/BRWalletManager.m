@@ -1144,10 +1144,23 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
              decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits] longLongValue];
 }
 
+- (int64_t)amountForBitcoinString:(NSString *)string
+{
+    if (! string.length) return 0;
+    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.bitcoinFormat numberFromString:string] decimalValue]]
+             decimalNumberByMultiplyingByPowerOf10:self.bitcoinFormat.maximumFractionDigits] longLongValue];
+}
+
 - (NSString *)stringForAmount:(int64_t)amount
 {
     return [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
             decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+}
+
+- (NSNumber *)numberForAmount:(int64_t)amount
+{
+    return (id)[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                          decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits];
 }
 
 - (NSString *)bitcoinStringForAmount:(int64_t)amount

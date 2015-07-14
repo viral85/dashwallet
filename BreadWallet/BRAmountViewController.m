@@ -92,6 +92,9 @@
         queue:nil usingBlock:^(NSNotification *note) {
             self.navigationItem.titleView = self.logo;
         }];
+    if (self.usingShapeshift) {
+        [self swapCurrency:self];
+    }
 }
 
 - (void)dealloc
@@ -138,8 +141,8 @@
     BRWalletManager *m = [BRWalletManager sharedInstance];
     uint64_t amount;
     if (self.usingShapeshift) {
-        amount = (self.swapped) ? [m amountForBitcoinCurrencyString:self.amountField.text] :
-        [m amountForString:self.amountField.text];
+        amount = (self.swapped) ? [m amountForBitcoinCurrencyString:self.amountField.text] * 1.035 :
+        [m amountForString:self.amountField.text] * 0.97;
     } else {
         amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text] :
                       [m amountForString:self.amountField.text];
@@ -190,12 +193,12 @@
     if (self.usingShapeshift) {
         BRWalletManager *m = [BRWalletManager sharedInstance];
         
-        self.amount = (self.swapped) ? [m amountForBitcoinCurrencyString:self.amountField.text] :
+        self.amount = (self.swapped) ? [m amountForBitcoinString:self.amountField.text]:
         [m amountForString:self.amountField.text];
         
         if (self.amount == 0) return;
         if (self.swapped)
-            [self.delegate amountViewController:self shapeshiftBitcoinAmount:self.amount];
+            [self.delegate amountViewController:self shapeshiftBitcoinAmount:self.amount approximateDashAmount:[m amountForBitcoinCurrencyString:self.amountField.text]];
         else
             [self.delegate amountViewController:self shapeshiftDashAmount:self.amount];
     } else {

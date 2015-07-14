@@ -36,9 +36,14 @@
 {
     NSMutableArray *parameterArray = [NSMutableArray array];
     
-    [paramDictionary enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *obj, BOOL *stop) {
-        NSString *param = [NSString stringWithFormat:@"%@=%@", key, [self percentEscapeString:obj]];
-        [parameterArray addObject:param];
+    [paramDictionary enumerateKeysAndObjectsUsingBlock:^(NSString *key, id obj, BOOL *stop) {
+        if ([obj isKindOfClass:[NSString class]]) {
+            NSString *param = [NSString stringWithFormat:@"%@=%@", key, [self percentEscapeString:obj]];
+            [parameterArray addObject:param];
+        } else {
+            NSString *param = [NSString stringWithFormat:@"%@=%@", key, obj];
+            [parameterArray addObject:param];
+        }
     }];
     
     NSString *string = [parameterArray componentsJoinedByString:@"&"];
@@ -119,20 +124,20 @@
                            }];
 }
 
--(void)POST_SendAmount:(double)amount withAddress:(NSString*)withdrawalAddress returnAddress:(NSString*)returnAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock {
-    NSDictionary *params = @{@"amount":@(amount),@"withdrawal": withdrawalAddress, @"pair": @"dash_btc", @"returnAddress":returnAddress};
+-(void)POST_SendAmount:(NSNumber*)amount withAddress:(NSString*)withdrawalAddress returnAddress:(NSString*)returnAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock {
+    NSDictionary *params = @{@"amount":amount,@"withdrawal": withdrawalAddress, @"pair": @"dash_btc", @"returnAddress":returnAddress};
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/shift"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/sendamount"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[self httpBodyForParamsDictionary:params]];
-    
+    NSString * s = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
                                    NSError * returnError = connectionError;
                                    if (!returnError) {
-                                       returnError = [NSError errorWithDomain:@"DashWallet" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
+                                       returnError = [NSError errorWithDomain:@"Shapeshift" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
                                    }
                                    dispatch_async(dispatch_get_main_queue(), ^{
                                        completionBlock(nil,returnError);
@@ -146,8 +151,16 @@
                                    });
                                    return;
                                }
+                               if (dictionary[@"error"]) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,[NSError errorWithDomain:@"Shapeshift" code:416 userInfo:@{NSLocalizedDescriptionKey:
+                                                                                                                                                                dictionary[@"error"]
+                                                                                                                                                            }]);
+                                   });
+                                   return;
+                               }
                                dispatch_async(dispatch_get_main_queue(), ^{
-                                   completionBlock(dictionary,nil);
+                                   completionBlock(dictionary[@"success"],nil);
                                });
                                
                            }];

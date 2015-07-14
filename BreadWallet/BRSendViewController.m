@@ -506,43 +506,8 @@ static NSString *sanitizeString(NSString *s)
             [self cancel:nil];
             return;
         }
-        
         self.request = protoReq;
-        
-        if (self.amount == 0) {
-            tx = [m.wallet transactionForAmounts:protoReq.details.outputAmounts
-                                 toOutputScripts:protoReq.details.outputScripts withFee:YES];
-        }
-        else {
-            tx = [m.wallet transactionForAmounts:@[@(self.amount)]
-                                 toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES];
-        }
-        
-        if (tx) {
-            amount = [m.wallet amountSentByTransaction:tx] - [m.wallet amountReceivedFromTransaction:tx];
-            fee = [m.wallet feeForTransaction:tx];
-        }
-        else {
-            fee = [m.wallet feeForTxSize:[m.wallet transactionFor:m.wallet.balance to:address withFee:NO].size];
-            amount += fee;
-        }
-        
-        for (NSData *script in protoReq.details.outputScripts) {
-            NSString *addr = [NSString addressWithScriptPubKey:script];
-            
-            if (! addr) addr = NSLocalizedString(@"unrecognized address", nil);
-            if ([address rangeOfString:addr].location != NSNotFound) continue;
-            address = [address stringByAppendingFormat:@"%@%@", (address.length > 0) ? @", " : @"", addr];
-        }
-        
-        NSString *prompt = [self promptForAmount:amount fee:fee address:address name:protoReq.commonName
-                                            memo:protoReq.details.memo isSecure:(valid && ! [protoReq.pkiType isEqual:@"none"])];
-        
-        // to avoid the frozen pincode keyboard bug, we need to make sure we're scheduled normally on the main runloop
-        // rather than a dispatch_async queue
-        CFRunLoopPerformBlock([[NSRunLoop mainRunLoop] getCFRunLoop], kCFRunLoopCommonModes, ^{
-            [self confirmTransaction:tx withPrompt:prompt forAmount:amount];
-        });
+        [self amountViewController:nil shapeshiftBitcoinAmount:amount approximateDashAmount:1.03*amount/m.bitcoinDashPrice];
     }
 }
 
@@ -950,17 +915,17 @@ static NSString *sanitizeString(NSString *s)
 -(void)verifyShapeshiftAmountIsInBounds:(uint64_t)amount completionBlock:(void (^)())completionBlock {
     [[DCShapeshiftManager sharedInstance] GET_marketInfo:^(NSDictionary *marketInfo, NSError *error) {
         BRWalletManager *m = [BRWalletManager sharedInstance];
-        if ([DCShapeshiftManager sharedInstance].min > amount) {
+        if ([DCShapeshiftManager sharedInstance].min > (amount * .97)) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
                                         message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too low, "
-                                                                                             @"please input a value over %@", nil),[m stringForAmount:[DCShapeshiftManager sharedInstance].min]]
+                                                                                             @"please input a value over %@", nil),[m stringForAmount:[DCShapeshiftManager sharedInstance].min / .97]]
                                        delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
                               otherButtonTitles:nil] show];
             return;
-        } else if ([DCShapeshiftManager sharedInstance].limit < amount) {
+        } else if ([DCShapeshiftManager sharedInstance].limit < (amount * 1.03)) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
                                         message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too high, "
-                                                                                             @"please input a value under %@", nil),[m stringForAmount:[DCShapeshiftManager sharedInstance].limit]]
+                                                                                             @"please input a value under %@", nil),[m stringForAmount:[DCShapeshiftManager sharedInstance].limit / 1.03]]
                                        delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
                               otherButtonTitles:nil] show];
             return;
@@ -970,25 +935,26 @@ static NSString *sanitizeString(NSString *s)
 
 }
 
-- (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftBitcoinAmount:(uint64_t)amount
+- (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftBitcoinAmount:(uint64_t)amount approximateDashAmount:(uint64_t)dashAmount
 {
-    [self verifyShapeshiftAmountIsInBounds:amount completionBlock:^{
+    [self verifyShapeshiftAmountIsInBounds:dashAmount completionBlock:^{
         //we know the exact amount of bitcoins we want to send
         BRWalletManager *m = [BRWalletManager sharedInstance];
         NSString * address = [NSString bitcoinAddressWithScriptPubKey:self.request.details.outputScripts.firstObject];
         NSString * returnAddress = m.wallet.receiveAddress;
-        [[DCShapeshiftManager sharedInstance] POST_SendAmount:amount withAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
+        NSNumber * numberAmount = [m numberForAmount:amount];
+        [[DCShapeshiftManager sharedInstance] POST_SendAmount:numberAmount withAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
             if (error)
                 NSLog(@"shapeshiftBitcoinAmount Error %@",error);
             NSString * depositAddress = shiftInfo[@"deposit"];
             NSString * withdrawalAddress = shiftInfo[@"withdrawal"];
             NSNumber * withdrawalAmount = shiftInfo[@"withdrawalAmount"];
-            NSNumber * depositAmountNumber = shiftInfo[@"depositAmount"];
+            NSNumber * depositAmountNumber = @([shiftInfo[@"depositAmount"] doubleValue]);
             if (depositAmountNumber) {
                 uint64_t depositAmount = [[[NSDecimalNumber decimalNumberWithString:[NSString stringWithFormat:@"%@",depositAmountNumber]] decimalNumberByMultiplyingByPowerOf10:8]
                                           unsignedLongLongValue];
                 self.amount = depositAmount;
-                BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu",depositAddress,depositAmount]];
+                BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=shapeshift",depositAddress,depositAmount,sanitizeString(self.request.commonName)]];
                 [self confirmProtocolRequest:request.protocolRequest];
             }
         }];
@@ -1050,7 +1016,7 @@ static NSString *sanitizeString(NSString *s)
                                                                              NSLocalizedString(@"not a valid dash address", nil),
                                                                              request.paymentAddress];
                                      }
-                                     else self.scanController.message.text = NSLocalizedString(@"not a dash QR code", nil);
+                                     else self.scanController.message.text = NSLocalizedString(@"not a dash or bitcoin QR code", nil);
                                      
                                      [self performSelector:@selector(resetQRGuide) withObject:nil afterDelay:0.35];
                                  }

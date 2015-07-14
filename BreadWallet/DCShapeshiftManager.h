@@ -107,7 +107,7 @@
 */
 ////////////////////////////////////////////////////////////////////
 
--(void)POST_SendAmount:(double)amount withAddress:(NSString*)withdrawalAddress returnAddress:(NSString*)returnAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock;
+-(void)POST_SendAmount:(NSNumber*)amount withAddress:(NSString*)withdrawalAddress returnAddress:(NSString*)returnAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock;
 
 ////////////////////////////////////////////////////////////////////
 /*

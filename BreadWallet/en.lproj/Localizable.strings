@@ -239,7 +239,7 @@
 "no peers found" = "no peers found";
 
 /* No comment provided by engineer. */
-"not a dash QR code" = "not a dash QR code";
+"not a dash or bitcoin QR code" = "not a dash or bitcoin QR code";
 
 /* No comment provided by engineer. */
 "not a valid dash address" = "not a valid dash address";
