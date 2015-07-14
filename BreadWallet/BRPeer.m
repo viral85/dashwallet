@@ -622,7 +622,7 @@ services:(uint64_t)services
         return;
     }
     
-    NSLog(@"%@:%u got inv with %u items", self.host, self.port, (int)count);
+    //NSLog(@"%@:%u got inv with %u items", self.host, self.port, (int)count);
     
     for (NSUInteger off = l; off < l + 36*count; off += 36) {
         inv_t type = [message UInt32AtOffset:off];

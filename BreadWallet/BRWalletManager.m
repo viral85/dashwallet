@@ -228,6 +228,20 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     self.format.maximumFractionDigits = 8;
     self.format.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
     self.format.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.format.maximumFractionDigits));
+    
+    _bitcoinFormat = [NSNumberFormatter new];
+    self.bitcoinFormat.lenient = YES;
+    self.bitcoinFormat.numberStyle = NSNumberFormatterCurrencyStyle;
+    self.bitcoinFormat.generatesDecimalNumbers = YES;
+    self.bitcoinFormat.negativeFormat = [self.format.positiveFormat
+                                  stringByReplacingCharactersInRange:[self.format.positiveFormat rangeOfString:@"#"]
+                                  withString:@"-#"];
+    self.bitcoinFormat.currencyCode = @"BTC";
+    self.bitcoinFormat.currencySymbol = BTC NARROW_NBSP;
+    self.bitcoinFormat.maximumFractionDigits = 8;
+    self.bitcoinFormat.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
+    self.bitcoinFormat.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.bitcoinFormat.maximumFractionDigits));
+    
     _localFormat = [NSNumberFormatter new];
     self.localFormat.lenient = YES;
     self.localFormat.numberStyle = NSNumberFormatterCurrencyStyle;
@@ -1136,14 +1150,20 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
             decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
 }
 
+- (NSString *)bitcoinStringForAmount:(int64_t)amount
+{
+    return [self.bitcoinFormat stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                          decimalNumberByMultiplyingByPowerOf10:-self.bitcoinFormat.maximumFractionDigits]];
+}
+
 // NOTE: For now these local currency methods assume that a satoshi has a smaller value than the smallest unit of any
 // local currency. They will need to be revisited when that is no longer a safe assumption.
 - (int64_t)amountForLocalCurrencyString:(NSString *)string
 {
-    if (self.localCurrencyBitcoinPrice <= DBL_EPSILON) return 0;
+    if (self.localCurrencyBitcoinPrice*self.bitcoinDashPrice <= DBL_EPSILON) return 0;
     if ([string hasPrefix:@"<"]) string = [string substringFromIndex:1];
 
-    double price = self.localCurrencyBitcoinPrice*pow(10.0, self.localFormat.maximumFractionDigits),
+    double price = self.localCurrencyBitcoinPrice*self.bitcoinDashPrice*pow(10.0, self.localFormat.maximumFractionDigits),
            amt = [[self.localFormat numberFromString:string] doubleValue]*
                  pow(10.0, self.localFormat.maximumFractionDigits);
     int64_t local = amt + DBL_EPSILON*amt, overflowbits = 0;
@@ -1161,6 +1181,51 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
     p /= 10;
     return (local < 0) ? -(amount/p)*p : (amount/p)*p;
 }
+
+- (int64_t)amountForBitcoinCurrencyString:(NSString *)string
+{
+    if (self.bitcoinDashPrice <= DBL_EPSILON) return 0;
+    if ([string hasPrefix:@"<"]) string = [string substringFromIndex:1];
+    
+    double price = self.bitcoinDashPrice*pow(10.0, self.bitcoinFormat.maximumFractionDigits),
+    amt = [[self.bitcoinFormat numberFromString:string] doubleValue]*
+    pow(10.0, self.bitcoinFormat.maximumFractionDigits);
+    int64_t local = amt + DBL_EPSILON*amt, overflowbits = 0;
+    
+    if (local == 0) return 0;
+    while (llabs(local) + 1 > INT64_MAX/DUFFS) local /= 2, overflowbits++; // make sure we won't overflow an int64_t
+    int64_t min = llabs(local)*DUFFS/(int64_t)(price + DBL_EPSILON*price) + 1,
+    max = (llabs(local) + 1)*DUFFS/(int64_t)(price + DBL_EPSILON*price) - 1,
+    amount = (min + max)/2, p = 10;
+    
+    while (overflowbits > 0) local *= 2, min *= 2, max *= 2, amount *= 2, overflowbits--;
+    
+    if (amount >= MAX_MONEY) return (local < 0) ? -MAX_MONEY : MAX_MONEY;
+    while ((amount/p)*p >= min && p <= INT64_MAX/10) p *= 10; // lowest decimal precision matching local currency string
+    p /= 10;
+    return (local < 0) ? -(amount/p)*p : (amount/p)*p;
+}
+
+-(NSString *)bitcoinCurrencyStringForAmount:(int64_t)amount
+{
+    if (amount == 0) return [self.bitcoinFormat stringFromNumber:@(0)];
+    
+    
+    NSNumber * local = [NSNumber numberWithDouble:self.bitcoinDashPrice];
+    
+    
+    NSDecimalNumber *n = [[[NSDecimalNumber decimalNumberWithDecimal:local.decimalValue]
+                           decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:llabs(amount)]]
+                          decimalNumberByDividingBy:(id)[NSDecimalNumber numberWithLongLong:DUFFS]],
+    *min = [[NSDecimalNumber one]
+            decimalNumberByMultiplyingByPowerOf10:-self.bitcoinFormat.maximumFractionDigits];
+    
+    // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
+    if ([n compare:min] == NSOrderedAscending) n = min;
+    if (amount < 0) n = [n decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithInt:-1]];
+    return [self.bitcoinFormat stringFromNumber:n];
+}
+
 
 - (NSString *)localCurrencyStringForAmount:(int64_t)amount
 {

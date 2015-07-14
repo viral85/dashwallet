@@ -31,6 +31,9 @@
 @required
 
 - (void)amountViewController:(BRAmountViewController *)amountViewController selectedAmount:(uint64_t)amount;
+@optional
+- (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftBitcoinAmount:(uint64_t)amount;
+- (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftDashAmount:(uint64_t)amount;
 
 @end
 

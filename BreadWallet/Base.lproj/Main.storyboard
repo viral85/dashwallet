@@ -372,7 +372,7 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" red="0.10196078431372549" green="0.29019607843137257" blue="0.54509803921568623" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="backgroundColor" red="0.044243600217864922" green="0.32509872004357293" blue="0.52875136165577274" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="B1V-5u-az7" secondAttribute="bottom" id="2Sg-RK-xbu"/>
                             <constraint firstAttribute="trailing" secondItem="xl3-sr-16q" secondAttribute="trailing" constant="35" id="3k8-ws-pJj"/>
@@ -828,10 +828,9 @@
                                     <constraint firstAttribute="height" constant="40" id="ArR-oA-gCr"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                <color key="textColor" white="0.5" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <color key="textColor" white="0.90000000000000002" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
-                                <color key="shadowColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <size key="shadowOffset" width="0.0" height="1"/>
+                                <size key="shadowOffset" width="0.0" height="0.0"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -1058,7 +1057,7 @@
                                     <constraint firstAttribute="height" constant="45" id="wJO-7N-OV1"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="e04-Mx-zfv" appends="YES" id="djh-ZP-WYS"/>
@@ -1165,7 +1164,7 @@
                                     <constraint firstAttribute="height" constant="45" id="TC5-Ce-4Ic"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="EKr-Gi-AHW" appends="YES" id="nUb-Yv-XS0"/>

@@ -83,7 +83,7 @@
     NSURL *url = [NSURL URLWithString:s];
     
     if (! url || ! url.scheme) {
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"bitcoin://%@", s]];
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"dash://%@", s]];
         self.type = @"dash";
     }
     else if (! url.host && url.resourceSpecifier) {
@@ -197,8 +197,13 @@
 #endif
     NSData *name = [self.label dataUsingEncoding:NSUTF8StringEncoding];
     NSMutableData *script = [NSMutableData data];
-    
-    [script appendScriptPubKeyForAddress:self.paymentAddress];
+    if ([self.paymentAddress isValidDigitalCashAddress]) {
+        [script appendScriptPubKeyForAddress:self.paymentAddress];
+    } else if ([self.paymentAddress isValidBitcoinAddress]) {
+        [script appendBitcoinScriptPubKeyForAddress:self.paymentAddress];
+    } else {
+        return nil;
+    }
     if (! script.length) return nil;
     
     BRPaymentProtocolDetails *details =

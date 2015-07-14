@@ -1,0 +1,185 @@
+//
+//  DCShapeshiftManager.m
+//  DashWallet
+//
+//  Created by  Quantum Exploreron 7/14/15.
+//  Copyright (c) 2015 Aaron Voisine. All rights reserved.
+//
+
+#import "DCShapeshiftManager.h"
+
+@implementation DCShapeshiftManager
+
++ (instancetype)sharedInstance
+{
+    static id singleton = nil;
+    static dispatch_once_t onceToken = 0;
+    
+    dispatch_once(&onceToken, ^{
+        singleton = [self new];
+    });
+    
+    return singleton;
+}
+
+- (NSString *)percentEscapeString:(NSString *)string
+{
+    NSString *result = CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault,
+                                                                                 (CFStringRef)string,
+                                                                                 (CFStringRef)@" ",
+                                                                                 (CFStringRef)@":/?@!$&'()*+,;=",
+                                                                                 kCFStringEncodingUTF8));
+    return [result stringByReplacingOccurrencesOfString:@" " withString:@"+"];
+}
+
+- (NSData *)httpBodyForParamsDictionary:(NSDictionary *)paramDictionary
+{
+    NSMutableArray *parameterArray = [NSMutableArray array];
+    
+    [paramDictionary enumerateKeysAndObjectsUsingBlock:^(NSString *key, NSString *obj, BOOL *stop) {
+        NSString *param = [NSString stringWithFormat:@"%@=%@", key, [self percentEscapeString:obj]];
+        [parameterArray addObject:param];
+    }];
+    
+    NSString *string = [parameterArray componentsJoinedByString:@"&"];
+    
+    return [string dataUsingEncoding:NSUTF8StringEncoding];
+}
+
+-(void)GET_marketInfo:(void (^)(NSDictionary *marketInfo, NSError *error))completionBlock {
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/marketinfo/dash_btc"]
+                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+                                   NSError * returnError = connectionError;
+                                   if (!returnError) {
+                                       returnError = [NSError errorWithDomain:@"DashWallet" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
+                                   }
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,returnError);
+                                   });
+                               }
+                               NSError *error = nil;
+                               NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                               if (error) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,error);
+                                   });
+                                   return;
+                               }
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                   
+                                   self.lastMarketInfoCheck = [NSDate date];
+                                   self.rate = [dictionary[@"rate"] doubleValue];
+                                   if (dictionary[@"limit"])
+                                       self.limit = [[[NSDecimalNumber decimalNumberWithString:[NSString stringWithFormat:@"%@",dictionary[@"limit"]]] decimalNumberByMultiplyingByPowerOf10:8]
+                                                 unsignedLongLongValue];
+                                   if (dictionary[@"minimum"])
+                                       self.min = [[[NSDecimalNumber decimalNumberWithString:[NSString stringWithFormat:@"%@",dictionary[@"minimum"]]] decimalNumberByMultiplyingByPowerOf10:8]
+                                    unsignedLongLongValue];
+                                   completionBlock(dictionary,nil);
+                               });
+                           }];
+    
+}
+
+-(void)POST_ShiftWithAddress:(NSString*)withdrawalAddress returnAddress:(NSString*)returnAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock {
+    NSDictionary *params = @{@"withdrawal": withdrawalAddress, @"pair": @"dash_btc", @"returnAddress":returnAddress};
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/shift"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[self httpBodyForParamsDictionary:params]];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+                                   NSError * returnError = connectionError;
+                                   if (!returnError) {
+                                       returnError = [NSError errorWithDomain:@"DashWallet" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
+                                   }
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,returnError);
+                                   });
+                               }
+                               NSError *error = nil;
+                               NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                               if (error) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,error);
+                                   });
+                                   return;
+                               }
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                   completionBlock(dictionary,nil);
+                               });
+
+                           }];
+}
+
+-(void)POST_SendAmount:(double)amount withAddress:(NSString*)withdrawalAddress returnAddress:(NSString*)returnAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock {
+    NSDictionary *params = @{@"amount":@(amount),@"withdrawal": withdrawalAddress, @"pair": @"dash_btc", @"returnAddress":returnAddress};
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/shift"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[self httpBodyForParamsDictionary:params]];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+                                   NSError * returnError = connectionError;
+                                   if (!returnError) {
+                                       returnError = [NSError errorWithDomain:@"DashWallet" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
+                                   }
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,returnError);
+                                   });
+                               }
+                               NSError *error = nil;
+                               NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                               if (error) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,error);
+                                   });
+                                   return;
+                               }
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                   completionBlock(dictionary,nil);
+                               });
+                               
+                           }];
+}
+
+-(void)GET_transactionStatusWithAddress:(NSString*)withdrawalAddress completionBlock:(void (^)(NSDictionary *transactionInfo, NSError *error))completionBlock {
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://shapeshift.io/txStat/%@",withdrawalAddress]]
+                                             cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+                                   NSError * returnError = connectionError;
+                                   if (!returnError) {
+                                       returnError = [NSError errorWithDomain:@"DashWallet" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
+                                   }
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,returnError);
+                                   });
+                               }
+                               NSError *error = nil;
+                               NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                               if (error) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,error);
+                                   });
+                                   return;
+                               }
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                   completionBlock(dictionary,nil);
+                               });
+                           }];
+}
+
+@end

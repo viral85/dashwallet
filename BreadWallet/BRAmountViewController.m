@@ -59,7 +59,7 @@
     [charset addCharactersInString:m.format.currencyDecimalSeparator];
     self.charset = charset;
 
-    self.payButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"pay", nil)
+    self.payButton = [[UIBarButtonItem alloc] initWithTitle:self.usingShapeshift?@"Shapeshift!":NSLocalizedString(@"pay", nil)
                       style:UIBarButtonItemStyleBordered target:self action:@selector(pay:)];
     self.amountField.placeholder = [m stringForAmount:0];
     [self.decimalButton setTitle:m.format.currencyDecimalSeparator forState:UIControlStateNormal];
@@ -103,9 +103,13 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
-    self.addressLabel.text = (self.to.length > 0) ?
-                             [NSString stringWithFormat:NSLocalizedString(@"to: %@", nil), self.to] : nil;
+    if (self.usingShapeshift) {
+        self.addressLabel.text = (self.to.length > 0) ?
+                             [NSString stringWithFormat:NSLocalizedString(@"to: %@ (via Shapeshift)", nil), self.to] : nil;
+    } else {
+        self.addressLabel.text = (self.to.length > 0) ?
+        [NSString stringWithFormat:NSLocalizedString(@"to: %@", nil), self.to] : nil;
+    }
     self.wallpaper.hidden = NO;
 
     if (self.navigationController.viewControllers.firstObject != self) {
@@ -132,13 +136,22 @@
 - (void)updateLocalCurrencyLabel
 {
     BRWalletManager *m = [BRWalletManager sharedInstance];
-    uint64_t amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text] :
+    uint64_t amount;
+    if (self.usingShapeshift) {
+        amount = (self.swapped) ? [m amountForBitcoinCurrencyString:self.amountField.text] :
+        [m amountForString:self.amountField.text];
+    } else {
+        amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text] :
                       [m amountForString:self.amountField.text];
+    }
 
     self.swapLeftLabel.hidden = YES;
     self.localCurrencyLabel.hidden = NO;
-    self.localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m stringForAmount:amount] :
-                                                                       [m localCurrencyStringForAmount:amount]];
+    if (self.usingShapeshift) {
+        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(~%@)", (self.swapped) ? [m stringForAmount:amount]:[m bitcoinCurrencyStringForAmount:amount]];
+    } else {
+        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m stringForAmount:amount]:[m localCurrencyStringForAmount:amount]];
+    }
     self.localCurrencyLabel.textColor = (amount > 0) ? [UIColor grayColor] : [UIColor colorWithWhite:0.75 alpha:1.0];
 }
 
@@ -174,14 +187,27 @@
 
 - (IBAction)pay:(id)sender
 {
-    BRWalletManager *m = [BRWalletManager sharedInstance];
+    if (self.usingShapeshift) {
+        BRWalletManager *m = [BRWalletManager sharedInstance];
+        
+        self.amount = (self.swapped) ? [m amountForBitcoinCurrencyString:self.amountField.text] :
+        [m amountForString:self.amountField.text];
+        
+        if (self.amount == 0) return;
+        if (self.swapped)
+            [self.delegate amountViewController:self shapeshiftBitcoinAmount:self.amount];
+        else
+            [self.delegate amountViewController:self shapeshiftDashAmount:self.amount];
+    } else {
+        BRWalletManager *m = [BRWalletManager sharedInstance];
 
-    self.amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text] :
-                  [m amountForString:self.amountField.text];
+        self.amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text] :
+                      [m amountForString:self.amountField.text];
 
-    if (self.amount == 0) return;
-    
-    [self.delegate amountViewController:self selectedAmount:self.amount];
+        if (self.amount == 0) return;
+        
+        [self.delegate amountViewController:self selectedAmount:self.amount];
+    }
 }
 
 - (IBAction)done:(id)sender
@@ -220,9 +246,15 @@
     uint64_t amount =
         [m amountForLocalCurrencyString:(self.swapped) ? [s substringWithRange:NSMakeRange(1, s.length - 2)] : s];
 
-    self.localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m stringForAmount:amount] :
-                                                                       [m localCurrencyStringForAmount:amount]];
-    self.amountField.text = (self.swapped) ? [m localCurrencyStringForAmount:amount] : [m stringForAmount:amount];
+    if (self.usingShapeshift) {
+        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(~%@)", (self.swapped) ? [m stringForAmount:amount] :
+                                        [m bitcoinCurrencyStringForAmount:amount]];
+        self.amountField.text = (self.swapped) ? [m bitcoinCurrencyStringForAmount:amount]:[m stringForAmount:amount];
+    } else {
+        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m stringForAmount:amount] :
+                                    [m localCurrencyStringForAmount:amount]];
+        self.amountField.text = (self.swapped) ? [m localCurrencyStringForAmount:amount]:[m stringForAmount:amount];
+    }
 
     if (amount == 0) {
         self.amountField.placeholder = self.amountField.text;
@@ -298,8 +330,13 @@
         //self.swapLeftLabel.transform = CGAffineTransformMakeScale(0.85, 0.85);
         self.swapLeftLabel.textColor = self.swapRightLabel.textColor;
         self.swapRightLabel.textColor = self.localCurrencyLabel.textColor;
-        self.swapLeftLabel.text = [[self.swapLeftLabel.text stringByReplacingOccurrencesOfString:@"(" withString:@""]
+        if (self.usingShapeshift) {
+            self.swapLeftLabel.text = [[self.swapLeftLabel.text stringByReplacingOccurrencesOfString:@"(~" withString:@""]
                                    stringByReplacingOccurrencesOfString:@")" withString:@""];
+        } else {
+            self.swapLeftLabel.text = [[self.swapLeftLabel.text stringByReplacingOccurrencesOfString:@"(" withString:@""]
+                                       stringByReplacingOccurrencesOfString:@")" withString:@""];
+        }
     }];
 }
 
@@ -320,7 +357,12 @@
 replacementString:(NSString *)string
 {
     BRWalletManager *m = [BRWalletManager sharedInstance];
-    NSNumberFormatter *f = (self.swapped) ? m.localFormat : m.format;
+    NSNumberFormatter *f;
+    if (self.usingShapeshift) {
+        f = (self.swapped) ? m.bitcoinFormat:m.format;
+    } else {
+        f = (self.swapped) ? m.localFormat:m.format;
+    }
     NSUInteger mindigits = f.minimumFractionDigits;
     NSUInteger point = [textField.text rangeOfString:f.currencyDecimalSeparator].location, l;
     NSString *t = textField.text ? [textField.text stringByReplacingCharactersInRange:range withString:string] : string;
@@ -371,7 +413,11 @@ replacementString:(NSString *)string
     if (t.length > 0 && textField.placeholder.length > 0) textField.placeholder = nil;
 
     if (t.length == 0 && textField.placeholder.length == 0) {
-        textField.placeholder = (self.swapped) ? [m localCurrencyStringForAmount:0] : [m stringForAmount:0];
+        if (self.usingShapeshift) {
+            textField.placeholder = (self.swapped) ? [m bitcoinCurrencyStringForAmount:0]:[m stringForAmount:0];
+        } else {
+            textField.placeholder = (self.swapped) ? [m localCurrencyStringForAmount:0]:[m stringForAmount:0];
+        }
     }
     
     if (self.navigationController.viewControllers.firstObject != self) {

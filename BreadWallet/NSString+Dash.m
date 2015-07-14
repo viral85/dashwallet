@@ -137,6 +137,7 @@ static const UniChar base58chars[] = {
     return [self base58checkWithData:d];
 }
 
+
 + (NSString *)addressWithScriptSig:(NSData *)script
 {
     if (script == (id)[NSNull null]) return nil;

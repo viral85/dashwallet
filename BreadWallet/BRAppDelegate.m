@@ -44,7 +44,7 @@
     UIPageControl.appearance.currentPageIndicatorTintColor = [UIColor blackColor];
 
     [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
-     setTitleTextAttributes:@{NSFontAttributeName:[UIFont fontWithName:@"HelveticaNeue-Light" size:17.0]}
+     setTitleTextAttributes:@{NSFontAttributeName:[UIFont fontWithName:@"HelveticaNeue-Light" size:17.0],NSForegroundColorAttributeName:[UIColor colorWithWhite:0.9 alpha:1.0]}
      forState:UIControlStateNormal];
 
     if (launchOptions[UIApplicationLaunchOptionsURLKey]) {

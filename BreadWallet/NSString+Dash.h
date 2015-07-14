@@ -32,6 +32,13 @@
 #define DASH_PRIVKEY             204
 #define DASH_PRIVKEY_TEST        239
 
+#define BITCOIN_PUBKEY_ADDRESS      0
+#define BITCOIN_SCRIPT_ADDRESS      5
+#define BITCOIN_PUBKEY_ADDRESS_TEST 111
+#define BITCOIN_SCRIPT_ADDRESS_TEST 196
+#define BITCOIN_PRIVKEY             128
+#define BITCOIN_PRIVKEY_TEST        239
+
 #define BIP38_NOEC_PREFIX      0x0142
 #define BIP38_EC_PREFIX        0x0143
 #define BIP38_NOEC_FLAG        (0x80 | 0x40)

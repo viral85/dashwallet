@@ -49,6 +49,7 @@ CFAllocatorRef SecureAllocator();
 - (void)appendVarInt:(uint64_t)i;
 - (void)appendString:(NSString *)s;
 
+- (void)appendBitcoinScriptPubKeyForAddress:(NSString *)address;
 - (void)appendScriptPubKeyForAddress:(NSString *)address;
 - (void)appendScriptPushData:(NSData *)d;
 

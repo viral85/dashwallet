@@ -57,7 +57,8 @@ NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
 @property (nonatomic, readonly, getter=isTouchIdEnabled) BOOL touchIdEnabled; // true if touch id is enabled
 @property (nonatomic, readonly, getter=isPasscodeEnabled) BOOL passcodeEnabled; // true if device passcode is enabled
 @property (nonatomic, assign) BOOL didAuthenticate; // true if the user authenticated after this was last set to false
-@property (nonatomic, readonly) NSNumberFormatter *format; // bitcoin currency formatter
+@property (nonatomic, readonly) NSNumberFormatter *format; // dash currency formatter
+@property (nonatomic, readonly) NSNumberFormatter *bitcoinFormat; // dash currency formatter
 @property (nonatomic, readonly) NSNumberFormatter *localFormat; // local currency formatter
 @property (nonatomic, copy) NSString *localCurrencyCode; // local currency ISO code
 @property (nonatomic, readonly) double localCurrencyBitcoinPrice; // exchange rate in local currency units per bitcoin
@@ -85,7 +86,10 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 
 - (int64_t)amountForString:(NSString *)string;
 - (NSString *)stringForAmount:(int64_t)amount;
+- (NSString *)bitcoinStringForAmount:(int64_t)amount;
+- (int64_t)amountForBitcoinCurrencyString:(NSString *)string;
 - (int64_t)amountForLocalCurrencyString:(NSString *)string;
+- (NSString *)bitcoinCurrencyStringForAmount:(int64_t)amount;
 - (NSString *)localCurrencyStringForAmount:(int64_t)amount;
 
 @end

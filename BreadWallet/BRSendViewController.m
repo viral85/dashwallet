@@ -35,7 +35,11 @@
 #import "BRPaymentProtocol.h"
 #import "BRKey.h"
 #import "BRTransaction.h"
+
+#import "DCShapeshiftManager.h"
+
 #import "NSString+Dash.h"
+#import "NSString+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Dash.h"
 
@@ -190,7 +194,7 @@ static NSString *sanitizeString(NSString *s)
             [[UIApplication sharedApplication] openURL:callback];
         }
     }
-    else if ([url.scheme isEqual:@"bitcoin"]) {
+    else if ([url.scheme isEqual:@"dash"] || [url.scheme isEqual:@"bitcoin"]) {
         [self confirmRequest:[BRPaymentRequest requestWithURL:url]];
     }
     else {
@@ -313,8 +317,13 @@ static NSString *sanitizeString(NSString *s)
 
 - (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq currency:(NSString*)currency
 {
-    
-    NSString *address = [NSString addressWithScriptPubKey:protoReq.details.outputScripts.firstObject];
+    NSString *address;
+    if ([currency isEqualToString:@"bitcoin"]) {
+        address = [NSString bitcoinAddressWithScriptPubKey:protoReq.details.outputScripts.firstObject];
+
+    } else {
+        address = [NSString addressWithScriptPubKey:protoReq.details.outputScripts.firstObject];
+    }
     BOOL valid = [protoReq isValid], outputTooSmall = NO;
     
     if (! valid && [protoReq.errorMessage isEqual:NSLocalizedString(@"request expired", nil)]) {
@@ -936,6 +945,73 @@ static NSString *sanitizeString(NSString *s)
 {
     self.amount = amount;
     [self confirmProtocolRequest:self.request];
+}
+
+-(void)verifyShapeshiftAmountIsInBounds:(uint64_t)amount completionBlock:(void (^)())completionBlock {
+    [[DCShapeshiftManager sharedInstance] GET_marketInfo:^(NSDictionary *marketInfo, NSError *error) {
+        BRWalletManager *m = [BRWalletManager sharedInstance];
+        if ([DCShapeshiftManager sharedInstance].min > amount) {
+            [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
+                                        message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too low, "
+                                                                                             @"please input a value over %@", nil),[m stringForAmount:[DCShapeshiftManager sharedInstance].min]]
+                                       delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                              otherButtonTitles:nil] show];
+            return;
+        } else if ([DCShapeshiftManager sharedInstance].limit < amount) {
+            [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
+                                        message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too high, "
+                                                                                             @"please input a value under %@", nil),[m stringForAmount:[DCShapeshiftManager sharedInstance].limit]]
+                                       delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                              otherButtonTitles:nil] show];
+            return;
+        }
+        completionBlock();
+    }];
+
+}
+
+- (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftBitcoinAmount:(uint64_t)amount
+{
+    [self verifyShapeshiftAmountIsInBounds:amount completionBlock:^{
+        //we know the exact amount of bitcoins we want to send
+        BRWalletManager *m = [BRWalletManager sharedInstance];
+        NSString * address = [NSString bitcoinAddressWithScriptPubKey:self.request.details.outputScripts.firstObject];
+        NSString * returnAddress = m.wallet.receiveAddress;
+        [[DCShapeshiftManager sharedInstance] POST_SendAmount:amount withAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
+            if (error)
+                NSLog(@"shapeshiftBitcoinAmount Error %@",error);
+            NSString * depositAddress = shiftInfo[@"deposit"];
+            NSString * withdrawalAddress = shiftInfo[@"withdrawal"];
+            NSNumber * withdrawalAmount = shiftInfo[@"withdrawalAmount"];
+            NSNumber * depositAmountNumber = shiftInfo[@"depositAmount"];
+            if (depositAmountNumber) {
+                uint64_t depositAmount = [[[NSDecimalNumber decimalNumberWithString:[NSString stringWithFormat:@"%@",depositAmountNumber]] decimalNumberByMultiplyingByPowerOf10:8]
+                                          unsignedLongLongValue];
+                self.amount = depositAmount;
+                BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu",depositAddress,depositAmount]];
+                [self confirmProtocolRequest:request.protocolRequest];
+            }
+        }];
+    }];
+}
+
+- (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftDashAmount:(uint64_t)amount
+{
+    [self verifyShapeshiftAmountIsInBounds:amount completionBlock:^{
+        //we don't know the exact amount of bitcoins we want to send, we are just sending dash
+        BRWalletManager *m = [BRWalletManager sharedInstance];
+        NSString * address = [NSString bitcoinAddressWithScriptPubKey:self.request.details.outputScripts.firstObject];
+        NSString * returnAddress = m.wallet.receiveAddress;
+        self.amount = amount;
+        [[DCShapeshiftManager sharedInstance] POST_ShiftWithAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
+            if (error)
+                NSLog(@"shapeshiftDashAmount Error %@",error);
+            NSString * depositAddress = shiftInfo[@"deposit"];
+            NSString * withdrawalAddress = shiftInfo[@"withdrawal"];
+            BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=shapeshift",depositAddress,self.amount,sanitizeString(self.request.commonName)]];
+            [self confirmProtocolRequest:request.protocolRequest];
+        }];
+    }];
 }
 
 #pragma mark - AVCaptureMetadataOutputObjectsDelegate

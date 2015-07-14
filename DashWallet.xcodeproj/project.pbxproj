@@ -67,6 +67,8 @@
 		84F68C8A1975E9E2002FC300 /* BRScanViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F68C891975E9E2002FC300 /* BRScanViewController.m */; };
 		FB00F6751B5101420061C2FB /* NSString+Bitcoin.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6741B5101420061C2FB /* NSString+Bitcoin.m */; };
 		FB00F6761B5101420061C2FB /* NSString+Bitcoin.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6741B5101420061C2FB /* NSString+Bitcoin.m */; };
+		FB00F67A1B542A340061C2FB /* DCShapeshiftManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6791B542A340061C2FB /* DCShapeshiftManager.m */; };
+		FB00F67B1B542A340061C2FB /* DCShapeshiftManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6791B542A340061C2FB /* DCShapeshiftManager.m */; };
 		FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
@@ -313,6 +315,8 @@
 		84F68C891975E9E2002FC300 /* BRScanViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRScanViewController.m; sourceTree = "<group>"; };
 		FB00F6731B5101420061C2FB /* NSString+Bitcoin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Bitcoin.h"; sourceTree = "<group>"; };
 		FB00F6741B5101420061C2FB /* NSString+Bitcoin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Bitcoin.m"; sourceTree = "<group>"; };
+		FB00F6781B542A340061C2FB /* DCShapeshiftManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCShapeshiftManager.h; sourceTree = "<group>"; };
+		FB00F6791B542A340061C2FB /* DCShapeshiftManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCShapeshiftManager.m; sourceTree = "<group>"; };
 		FB6C29B91AE3785600CEB807 /* darksend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = darksend.cpp; sourceTree = "<group>"; };
 		FB6C29BA1AE3785600CEB807 /* darksend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = darksend.h; sourceTree = "<group>"; };
 		FB6C29BD1AE7FCE500CEB807 /* DCDarksendPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendPool.h; sourceTree = "<group>"; };
@@ -432,6 +436,8 @@
 				752E28BF19234C3600DB5A3C /* BRPaymentProtocol.m */,
 				752E28C019234C3600DB5A3C /* BRPaymentRequest.h */,
 				752E28C119234C3600DB5A3C /* BRPaymentRequest.m */,
+				FB00F6781B542A340061C2FB /* DCShapeshiftManager.h */,
+				FB00F6791B542A340061C2FB /* DCShapeshiftManager.m */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -874,6 +880,7 @@
 				752E28AE19234AE300DB5A3C /* BRTxInputEntity.m in Sources */,
 				752E28AF19234AE300DB5A3C /* BRTxOutputEntity.m in Sources */,
 				758DBD0E1980634900389E2A /* BRTxDetailViewController.m in Sources */,
+				FB00F67A1B542A340061C2FB /* DCShapeshiftManager.m in Sources */,
 				7548CF3719556FD700EF827F /* BRCopyLabel.m in Sources */,
 				75767C421A0EC6F9003E7DE9 /* UIImage+Blur.m in Sources */,
 				752E28D119234C3600DB5A3C /* BRKey.m in Sources */,
@@ -944,6 +951,7 @@
 				FB00F6761B5101420061C2FB /* NSString+Bitcoin.m in Sources */,
 				FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */,
 				FBE689E01AC07C1800467F4C /* NSData+Skein.m in Sources */,
+				FB00F67B1B542A340061C2FB /* DCShapeshiftManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

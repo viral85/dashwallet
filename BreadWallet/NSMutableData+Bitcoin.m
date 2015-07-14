@@ -234,6 +234,35 @@ CFAllocatorRef SecureAllocator()
     }
 }
 
+- (void)appendBitcoinScriptPubKeyForAddress:(NSString *)address
+{
+    static uint8_t pubkeyAddress = BITCOIN_PUBKEY_ADDRESS, scriptAddress = BITCOIN_SCRIPT_ADDRESS;
+    NSData *d = address.base58checkToData;
+    
+    if (d.length != 21) return;
+    
+    uint8_t version = *(const uint8_t *)d.bytes;
+    NSData *hash = [d subdataWithRange:NSMakeRange(1, d.length - 1)];
+    
+#if DASH_TESTNET
+    pubkeyAddress = BITCOIN_PUBKEY_ADDRESS_TEST;
+    scriptAddress = BITCOIN_SCRIPT_ADDRESS_TEST;
+#endif
+    
+    if (version == pubkeyAddress) {
+        [self appendUInt8:OP_DUP];
+        [self appendUInt8:OP_HASH160];
+        [self appendScriptPushData:hash];
+        [self appendUInt8:OP_EQUALVERIFY];
+        [self appendUInt8:OP_CHECKSIG];
+    }
+    else if (version == scriptAddress) {
+        [self appendUInt8:OP_HASH160];
+        [self appendScriptPushData:hash];
+        [self appendUInt8:OP_EQUAL];
+    }
+}
+
 #pragma mark - dash protocol
 
 - (void)appendMessage:(NSData *)message type:(NSString *)type;
