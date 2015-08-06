@@ -493,7 +493,7 @@ static const char *dns_seeds[] = {
     if (! [transaction isSigned]) {
         if (completion) {
             completion([NSError errorWithDomain:@"DashWallet" code:401 userInfo:@{NSLocalizedDescriptionKey:
-                        NSLocalizedString(@"bitcoin transaction not signed", nil)}]);
+                        NSLocalizedString(@"dash transaction not signed", nil)}]);
         }
         
         return;

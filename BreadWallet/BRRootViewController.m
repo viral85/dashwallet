@@ -26,6 +26,7 @@
 #import "BRRootViewController.h"
 #import "BRReceiveViewController.h"
 #import "BRSendViewController.h"
+#import "DCTickerViewController.h"
 #import "BRSettingsViewController.h"
 #import "BRAppDelegate.h"
 #import "BRBubbleView.h"
@@ -90,6 +91,7 @@
     
     self.receiveViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"ReceiveViewController"];
     self.sendViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"SendViewController"];
+    self.tickerViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TickerViewController"];
     self.pageViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"PageViewController"];
 
     self.pageViewController.dataSource = self;
@@ -181,7 +183,7 @@
                 [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"WARNING", nil)
                   message:NSLocalizedString(@"DEVICE SECURITY COMPROMISED\n"
                                             "Any 'jailbreak' app can access any other app's keychain data "
-                                            "(and steal your bitcoins). "
+                                            "(and steal your dash). "
                                             "Wipe this wallet immediately and restore on a secure device.", nil)
                  delegate:self cancelButtonTitle:NSLocalizedString(@"ignore", nil)
                  otherButtonTitles:NSLocalizedString(@"wipe", nil), nil] show];
@@ -190,7 +192,7 @@
                 [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"WARNING", nil)
                   message:NSLocalizedString(@"DEVICE SECURITY COMPROMISED\n"
                                             "Any 'jailbreak' app can access any other app's keychain data "
-                                            "(and steal your bitcoins).", nil)
+                                            "(and steal your dash).", nil)
                   delegate:self cancelButtonTitle:NSLocalizedString(@"ignore", nil)
                   otherButtonTitles:NSLocalizedString(@"close app", nil), nil] show];
             }
@@ -787,23 +789,23 @@
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
 viewControllerBeforeViewController:(UIViewController *)viewController
 {
-    return (viewController == self.receiveViewController) ? self.sendViewController : nil;
+    return (viewController == self.tickerViewController)? self.receiveViewController:((viewController == self.receiveViewController) ? self.sendViewController : nil);
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
 viewControllerAfterViewController:(UIViewController *)viewController
 {
-    return (viewController == self.sendViewController) ? self.receiveViewController : nil;
+    return (viewController == self.sendViewController)? self.receiveViewController :((viewController == self.receiveViewController)?self.tickerViewController:nil);
 }
 
 - (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController
 {
-    return 2;
+    return 3;
 }
 
 - (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController
 {
-    return (pageViewController.viewControllers.lastObject == self.receiveViewController) ? 1 : 0;
+    return (pageViewController.viewControllers.lastObject == self.tickerViewController) ? 2 :((pageViewController.viewControllers.lastObject == self.receiveViewController) ? 1 : 0);
 }
 
 #pragma mark - UIScrollViewDelegate

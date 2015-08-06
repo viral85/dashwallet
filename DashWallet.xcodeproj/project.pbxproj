@@ -69,6 +69,30 @@
 		FB00F6761B5101420061C2FB /* NSString+Bitcoin.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6741B5101420061C2FB /* NSString+Bitcoin.m */; };
 		FB00F67A1B542A340061C2FB /* DCShapeshiftManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6791B542A340061C2FB /* DCShapeshiftManager.m */; };
 		FB00F67B1B542A340061C2FB /* DCShapeshiftManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6791B542A340061C2FB /* DCShapeshiftManager.m */; };
+		FB00F67E1B5AE1E50061C2FB /* DCTickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F67D1B5AE1E50061C2FB /* DCTickerViewController.m */; };
+		FB00F67F1B5AE1E50061C2FB /* DCTickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F67D1B5AE1E50061C2FB /* DCTickerViewController.m */; };
+		FB00F69B1B5AE2AA0061C2FB /* Area.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6831B5AE2AA0061C2FB /* Area.m */; };
+		FB00F69C1B5AE2AA0061C2FB /* Area.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6831B5AE2AA0061C2FB /* Area.m */; };
+		FB00F69D1B5AE2AA0061C2FB /* AxisX.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6861B5AE2AA0061C2FB /* AxisX.m */; };
+		FB00F69E1B5AE2AA0061C2FB /* AxisX.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6861B5AE2AA0061C2FB /* AxisX.m */; };
+		FB00F69F1B5AE2AA0061C2FB /* AxisY.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6881B5AE2AA0061C2FB /* AxisY.m */; };
+		FB00F6A01B5AE2AA0061C2FB /* AxisY.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6881B5AE2AA0061C2FB /* AxisY.m */; };
+		FB00F6A11B5AE2AA0061C2FB /* BaseLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F68A1B5AE2AA0061C2FB /* BaseLayer.m */; };
+		FB00F6A21B5AE2AA0061C2FB /* BaseLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F68A1B5AE2AA0061C2FB /* BaseLayer.m */; };
+		FB00F6A31B5AE2AA0061C2FB /* BBChartUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F68C1B5AE2AA0061C2FB /* BBChartUtils.m */; };
+		FB00F6A41B5AE2AA0061C2FB /* BBChartUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F68C1B5AE2AA0061C2FB /* BBChartUtils.m */; };
+		FB00F6A51B5AE2AA0061C2FB /* BBChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F68E1B5AE2AA0061C2FB /* BBChartView.m */; };
+		FB00F6A61B5AE2AA0061C2FB /* BBChartView.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F68E1B5AE2AA0061C2FB /* BBChartView.m */; };
+		FB00F6A71B5AE2AA0061C2FB /* BBTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6911B5AE2AA0061C2FB /* BBTheme.m */; };
+		FB00F6A81B5AE2AA0061C2FB /* BBTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6911B5AE2AA0061C2FB /* BBTheme.m */; };
+		FB00F6A91B5AE2AA0061C2FB /* BarSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6941B5AE2AA0061C2FB /* BarSeries.m */; };
+		FB00F6AA1B5AE2AA0061C2FB /* BarSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6941B5AE2AA0061C2FB /* BarSeries.m */; };
+		FB00F6AB1B5AE2AA0061C2FB /* LineSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6961B5AE2AA0061C2FB /* LineSeries.m */; };
+		FB00F6AC1B5AE2AA0061C2FB /* LineSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6961B5AE2AA0061C2FB /* LineSeries.m */; };
+		FB00F6AD1B5AE2AA0061C2FB /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6981B5AE2AA0061C2FB /* Series.m */; };
+		FB00F6AE1B5AE2AA0061C2FB /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6981B5AE2AA0061C2FB /* Series.m */; };
+		FB00F6AF1B5AE2AA0061C2FB /* StockSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */; };
+		FB00F6B01B5AE2AA0061C2FB /* StockSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */; };
 		FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
@@ -317,6 +341,31 @@
 		FB00F6741B5101420061C2FB /* NSString+Bitcoin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Bitcoin.m"; sourceTree = "<group>"; };
 		FB00F6781B542A340061C2FB /* DCShapeshiftManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCShapeshiftManager.h; sourceTree = "<group>"; };
 		FB00F6791B542A340061C2FB /* DCShapeshiftManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCShapeshiftManager.m; sourceTree = "<group>"; };
+		FB00F67C1B5AE1E50061C2FB /* DCTickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCTickerViewController.h; sourceTree = "<group>"; };
+		FB00F67D1B5AE1E50061C2FB /* DCTickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCTickerViewController.m; sourceTree = "<group>"; };
+		FB00F6821B5AE2AA0061C2FB /* Area.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Area.h; sourceTree = "<group>"; };
+		FB00F6831B5AE2AA0061C2FB /* Area.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Area.m; sourceTree = "<group>"; };
+		FB00F6851B5AE2AA0061C2FB /* AxisX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AxisX.h; sourceTree = "<group>"; };
+		FB00F6861B5AE2AA0061C2FB /* AxisX.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AxisX.m; sourceTree = "<group>"; };
+		FB00F6871B5AE2AA0061C2FB /* AxisY.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AxisY.h; sourceTree = "<group>"; };
+		FB00F6881B5AE2AA0061C2FB /* AxisY.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AxisY.m; sourceTree = "<group>"; };
+		FB00F6891B5AE2AA0061C2FB /* BaseLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BaseLayer.h; sourceTree = "<group>"; };
+		FB00F68A1B5AE2AA0061C2FB /* BaseLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BaseLayer.m; sourceTree = "<group>"; };
+		FB00F68B1B5AE2AA0061C2FB /* BBChartUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBChartUtils.h; sourceTree = "<group>"; };
+		FB00F68C1B5AE2AA0061C2FB /* BBChartUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BBChartUtils.m; sourceTree = "<group>"; };
+		FB00F68D1B5AE2AA0061C2FB /* BBChartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBChartView.h; sourceTree = "<group>"; };
+		FB00F68E1B5AE2AA0061C2FB /* BBChartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BBChartView.m; sourceTree = "<group>"; };
+		FB00F68F1B5AE2AA0061C2FB /* BBStockChart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBStockChart.h; sourceTree = "<group>"; };
+		FB00F6901B5AE2AA0061C2FB /* BBTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BBTheme.h; sourceTree = "<group>"; };
+		FB00F6911B5AE2AA0061C2FB /* BBTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BBTheme.m; sourceTree = "<group>"; };
+		FB00F6931B5AE2AA0061C2FB /* BarSeries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BarSeries.h; sourceTree = "<group>"; };
+		FB00F6941B5AE2AA0061C2FB /* BarSeries.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BarSeries.m; sourceTree = "<group>"; };
+		FB00F6951B5AE2AA0061C2FB /* LineSeries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineSeries.h; sourceTree = "<group>"; };
+		FB00F6961B5AE2AA0061C2FB /* LineSeries.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineSeries.m; sourceTree = "<group>"; };
+		FB00F6971B5AE2AA0061C2FB /* Series.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Series.h; sourceTree = "<group>"; };
+		FB00F6981B5AE2AA0061C2FB /* Series.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Series.m; sourceTree = "<group>"; };
+		FB00F6991B5AE2AA0061C2FB /* StockSeries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StockSeries.h; sourceTree = "<group>"; };
+		FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StockSeries.m; sourceTree = "<group>"; };
 		FB6C29B91AE3785600CEB807 /* darksend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = darksend.cpp; sourceTree = "<group>"; };
 		FB6C29BA1AE3785600CEB807 /* darksend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = darksend.h; sourceTree = "<group>"; };
 		FB6C29BD1AE7FCE500CEB807 /* DCDarksendPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendPool.h; sourceTree = "<group>"; };
@@ -483,6 +532,7 @@
 		7579F7FE19231D4600CA56F4 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				FB00F6801B5AE2AA0061C2FB /* BBStockChartView */,
 				752E28EF19234E8100DB5A3C /* Reachability.h */,
 				752E28F019234E8100DB5A3C /* Reachability.m */,
 				75F27B0619DE2AB20047FC62 /* ccMemory.h */,
@@ -565,6 +615,8 @@
 				757BE7E2192C0E9D0061CB20 /* BRRestoreViewController.m */,
 				757BE7E7192D4E880061CB20 /* BRSeedViewController.h */,
 				757BE7E8192D4E880061CB20 /* BRSeedViewController.m */,
+				FB00F67C1B5AE1E50061C2FB /* DCTickerViewController.h */,
+				FB00F67D1B5AE1E50061C2FB /* DCTickerViewController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -656,6 +708,60 @@
 				75D5F3EF191EC270004AB296 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		FB00F6801B5AE2AA0061C2FB /* BBStockChartView */ = {
+			isa = PBXGroup;
+			children = (
+				FB00F6811B5AE2AA0061C2FB /* Area */,
+				FB00F6841B5AE2AA0061C2FB /* Axis */,
+				FB00F6891B5AE2AA0061C2FB /* BaseLayer.h */,
+				FB00F68A1B5AE2AA0061C2FB /* BaseLayer.m */,
+				FB00F68B1B5AE2AA0061C2FB /* BBChartUtils.h */,
+				FB00F68C1B5AE2AA0061C2FB /* BBChartUtils.m */,
+				FB00F68D1B5AE2AA0061C2FB /* BBChartView.h */,
+				FB00F68E1B5AE2AA0061C2FB /* BBChartView.m */,
+				FB00F68F1B5AE2AA0061C2FB /* BBStockChart.h */,
+				FB00F6901B5AE2AA0061C2FB /* BBTheme.h */,
+				FB00F6911B5AE2AA0061C2FB /* BBTheme.m */,
+				FB00F6921B5AE2AA0061C2FB /* Series */,
+			);
+			path = BBStockChartView;
+			sourceTree = "<group>";
+		};
+		FB00F6811B5AE2AA0061C2FB /* Area */ = {
+			isa = PBXGroup;
+			children = (
+				FB00F6821B5AE2AA0061C2FB /* Area.h */,
+				FB00F6831B5AE2AA0061C2FB /* Area.m */,
+			);
+			path = Area;
+			sourceTree = "<group>";
+		};
+		FB00F6841B5AE2AA0061C2FB /* Axis */ = {
+			isa = PBXGroup;
+			children = (
+				FB00F6851B5AE2AA0061C2FB /* AxisX.h */,
+				FB00F6861B5AE2AA0061C2FB /* AxisX.m */,
+				FB00F6871B5AE2AA0061C2FB /* AxisY.h */,
+				FB00F6881B5AE2AA0061C2FB /* AxisY.m */,
+			);
+			path = Axis;
+			sourceTree = "<group>";
+		};
+		FB00F6921B5AE2AA0061C2FB /* Series */ = {
+			isa = PBXGroup;
+			children = (
+				FB00F6931B5AE2AA0061C2FB /* BarSeries.h */,
+				FB00F6941B5AE2AA0061C2FB /* BarSeries.m */,
+				FB00F6951B5AE2AA0061C2FB /* LineSeries.h */,
+				FB00F6961B5AE2AA0061C2FB /* LineSeries.m */,
+				FB00F6971B5AE2AA0061C2FB /* Series.h */,
+				FB00F6981B5AE2AA0061C2FB /* Series.m */,
+				FB00F6991B5AE2AA0061C2FB /* StockSeries.h */,
+				FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */,
+			);
+			path = Series;
 			sourceTree = "<group>";
 		};
 		FB6C29B41AE36FC000CEB807 /* Darksend */ = {
@@ -791,7 +897,7 @@
 						CreatedOnToolsVersion = 6.1;
 					};
 					75D5F3BD191EC270004AB296 = {
-						DevelopmentTeam = 726K4AHK5D;
+						DevelopmentTeam = 44RJ69WHFF;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -887,22 +993,30 @@
 				84F68C8A1975E9E2002FC300 /* BRScanViewController.m in Sources */,
 				752E28D219234C3600DB5A3C /* BRKey+BIP38.m in Sources */,
 				752E28D919234C3600DB5A3C /* BRTransaction.m in Sources */,
+				FB00F69F1B5AE2AA0061C2FB /* AxisY.m in Sources */,
 				752E28CE19234C3600DB5A3C /* BRBIP32Sequence.m in Sources */,
 				752E28CF19234C3600DB5A3C /* BRBIP39Mnemonic.m in Sources */,
 				FBE689D31AC07BCD00467F4C /* NSData+Luffa.m in Sources */,
 				FBE689DB1AC07BFF00467F4C /* NSData+Simd.m in Sources */,
 				752E28DA19234C3600DB5A3C /* BRWallet.m in Sources */,
+				FB00F6AB1B5AE2AA0061C2FB /* LineSeries.m in Sources */,
+				FB00F6AF1B5AE2AA0061C2FB /* StockSeries.m in Sources */,
 				752E28DB19234C3600DB5A3C /* BRWalletManager.m in Sources */,
+				FB00F6A71B5AE2AA0061C2FB /* BBTheme.m in Sources */,
 				752E28D319234C3600DB5A3C /* BRMerkleBlock.m in Sources */,
 				FBFB9B021AEBADA1008D2249 /* NSString+DCAdditions.m in Sources */,
+				FB00F69B1B5AE2AA0061C2FB /* Area.m in Sources */,
 				752E28D019234C3600DB5A3C /* BRBloomFilter.m in Sources */,
 				752E28D619234C3600DB5A3C /* BRPeer.m in Sources */,
+				FB00F6A31B5AE2AA0061C2FB /* BBChartUtils.m in Sources */,
 				FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */,
 				752E28D819234C3600DB5A3C /* BRPeerManager.m in Sources */,
+				FB00F6AD1B5AE2AA0061C2FB /* Series.m in Sources */,
 				FBE689CF1AC07BB500467F4C /* NSData+Keccak.m in Sources */,
 				752E28D419234C3600DB5A3C /* BRPaymentProtocol.m in Sources */,
 				752E28D519234C3600DB5A3C /* BRPaymentRequest.m in Sources */,
 				7525B619192453840041C0F2 /* BRNavigationBar.m in Sources */,
+				FB00F67E1B5AE1E50061C2FB /* DCTickerViewController.m in Sources */,
 				FBE689D71AC07BE400467F4C /* NSData+Shavite.m in Sources */,
 				FBE689CB1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
 				75878BC1192AEC3F002505AB /* BRReceiveViewController.m in Sources */,
@@ -911,11 +1025,15 @@
 				759816E719357D6F005060EA /* BRBubbleView.m in Sources */,
 				75878BC6192B1AF0002505AB /* BRTxHistoryViewController.m in Sources */,
 				757BE7E3192C0E9D0061CB20 /* BRRestoreViewController.m in Sources */,
+				FB00F69D1B5AE2AA0061C2FB /* AxisX.m in Sources */,
 				757BE7E6192C1FF70061CB20 /* BRWelcomeViewController.m in Sources */,
+				FB00F6A11B5AE2AA0061C2FB /* BaseLayer.m in Sources */,
 				757BE7E9192D4E880061CB20 /* BRSeedViewController.m in Sources */,
 				FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */,
 				752E28E719234DA200DB5A3C /* NSData+Dash.m in Sources */,
 				752E28E919234DA200DB5A3C /* NSManagedObject+Sugar.m in Sources */,
+				FB00F6A51B5AE2AA0061C2FB /* BBChartView.m in Sources */,
+				FB00F6A91B5AE2AA0061C2FB /* BarSeries.m in Sources */,
 				FBE689DF1AC07C1800467F4C /* NSData+Skein.m in Sources */,
 				FBE689BC1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */,
 				FBFB9AFC1AE804FF008D2249 /* DCMasternode.m in Sources */,
@@ -938,20 +1056,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FB00F6A41B5AE2AA0061C2FB /* BBChartUtils.m in Sources */,
+				FB00F6B01B5AE2AA0061C2FB /* StockSeries.m in Sources */,
+				FB00F6A01B5AE2AA0061C2FB /* AxisY.m in Sources */,
 				FBE689CC1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
+				FB00F6A81B5AE2AA0061C2FB /* BBTheme.m in Sources */,
 				FBE689BD1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */,
 				FBE689C41ABF9A1B00467F4C /* NSData+Echo.m in Sources */,
 				75D5F3F3191EC270004AB296 /* BreadWalletTests.m in Sources */,
+				FB00F6AE1B5AE2AA0061C2FB /* Series.m in Sources */,
+				FB00F6AA1B5AE2AA0061C2FB /* BarSeries.m in Sources */,
 				FBE689D81AC07BE400467F4C /* NSData+Shavite.m in Sources */,
 				FBE689B91ABF160000467F4C /* NSData+Blake.m in Sources */,
+				FB00F6AC1B5AE2AA0061C2FB /* LineSeries.m in Sources */,
 				FBE689DC1AC07BFF00467F4C /* NSData+Simd.m in Sources */,
 				FBE689C81AC0785F00467F4C /* NSData+Groestl.m in Sources */,
 				FBE689D41AC07BCD00467F4C /* NSData+Luffa.m in Sources */,
 				FBE689D01AC07BB500467F4C /* NSData+Keccak.m in Sources */,
+				FB00F69C1B5AE2AA0061C2FB /* Area.m in Sources */,
+				FB00F6A21B5AE2AA0061C2FB /* BaseLayer.m in Sources */,
 				FB00F6761B5101420061C2FB /* NSString+Bitcoin.m in Sources */,
+				FB00F69E1B5AE2AA0061C2FB /* AxisX.m in Sources */,
 				FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */,
+				FB00F67F1B5AE1E50061C2FB /* DCTickerViewController.m in Sources */,
 				FBE689E01AC07C1800467F4C /* NSData+Skein.m in Sources */,
 				FB00F67B1B542A340061C2FB /* DCShapeshiftManager.m in Sources */,
+				FB00F6A61B5AE2AA0061C2FB /* BBChartView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1142,7 +1272,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Quantum Explorer (7CAY8RCMVA)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Darkcoin Foundation Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1155,7 +1285,7 @@
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9764efc0-9b8d-446f-ba83-48f2621c3c26";
+				PROVISIONING_PROFILE = "602913eb-71c0-44f9-861d-b7215ae7c31d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = GCov_Build;
@@ -1268,7 +1398,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Quantum Explorer (7CAY8RCMVA)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Darkcoin Foundation Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1281,7 +1411,7 @@
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9764efc0-9b8d-446f-ba83-48f2621c3c26";
+				PROVISIONING_PROFILE = "602913eb-71c0-44f9-861d-b7215ae7c31d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1292,7 +1422,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Quantum Explorer (7CAY8RCMVA)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Darkcoin Foundation Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1305,7 +1435,7 @@
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9764efc0-9b8d-446f-ba83-48f2621c3c26";
+				PROVISIONING_PROFILE = "602913eb-71c0-44f9-861d-b7215ae7c31d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

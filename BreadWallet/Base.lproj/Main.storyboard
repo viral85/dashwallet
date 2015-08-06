@@ -517,6 +517,33 @@
             </objects>
             <point key="canvasLocation" x="1134" y="671"/>
         </scene>
+        <!--Ticker View Controller-->
+        <scene sceneID="ZMX-BP-azH">
+            <objects>
+                <viewController storyboardIdentifier="TickerViewController" id="Idb-tJ-j7F" customClass="DCTickerViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="MCg-Xo-SyL"/>
+                        <viewControllerLayoutGuide type="bottom" id="vgp-rv-dbR"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="ftv-TH-hs9">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0Y5-HI-IXg" customClass="BBChartView">
+                                <rect key="frame" x="0.0" y="231" width="320" height="337"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="chartView" destination="0Y5-HI-IXg" id="1JE-LT-As7"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Q8X-Vq-eYf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1546" y="1354"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="xl1-66-UPf">
             <objects>
@@ -531,7 +558,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tWP-7g-jg8" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1546" y="1354"/>
+            <point key="canvasLocation" x="1949" y="1354"/>
         </scene>
         <!--Amount View Controller-->
         <scene sceneID="53j-BI-jfv">
@@ -937,7 +964,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Eo1-Mc-5Xo" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1949" y="1354"/>
+            <point key="canvasLocation" x="2352" y="1354"/>
         </scene>
         <!--Receive View Controller-->
         <scene sceneID="qxd-iA-4Pl">
@@ -1036,7 +1063,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3RX-tv-4mC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2334" y="1354"/>
+            <point key="canvasLocation" x="2737" y="1354"/>
         </scene>
         <!--Receive View Controller-->
         <scene sceneID="1OV-CI-Wjb">
