@@ -80,7 +80,7 @@
 "Bitcoin addresses can also be copied to the clipboard. A bitcoin address always starts with '1' or '3'." = "比特币地址也可以复制到剪贴板。一个比特币地址总是开始于'1'或'3'";
 
 /* No comment provided by engineer. */
-"bitcoin network fee" = "比特币网络费";
+"dash network fee" = "比特币网络费";
 
 /* No comment provided by engineer. */
 "bitcoin payments can't be less than %@" = "比特币付款不能低于%@";
@@ -143,7 +143,7 @@
 "couldn't sweep balance" = "不能清除余额";
 
 /* No comment provided by engineer. */
-"couldn't transmit payment to bitcoin network" = "不能将付款传送到比特币网络";
+"couldn't transmit payment to dash network" = "不能将付款传送到比特币网络";
 
 /* No comment provided by engineer. */
 "DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your bitcoins)." = "设备的安全性受损\n任何'越狱'的应用程序都可以访问任何其他应用程序的钥匙链数据（并窃取你的比特币）。";
@@ -200,7 +200,7 @@
 "insufficient funds" = "资金不足";
 
 /* No comment provided by engineer. */
-"insufficient funds for bitcoin network fee" = "资金不足以支付比特币的网络费用";
+"insufficient funds for dash network fee" = "资金不足以支付比特币的网络费用";
 
 /* No comment provided by engineer. */
 "INVALID" = "无效";
@@ -245,7 +245,7 @@
 "not a valid private key" = "不是一个有效的私钥";
 
 /* No comment provided by engineer. */
-"not connected to the bitcoin network" = "未连接到比特币网络";
+"not connected to the dash network" = "未连接到比特币网络";
 
 /* No comment provided by engineer. */
 "ok" = "确定。";
@@ -332,7 +332,7 @@
 "seen by %d of %d peers" = "被%2$d中%1$d节点看到";
 
 /* No comment provided by engineer. */
-"Send %@ (%@) from this private key into your wallet? The bitcoin network will receive a fee of %@ (%@)." = "从这个私钥发送%1$@ (%2$@) 到你的钱包吗 ？比特币网络将收到的 %3$@ (%4$@) 的费用。";
+"Send %@ (%@) from this private key into your wallet? The dash network will receive a fee of %@ (%@)." = "从这个私钥发送%1$@ (%2$@) 到你的钱包吗 ？比特币网络将收到的 %3$@ (%4$@) 的费用。";
 
 /* No comment provided by engineer. */
 "send address as email" = "作为电子邮件发送地址";

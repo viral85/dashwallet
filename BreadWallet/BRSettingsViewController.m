@@ -63,8 +63,8 @@
             queue:nil usingBlock:^(NSNotification *note) {
                 if (self.selectorType == 0) {
                     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyBitcoinPrice],
-                                                     [m stringForAmount:DUFFS/m.localCurrencyBitcoinPrice]];
+                                                     [m.localFormat stringFromNumber:@(1)],
+                                                     [m stringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
                 }
             }];
     }
@@ -171,8 +171,8 @@
     [[NSUserDefaults standardUserDefaults] setInteger:digits forKey:SETTINGS_MAX_DIGITS_KEY];
     m.localCurrencyCode = m.localCurrencyCode; // force balance notification
     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyBitcoinPrice],
-                                     [m stringForAmount:DUFFS/m.localCurrencyBitcoinPrice]];
+                                     [m.localFormat stringFromNumber:@(1)],
+                                     [m stringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
     [self.tableView reloadData];
 }
 
@@ -401,8 +401,8 @@
                     i = [m.currencyCodes indexOfObject:m.localCurrencyCode];
                     if (i < options.count) self.selectedOption = options[i];
                     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m localCurrencyStringForAmount:DUFFS/m.localCurrencyBitcoinPrice],
-                                                     [m stringForAmount:DUFFS/m.localCurrencyBitcoinPrice]];
+                                                     [m.localFormat stringFromNumber:@(1)],
+                                                     [m stringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
                     [self.navigationController pushViewController:self.selectorController animated:YES];
                     [self.selectorController.tableView reloadData];
                     

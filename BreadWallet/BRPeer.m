@@ -952,15 +952,72 @@ services:(uint64_t)services
 
 #pragma mark - Darksend
 
+- (void)sendDarkSendStatusUpdateMessage
+{
+//    NSMutableData *msg = [NSMutableData data];
+//    
+//    //TODO: send peer addresses we know about
+//    [msg appendVarInt:0];
+//    [self sendMessage:msg type:MSG_DSSTATUSUPDATE];
+}
+
 
 - (void)acceptDarkSendAcceptMessage:(NSData *)message
 {
-    //todo implement
+//    NSString * strError = @"This is not a Masternode.";
+//    NSLog(@"dsa -- not a Masternode! \n");
+//    pfrom->PushMessage("dssu", sessionID, GetState(), GetEntriesCount(), MASTERNODE_REJECTED, strError);
+
 }
 
 - (void)acceptDarkSendQueueMessage:(NSData *)message
 {
-    //todo implement
+//    CDarksendQueue dsq;
+//    vRecv >> dsq;
+//    
+//    CService addr;
+//    if(!dsq.GetAddress(addr)) return;
+//    if(!dsq.CheckSignature()) return;
+//    
+//    if(dsq.IsExpired()) return;
+//    
+//    CMasternode* pmn = mnodeman.Find(dsq.vin);
+//    if(pmn == NULL) return;
+//    
+//    // if the queue is ready, submit if we can
+//    if(dsq.ready) {
+//        if(!pSubmittedToMasternode) return;
+//        if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)addr){
+//            LogPrintf("dsq - message doesn't match current Masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), addr.ToString().c_str());
+//            return;
+//        }
+//        
+//        if(state == POOL_STATUS_QUEUE){
+//            if (fDebug)  LogPrintf("Darksend queue is ready - %s\n", addr.ToString().c_str());
+//            PrepareDarksendDenominate();
+//        }
+//    } else {
+//        BOOST_FOREACH(CDarksendQueue q, vecDarksendQueue){
+//            if(q.vin == dsq.vin) return;
+//        }
+//        
+//        if(fDebug) LogPrintf("dsq last %d last2 %d count %d\n", pmn->nLastDsq, pmn->nLastDsq + mnodeman.size()/5, mnodeman.nDsqCount);
+//        //don't allow a few nodes to dominate the queuing process
+//        if(pmn->nLastDsq != 0 &&
+//           pmn->nLastDsq + mnodeman.CountMasternodesAboveProtocol(MIN_POOL_PEER_PROTO_VERSION)/5 > mnodeman.nDsqCount){
+//            if(fDebug) LogPrintf("dsq -- Masternode sending too many dsq messages. %s \n", pmn->addr.ToString().c_str());
+//            return;
+//        }
+//        mnodeman.nDsqCount++;
+//        pmn->nLastDsq = mnodeman.nDsqCount;
+//        pmn->allowFreeTx = true;
+//        
+//        if(fDebug) LogPrintf("dsq - new Darksend queue object - %s\n", addr.ToString().c_str());
+//        vecDarksendQueue.push_back(dsq);
+//        dsq.Relay();
+//        dsq.time = GetTime();
+//    }
+
 }
 
 - (void)acceptDarkSendVInMessage:(NSData *)message
@@ -970,41 +1027,103 @@ services:(uint64_t)services
 
 - (void)acceptDarkSendStatusUpdateMessage:(NSData *)message
 {
-    //todo implement
+//    if(!pSubmittedToMasternode) return;
+//    if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
+//        //LogPrintf("dssu - message doesn't match current Masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
+//        return;
+//    }
+//    
+//    int sessionIDMessage;
+//    int state;
+//    int entriesCount;
+//    int accepted;
+//    std::string error;
+//    vRecv >> sessionIDMessage >> state >> entriesCount >> accepted >> error;
+//    
+//    if(fDebug) LogPrintf("dssu - state: %i entriesCount: %i accepted: %i error: %s \n", state, entriesCount, accepted, error.c_str());
+//    
+//    if((accepted != 1 && accepted != 0) && sessionID != sessionIDMessage){
+//        LogPrintf("dssu - message doesn't match current Darksend session %d %d\n", sessionID, sessionIDMessage);
+//        return;
+//    }
+//    
+//    StatusUpdate(state, entriesCount, accepted, error, sessionIDMessage);
 }
 
 - (void)acceptDarkSendSignFinalTXMessage:(NSData *)message
 {
-    //todo implement
+//    vector<CTxIn> sigs;
+//    vRecv >> sigs;
+//    
+//    bool success = false;
+//    int count = 0;
+//    
+//    BOOST_FOREACH(const CTxIn item, sigs)
+//    {
+//        if(AddScriptSig(item)) success = true;
+//        if(fDebug) LogPrintf(" -- sigs count %d %d\n", (int)sigs.size(), count);
+//        count++;
+//    }
+//    
+//    if(success){
+//        darkSendPool.Check();
+//        RelayStatus(darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET);
+//    }
 }
 
 - (void)acceptDarkSendFinalTXMessage:(NSData *)message
 {
-    if (self.version < MIN_PROTO_VERSION) {
-        return;
-    }
-    
-//    if((CNetAddr)darkSendPool.submittedToMasternode != self.address){
-//        //LogPrintf("dsc - message doesn't match current masternode - %s != %s\n", darkSendPool.submittedToMasternode.ToString().c_str(), pfrom->addr.ToString().c_str());
+//    if (self.version < MIN_PROTO_VERSION) {
 //        return;
 //    }
 //    
-//    int sessionID;
-//    CTransaction txNew;
-//    vRecv >> sessionID >> txNew;
+//    if (pfrom->nVersion < MIN_POOL_PEER_PROTO_VERSION) {
+//        return;
+//    }
 //    
-//    if(darkSendPool.sessionID != sessionID){
-//        if (fDebug) LogPrintf("dsf - message doesn't match current darksend session %d %d\n", darkSendPool.sessionID, sessionID);
+//    if(!pSubmittedToMasternode) return;
+//    if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
+//        //LogPrintf("dsc - message doesn't match current Masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
+//        return;
+//    }
+//    
+//    int sessionIDMessage;
+//    BRTransaction * txNew;
+//    vRecv >> sessionIDMessage >> txNew;
+//    
+//    if(sessionID != sessionIDMessage){
+//        if (fDebug) LogPrintf("dsf - message doesn't match current Darksend session %d %d\n", sessionID, sessionIDMessage);
 //        return;
 //    }
 //    
 //    //check to see if input is spent already? (and probably not confirmed)
-//    darkSendPool.SignFinalTransaction(txNew, pfrom);
+//    SignFinalTransaction(txNew, pfrom);
 }
 
 - (void)acceptDarkSendCompleteMessage:(NSData *)message
 {
-    //todo implement
+//    //todo implement
+//    if (self.version < MIN_PROTO_VERSION) {
+//        return;
+//    }
+//    
+//    if(!pSubmittedToMasternode) return;
+//    if((CNetAddr)pSubmittedToMasternode->addr != (CNetAddr)pfrom->addr){
+//        //LogPrintf("dsc - message doesn't match current Masternode - %s != %s\n", pSubmittedToMasternode->addr.ToString().c_str(), pfrom->addr.ToString().c_str());
+//        return;
+//    }
+//    
+//    int sessionIDMessage;
+//    bool error;
+//    std::string lastMessage;
+//    vRecv >> sessionIDMessage >> error >> lastMessage;
+//    
+//    if(sessionID != sessionIDMessage){
+//        if (fDebug) LogPrintf("dsc - message doesn't match current Darksend session %d %d\n", darkSendPool.sessionID, sessionIDMessage);
+//        return;
+//    }
+//    
+//    darkSendPool.CompletedTransaction(error, lastMessage);
 }
 
 #pragma mark - InstantX

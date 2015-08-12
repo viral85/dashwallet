@@ -224,7 +224,7 @@ static NSString *sanitizeString(NSString *s)
                 
                 if (error) {
                     [[[UIAlertView alloc]
-                      initWithTitle:NSLocalizedString(@"couldn't transmit payment to bitcoin network", nil)
+                      initWithTitle:NSLocalizedString(@"couldn't transmit payment to dash network", nil)
                       message:error.localizedDescription delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil)
                       otherButtonTitles:nil] show];
                 }

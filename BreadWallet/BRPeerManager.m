@@ -501,7 +501,7 @@ static const char *dns_seeds[] = {
     else if (! self.connected && self.connectFailures >= MAX_CONNECT_FAILURES) {
         if (completion) {
             completion([NSError errorWithDomain:@"DashWallet" code:-1009 userInfo:@{NSLocalizedDescriptionKey:
-                        NSLocalizedString(@"not connected to the bitcoin network", nil)}]);
+                        NSLocalizedString(@"not connected to the dash network", nil)}]);
         }
         
         return;

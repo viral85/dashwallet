@@ -62,7 +62,7 @@
 "Bitcoin addresses can also be copied to the clipboard. A bitcoin address always starts with '1' or '3'." = "Adresy Bitcoin można skopiować do schowka. Adres Bitcoin zaczyna się zawsze od '1' lub '3'.";
 
 /* No comment provided by engineer. */
-"bitcoin network fee" = "prowizja sieci bitcoin";
+"dash network fee" = "prowizja sieci bitcoin";
 
 /* No comment provided by engineer. */
 "cancel" = "anuluj";
@@ -140,7 +140,7 @@
 "insufficient funds" = "brak środków";
 
 /* No comment provided by engineer. */
-"insufficient funds for bitcoin network fee" = "brak środków na prowizję";
+"insufficient funds for dash network fee" = "brak środków na prowizję";
 
 /* No comment provided by engineer. */
 "INVALID" = "NIEPOPRAWNE";

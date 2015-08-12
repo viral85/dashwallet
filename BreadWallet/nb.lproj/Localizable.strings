@@ -80,7 +80,7 @@
 "Bitcoin addresses can also be copied to the clipboard. A bitcoin address always starts with '1' or '3'." = "Bitcoin-adresser kan også kopieres til utklippstavlen. En Bitcoin-adresse starter alltid med '1' eller '3'.";
 
 /* No comment provided by engineer. */
-"bitcoin network fee" = "bitcoin nettverksavgift";
+"dash network fee" = "bitcoin nettverksavgift";
 
 /* No comment provided by engineer. */
 "bitcoin payments can't be less than %@" = "beløp for bitcoin-betalinger kan ikke være lavere enn %@";
@@ -143,7 +143,7 @@
 "couldn't sweep balance" = "kunne ikke sweepe saldo";
 
 /* No comment provided by engineer. */
-"couldn't transmit payment to bitcoin network" = "kunne ikke kringkaste betaling til Bitcoin-nettverket";
+"couldn't transmit payment to dash network" = "kunne ikke kringkaste betaling til Bitcoin-nettverket";
 
 /* No comment provided by engineer. */
 "DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your bitcoins)." = "SIKKERHETEN TIL ENHETEN ER KOMPROMITTERT\nEnhver 'jailbreak'-app kan få tilgang til andre appers Keychain data (og stjele dine bitcoin).";
@@ -200,7 +200,7 @@
 "insufficient funds" = "utilstrekkelige midler";
 
 /* No comment provided by engineer. */
-"insufficient funds for bitcoin network fee" = "utilstrekkelige midler for nettverksavgift";
+"insufficient funds for dash network fee" = "utilstrekkelige midler for nettverksavgift";
 
 /* No comment provided by engineer. */
 "INVALID" = "UGYLDIG";
@@ -245,7 +245,7 @@
 "not a valid private key" = "ikke en gyldig privat nøkkel";
 
 /* No comment provided by engineer. */
-"not connected to the bitcoin network" = "ikke tilkoblet Bitcoin-nettverket";
+"not connected to the dash network" = "ikke tilkoblet Bitcoin-nettverket";
 
 /* No comment provided by engineer. */
 "ok" = "ok";
@@ -332,7 +332,7 @@
 "seen by %d of %d peers" = "sett av %1$d av %2$d peers";
 
 /* No comment provided by engineer. */
-"Send %@ (%@) from this private key into your wallet? The bitcoin network will receive a fee of %@ (%@)." = "send %1$@ (%2$@) fra denne private nøkkelen til din lommebok? Bitcoin-nettverket vil motta en avgift på %3$@ (%4$@).";
+"Send %@ (%@) from this private key into your wallet? The dash network will receive a fee of %@ (%@)." = "send %1$@ (%2$@) fra denne private nøkkelen til din lommebok? Bitcoin-nettverket vil motta en avgift på %3$@ (%4$@).";
 
 /* No comment provided by engineer. */
 "send address as email" = "send adressen på e-post";

@@ -42,6 +42,8 @@
 #define BALANCE_TIP_START NSLocalizedString(@"This is your digital cash (DASH) balance.", nil)
 #define DITS_TIP    NSLocalizedString(@"%@ is for 'dits'. %@ = 1 dash.", nil)
 
+#define VERSION_HAS_TICKER 0
+
 #define BACKUP_DIALOG_TIME_KEY @"BACKUP_DIALOG_TIME"
 
 @interface BRRootViewController ()
@@ -91,7 +93,9 @@
     
     self.receiveViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"ReceiveViewController"];
     self.sendViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"SendViewController"];
+#if VERSION_HAS_TICKER
     self.tickerViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TickerViewController"];
+#endif
     self.pageViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"PageViewController"];
 
     self.pageViewController.dataSource = self;
@@ -789,23 +793,39 @@
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
 viewControllerBeforeViewController:(UIViewController *)viewController
 {
+    #if VERSION_HAS_TICKER
     return (viewController == self.tickerViewController)? self.receiveViewController:((viewController == self.receiveViewController) ? self.sendViewController : nil);
+    #else
+    return (viewController == self.receiveViewController) ? self.sendViewController : nil;
+    #endif
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
 viewControllerAfterViewController:(UIViewController *)viewController
 {
+    #if VERSION_HAS_TICKER
     return (viewController == self.sendViewController)? self.receiveViewController :((viewController == self.receiveViewController)?self.tickerViewController:nil);
+    #else
+    return (viewController == self.sendViewController) ? self.receiveViewController : nil;
+    #endif
 }
 
 - (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController
 {
+    #if VERSION_HAS_TICKER
     return 3;
+    #else
+    return 2;
+    #endif
 }
 
 - (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController
 {
+#if VERSION_HAS_TICKER
     return (pageViewController.viewControllers.lastObject == self.tickerViewController) ? 2 :((pageViewController.viewControllers.lastObject == self.receiveViewController) ? 1 : 0);
+#else
+        return (pageViewController.viewControllers.lastObject == self.receiveViewController) ? 1 : 0;
+#endif
 }
 
 #pragma mark - UIScrollViewDelegate
