@@ -898,7 +898,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                    [self refreshBitcoinDashPrice];
                                }
                                NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:DUFFS],
-                                     [self stringForAmount:DUFFS]);
+                                     [self dashStringForAmount:DUFFS]);
                            }
      ];
     NSURLRequest *reqBitfinex = [NSURLRequest requestWithURL:[NSURL URLWithString:BITFINEX_TICKER_URL]
@@ -922,7 +922,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                [defs synchronize];
                                [self refreshBitcoinDashPrice];
                                NSLog(@"bitfinex exchange rate updated to %@/%@", [self localCurrencyStringForAmount:DUFFS],
-                                     [self stringForAmount:DUFFS]);
+                                     [self dashStringForAmount:DUFFS]);
                            }
     ];
 
@@ -987,7 +987,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         [defs setObject:self.currencyPrices forKey:CURRENCY_PRICES_KEY];
         [defs synchronize];
         NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:DUFFS],
-              [self stringForAmount:DUFFS]);
+              [self dashStringForAmount:DUFFS]);
     }];
 }
 
@@ -1151,10 +1151,25 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
              decimalNumberByMultiplyingByPowerOf10:self.bitcoinFormat.maximumFractionDigits] longLongValue];
 }
 
-- (NSString *)stringForAmount:(int64_t)amount
+- (NSString *)dashStringForAmount:(int64_t)amount
 {
-    return [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
-            decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+    NSString * string = [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                                       decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+    return [string stringByReplacingOccurrencesOfString:DASH withString:@"DASH"];
+}
+
+- (NSAttributedString *)attributedDashStringForAmount:(int64_t)amount
+{
+    NSString * string = [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                          decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+    return [string attributedStringForDashSymbol];
+}
+
+- (NSAttributedString *)attributedDashStringForAmount:(int64_t)amount withTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize
+{
+    NSString * string = [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                                       decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+    return [string attributedStringForDashSymbolWithTintColor:color dashSymbolSize:dashSymbolSize];
 }
 
 - (NSNumber *)numberForAmount:(int64_t)amount

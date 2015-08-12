@@ -34,13 +34,14 @@
 #import "BRPeerManager.h"
 #import "BRWalletManager.h"
 #import "UIImage+Blur.h"
+#import "NSString+Dash.h"
 #import "Reachability.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import <sys/stat.h>
 #import <mach-o/dyld.h>
 
 #define BALANCE_TIP_START NSLocalizedString(@"This is your digital cash (DASH) balance.", nil)
-#define DITS_TIP    NSLocalizedString(@"%@ is for 'dits'. %@ = 1 dash.", nil)
+#define DITS_TIP    NSLocalizedString(@"%@1 = 1 DASH", nil)
 
 #define VERSION_HAS_TICKER 0
 
@@ -504,7 +505,7 @@
 
     if (balance > _balance && [[UIApplication sharedApplication] applicationState] != UIApplicationStateBackground) {
         [self.view addSubview:[[[BRBubbleView viewWithText:[NSString
-         stringWithFormat:NSLocalizedString(@"received %@ (%@)", nil), [m stringForAmount:balance - _balance],
+         stringWithFormat:NSLocalizedString(@"received %@ (%@)", nil), [m dashStringForAmount:balance - _balance],
                           [m localCurrencyStringForAmount:balance - _balance]]
          center:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)] popIn]
          popOutAfterDelay:3.0]];
@@ -512,9 +513,8 @@
 
     _balance = balance;
 
-    if (self.percent.hidden) {
-        self.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:balance],
-                                     [m localCurrencyStringForAmount:balance]];
+    if (self.percent.hidden && m.didAuthenticate) {
+        [self updateTitleView];
     }
 }
 
@@ -692,11 +692,11 @@
     if ([v.text hasPrefix:BALANCE_TIP_START]) {
         BRWalletManager *m = [BRWalletManager sharedInstance];
         UINavigationBar *b = self.navigationController.navigationBar;
-        NSString *text = [NSString stringWithFormat:DITS_TIP, m.format.currencySymbol, [m stringForAmount:DUFFS]];
+        NSString *text = [NSString stringWithFormat:DITS_TIP, m.format.currencySymbol, [m dashStringForAmount:DUFFS]];
         CGRect r = [self.navigationItem.title boundingRectWithSize:b.bounds.size options:0
                     attributes:b.titleTextAttributes context:nil];
 
-        self.tipView = [BRBubbleView viewWithText:text
+        self.tipView = [BRBubbleView viewWithAttributedText:[text attributedStringForDashSymbolWithTintColor:[UIColor whiteColor] dashSymbolSize:CGSizeMake(13, 11)]
                         tipPoint:CGPointMake(b.center.x + 5.0 - r.size.width/2.0,
                                              b.frame.origin.y + b.frame.size.height - 10)
                         tipDirection:BRBubbleTipDirectionUp];
@@ -748,7 +748,7 @@
                      [[BRPeerManager sharedInstance] lastBlockHeight],
                      [[BRPeerManager sharedInstance] estimatedBlockHeight]];
 
-    self.tipView = [BRBubbleView viewWithText:tip
+    self.tipView = [BRBubbleView viewWithAttributedText:[tip attributedStringForDashSymbolWithTintColor:[UIColor whiteColor] dashSymbolSize:CGSizeMake(13, 11)]
                     tipPoint:CGPointMake(b.center.x, b.frame.origin.y + b.frame.size.height - 10)
                     tipDirection:BRBubbleTipDirectionUp];
     self.tipView.backgroundColor = [UIColor lightGrayColor];
@@ -758,13 +758,26 @@
     if (self.showTips) self.scrollView.scrollEnabled = NO;
 }
 
+-(void)updateTitleView {
+    BRWalletManager *m = [BRWalletManager sharedInstance];
+    UILabel * titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 1, 100)];
+    titleLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    [titleLabel setBackgroundColor:[UIColor clearColor]];
+    NSMutableAttributedString * attributedDashString = [[m attributedDashStringForAmount:_balance] mutableCopy];
+    NSString * titleString = [NSString stringWithFormat:@" (%@)",
+                              [m localCurrencyStringForAmount:_balance]];
+    [attributedDashString appendAttributedString:[[NSAttributedString alloc] initWithString:titleString]];
+    titleLabel.attributedText = attributedDashString;
+    self.navigationItem.titleView = titleLabel;
+}
+
 - (IBAction)unlock:(id)sender
 {
     BRWalletManager *m = [BRWalletManager sharedInstance];
     
     if (sender && ! m.didAuthenticate && ! [m authenticateWithPrompt:nil andTouchId:YES]) return;
     
-    self.navigationItem.titleView = nil;
+    [self updateTitleView];
     [self.navigationItem setRightBarButtonItem:nil animated:(sender) ? YES : NO];
 }
 

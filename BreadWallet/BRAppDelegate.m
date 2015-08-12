@@ -46,6 +46,11 @@
     [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
      setTitleTextAttributes:@{NSFontAttributeName:[UIFont fontWithName:@"HelveticaNeue-Light" size:17.0],NSForegroundColorAttributeName:[UIColor colorWithWhite:0.9 alpha:1.0]}
      forState:UIControlStateNormal];
+    
+//    NSMutableDictionary *titleBarAttributes = [NSMutableDictionary dictionaryWithDictionary: [[UINavigationBar appearance] titleTextAttributes]];
+//    [titleBarAttributes setValue:[UIFont fontWithName:@"DashFont-Light" size:20] forKey:NSFontAttributeName];
+//    [titleBarAttributes setValue:[UIColor colorWithRed:0.85 green:0.85 blue:0.85 alpha:1.0] forKey:NSForegroundColorAttributeName];
+//    [[UINavigationBar appearance] setTitleTextAttributes:titleBarAttributes];
 
     if (launchOptions[UIApplicationLaunchOptionsURLKey]) {
         NSData *file = [NSData dataWithContentsOfURL:launchOptions[UIApplicationLaunchOptionsURLKey]];

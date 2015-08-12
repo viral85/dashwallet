@@ -268,13 +268,13 @@ static NSString *sanitizeString(NSString *s)
     if (! isSecure || prompt.length == 0) prompt = [prompt stringByAppendingString:address];
     if (memo.length > 0) prompt = [prompt stringByAppendingFormat:@"\n\n%@", sanitizeString(memo)];
     prompt = [prompt stringByAppendingFormat:NSLocalizedString(@"\n\n     amount %@ (%@)", nil),
-              [m stringForAmount:amount - fee], [m localCurrencyStringForAmount:amount - fee]];
+              [m dashStringForAmount:amount - fee], [m localCurrencyStringForAmount:amount - fee]];
     
     if (fee > 0) {
         prompt = [prompt stringByAppendingFormat:NSLocalizedString(@"\nnetwork fee +%@ (%@)", nil),
-                  [m stringForAmount:fee], [m localCurrencyStringForAmount:fee]];
+                  [m dashStringForAmount:fee], [m localCurrencyStringForAmount:fee]];
         prompt = [prompt stringByAppendingFormat:NSLocalizedString(@"\n         total %@ (%@)", nil),
-                  [m stringForAmount:amount], [m localCurrencyStringForAmount:amount]];
+                  [m dashStringForAmount:amount], [m localCurrencyStringForAmount:amount]];
     }
     
     return prompt;
@@ -396,7 +396,7 @@ static NSString *sanitizeString(NSString *s)
             }
             else c.to = address;
             
-            c.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:m.wallet.balance],
+            c.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:m.wallet.balance],
                                       [m localCurrencyStringForAmount:m.wallet.balance]];
             [self.navigationController pushViewController:c animated:YES];
             return;
@@ -404,7 +404,7 @@ static NSString *sanitizeString(NSString *s)
         else if (amount < TX_MIN_OUTPUT_AMOUNT) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
                                         message:[NSString stringWithFormat:NSLocalizedString(@"dash payments can't be less than %@", nil),
-                                                 [m stringForAmount:TX_MIN_OUTPUT_AMOUNT]] delegate:nil
+                                                 [m dashStringForAmount:TX_MIN_OUTPUT_AMOUNT]] delegate:nil
                               cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
             [self cancel:nil];
             return;
@@ -412,7 +412,7 @@ static NSString *sanitizeString(NSString *s)
         else if (outputTooSmall) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
                                         message:[NSString stringWithFormat:NSLocalizedString(@"dash transaction outputs can't be less than %@",
-                                                                                             nil), [m stringForAmount:TX_MIN_OUTPUT_AMOUNT]]
+                                                                                             nil), [m dashStringForAmount:TX_MIN_OUTPUT_AMOUNT]]
                                        delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
             [self cancel:nil];
             return;
@@ -485,7 +485,7 @@ static NSString *sanitizeString(NSString *s)
             }
             else c.to = address;
             
-            c.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:m.wallet.balance],
+            c.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:m.wallet.balance],
                                       [m localCurrencyStringForAmount:m.wallet.balance]];
             [self.navigationController pushViewController:c animated:YES];
             return;
@@ -493,7 +493,7 @@ static NSString *sanitizeString(NSString *s)
         else if (amount < TX_MIN_OUTPUT_AMOUNT) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
                                         message:[NSString stringWithFormat:NSLocalizedString(@"dash payments can't be less than %@", nil),
-                                                 [m stringForAmount:TX_MIN_OUTPUT_AMOUNT]] delegate:nil
+                                                 [m dashStringForAmount:TX_MIN_OUTPUT_AMOUNT]] delegate:nil
                               cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
             [self cancel:nil];
             return;
@@ -501,7 +501,7 @@ static NSString *sanitizeString(NSString *s)
         else if (outputTooSmall) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
                                         message:[NSString stringWithFormat:NSLocalizedString(@"dash transaction outputs can't be less than %@",
-                                                                                             nil), [m stringForAmount:TX_MIN_OUTPUT_AMOUNT]]
+                                                                                             nil), [m dashStringForAmount:TX_MIN_OUTPUT_AMOUNT]]
                                        delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
             [self cancel:nil];
             return;
@@ -535,10 +535,10 @@ static NSString *sanitizeString(NSString *s)
                 [[[UIAlertView alloc]
                   initWithTitle:NSLocalizedString(@"insufficient funds for dash network fee", nil)
                   message:[NSString stringWithFormat:NSLocalizedString(@"reduce payment amount by\n%@ (%@)?", nil),
-                           [m stringForAmount:self.amount - amount],
+                           [m dashStringForAmount:self.amount - amount],
                            [m localCurrencyStringForAmount:self.amount - amount]] delegate:self
                   cancelButtonTitle:NSLocalizedString(@"cancel", nil)
-                  otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:amount - self.amount],
+                  otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:amount - self.amount],
                                      [m localCurrencyStringForAmount:amount - self.amount]], nil] show];
                 self.amount = amount;
             }
@@ -670,9 +670,9 @@ static NSString *sanitizeString(NSString *s)
             [[[UIAlertView alloc] initWithTitle:@"" message:[NSString
                                                              stringWithFormat:NSLocalizedString(@"Send %@ (%@) from this private key into your wallet? "
                                                                                                 "The dash network will receive a fee of %@ (%@).", nil),
-                                                             [m stringForAmount:amount], [m localCurrencyStringForAmount:amount], [m stringForAmount:fee],
+                                                             [m dashStringForAmount:amount], [m localCurrencyStringForAmount:amount], [m dashStringForAmount:fee],
                                                              [m localCurrencyStringForAmount:fee]] delegate:self cancelButtonTitle:NSLocalizedString(@"cancel", nil)
-                              otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:amount],
+                              otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:amount],
                                                  [m localCurrencyStringForAmount:amount]], nil] show];
         }
         else [self cancel:nil];
@@ -707,7 +707,7 @@ static NSString *sanitizeString(NSString *s)
             
             [[[UIAlertView alloc] initWithTitle:@""
                                         message:[NSString stringWithFormat:NSLocalizedString(@"%@\n\nbalance: %@ (%@)", nil), address,
-                                                 [m stringForAmount:balance], [m localCurrencyStringForAmount:balance]] delegate:nil
+                                                 [m dashStringForAmount:balance], [m localCurrencyStringForAmount:balance]] delegate:nil
                               cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
         }
     }];
@@ -918,14 +918,14 @@ static NSString *sanitizeString(NSString *s)
         if ([DCShapeshiftManager sharedInstance].min > (amount * .97)) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
                                         message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too low, "
-                                                                                             @"please input a value over %@", nil),[m stringForAmount:[DCShapeshiftManager sharedInstance].min / .97]]
+                                                                                             @"please input a value over %@", nil),[m dashStringForAmount:[DCShapeshiftManager sharedInstance].min / .97]]
                                        delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
                               otherButtonTitles:nil] show];
             return;
         } else if ([DCShapeshiftManager sharedInstance].limit < (amount * 1.03)) {
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
                                         message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too high, "
-                                                                                             @"please input a value under %@", nil),[m stringForAmount:[DCShapeshiftManager sharedInstance].limit / 1.03]]
+                                                                                             @"please input a value under %@", nil),[m dashStringForAmount:[DCShapeshiftManager sharedInstance].limit / 1.03]]
                                        delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
                               otherButtonTitles:nil] show];
             return;

@@ -86,7 +86,9 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 
 - (int64_t)amountForString:(NSString *)string;
 - (int64_t)amountForBitcoinString:(NSString *)string;
-- (NSString *)stringForAmount:(int64_t)amount;
+- (NSString *)dashStringForAmount:(int64_t)amount;
+- (NSAttributedString *)attributedDashStringForAmount:(int64_t)amount;
+- (NSAttributedString *)attributedDashStringForAmount:(int64_t)amount withTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize;
 - (NSNumber *)numberForAmount:(int64_t)amount;
 - (NSString *)bitcoinStringForAmount:(int64_t)amount;
 - (int64_t)amountForBitcoinCurrencyString:(NSString *)string;

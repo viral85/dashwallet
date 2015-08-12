@@ -1,9 +1,10 @@
 //
-//  NSString+Bitcoin.h
+//  UIImage+Color.m
 //  DashWallet
 //
-//  Created by Quantum Explorer on 7/11/15.
+//  Created by Quantum Explorer on 8/13/15.
 //  Copyright (c) 2015 Quantum Explorer. All rights reserved.
+//
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -23,20 +24,30 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#import <Foundation/Foundation.h>
+#import "UIImage+Color.h"
 
-#define BITCOIN_PUBKEY_ADDRESS      0
-#define BITCOIN_SCRIPT_ADDRESS      5
-#define BITCOIN_PUBKEY_ADDRESS_TEST 111
-#define BITCOIN_SCRIPT_ADDRESS_TEST 196
-#define BITCOIN_PRIVKEY             128
-#define BITCOIN_PRIVKEY_TEST        239
+@implementation UIImage (Color)
 
-@interface NSString (Bitcoin)
-
-+ (NSString *)bitcoinAddressWithScriptPubKey:(NSData *)script;
-- (BOOL)isValidBitcoinAddress;
-- (BOOL)isValidBitcoinPrivateKey;
-- (BOOL)isValidBitcoinBIP38Key; // BIP38 encrypted keys: https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki
+- (UIImage *)imageWithTintColor:(UIColor *)tintColor
+{
+    UIGraphicsBeginImageContextWithOptions(self.size, NO, [UIScreen mainScreen].scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextTranslateCTM(context, 0, self.size.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGRect rect = CGRectMake(0, 0, self.size.width, self.size.height);
+    
+    CGContextSetBlendMode(context, kCGBlendModeNormal);
+    CGContextDrawImage(context, rect, self.CGImage);
+    CGContextSetBlendMode(context, kCGBlendModeSourceIn);
+    [tintColor setFill];
+    CGContextFillRect(context, rect);
+    
+    
+    UIImage *coloredImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return coloredImage;
+}
 
 @end

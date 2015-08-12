@@ -54,6 +54,10 @@
 + (NSString *)addressWithScriptPubKey:(NSData *)script;
 + (NSString *)addressWithScriptSig:(NSData *)script;
 
+- (NSAttributedString*)attributedStringForDashSymbol;
+- (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color;
+- (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize;
+
 - (NSData *)base58ToData;
 - (NSData *)base58checkToData;
 - (NSData *)hexToData;

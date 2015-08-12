@@ -27,6 +27,8 @@
 #import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "ccMemory.h"
+#import "BRWalletManager.h"
+#import "UIImage+Color.h"
 
 static const UniChar base58chars[] = {
     '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P',
@@ -359,5 +361,27 @@ static const UniChar base58chars[] = {
     }
     else return NO; // invalid prefix
 }
+
+- (NSAttributedString*)attributedStringForDashSymbol {
+    return [self attributedStringForDashSymbolWithTintColor:[UIColor blackColor]];
+}
+
+- (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color {
+    return [self attributedStringForDashSymbolWithTintColor:color dashSymbolSize:CGSizeMake(15, 12)];
+}
+
+- (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize {
+    
+    NSTextAttachment *dashSymbol = [[NSTextAttachment alloc] init];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc]
+                                                   initWithString:self];
+    dashSymbol.bounds = CGRectMake(0, 0, dashSymbolSize.width, dashSymbolSize.height);
+    dashSymbol.image = [[UIImage imageNamed:@"Dash-Light"] imageWithTintColor:color];
+    NSRange range = [attributedString.string rangeOfString:DASH];
+    [attributedString replaceCharactersInRange:range
+                          withAttributedString:[NSAttributedString attributedStringWithAttachment:dashSymbol]];
+    return attributedString;
+}
+
 
 @end

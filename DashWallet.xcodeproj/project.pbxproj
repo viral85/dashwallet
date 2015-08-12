@@ -93,9 +93,10 @@
 		FB00F6AE1B5AE2AA0061C2FB /* Series.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F6981B5AE2AA0061C2FB /* Series.m */; };
 		FB00F6AF1B5AE2AA0061C2FB /* StockSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */; };
 		FB00F6B01B5AE2AA0061C2FB /* StockSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */; };
-		FB44E56D1B73550700E7E58D /* DashFont-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = FB44E56C1B73550700E7E58D /* DashFont-Regular.otf */; };
 		FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
+		FBE49E961B7BB1830020FAA6 /* Dash-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = FBE49E951B7BB1830020FAA6 /* Dash-Light.png */; };
+		FBE49E991B7BB55C0020FAA6 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */; };
 		FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
 		FBE689B91ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
 		FBE689BC1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689BB1ABF1F9B00467F4C /* NSData+Bmw.m */; };
@@ -367,7 +368,6 @@
 		FB00F6981B5AE2AA0061C2FB /* Series.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Series.m; sourceTree = "<group>"; };
 		FB00F6991B5AE2AA0061C2FB /* StockSeries.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StockSeries.h; sourceTree = "<group>"; };
 		FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StockSeries.m; sourceTree = "<group>"; };
-		FB44E56C1B73550700E7E58D /* DashFont-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DashFont-Regular.otf"; sourceTree = "<group>"; };
 		FB6C29B91AE3785600CEB807 /* darksend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = darksend.cpp; sourceTree = "<group>"; };
 		FB6C29BA1AE3785600CEB807 /* darksend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = darksend.h; sourceTree = "<group>"; };
 		FB6C29BD1AE7FCE500CEB807 /* DCDarksendPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendPool.h; sourceTree = "<group>"; };
@@ -382,6 +382,9 @@
 		FBBFEF631ABD796000CA937F /* aes_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes_helper.c; sourceTree = "<group>"; };
 		FBC731631AEE74AF001355A4 /* DCDarksendQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendQueue.h; sourceTree = "<group>"; };
 		FBC731641AEE74AF001355A4 /* DCDarksendQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendQueue.m; sourceTree = "<group>"; };
+		FBE49E951B7BB1830020FAA6 /* Dash-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Dash-Light.png"; sourceTree = "<group>"; };
+		FBE49E971B7BB55C0020FAA6 /* UIImage+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Color.h"; sourceTree = "<group>"; };
+		FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Color.m"; sourceTree = "<group>"; };
 		FBE4D98A1ABD652B007C3BA6 /* sph_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_types.h; sourceTree = "<group>"; };
 		FBE689B61ABF160000467F4C /* NSData+Blake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Blake.h"; sourceTree = "<group>"; };
 		FBE689B71ABF160000467F4C /* NSData+Blake.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Blake.m"; sourceTree = "<group>"; };
@@ -527,6 +530,8 @@
 				752E28E219234DA200DB5A3C /* NSManagedObject+Sugar.m */,
 				75767C401A0EC6F9003E7DE9 /* UIImage+Blur.h */,
 				75767C411A0EC6F9003E7DE9 /* UIImage+Blur.m */,
+				FBE49E971B7BB55C0020FAA6 /* UIImage+Color.h */,
+				FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -684,7 +689,7 @@
 		75D5F3C8191EC270004AB296 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				FB44E56C1B73550700E7E58D /* DashFont-Regular.otf */,
+				FBE49E951B7BB1830020FAA6 /* Dash-Light.png */,
 				75D5F3C9191EC270004AB296 /* DashWallet-Info.plist */,
 				75D5F3CA191EC270004AB296 /* InfoPlist.strings */,
 				757E09971ADB8EEB006FD352 /* Localizable.strings */,
@@ -961,7 +966,7 @@
 				752E28F619235B3000DB5A3C /* BIP39EnglishWords.plist in Resources */,
 				75D5F3CC191EC270004AB296 /* InfoPlist.strings in Resources */,
 				752E28F719235B3000DB5A3C /* FixedPeers.plist in Resources */,
-				FB44E56D1B73550700E7E58D /* DashFont-Regular.otf in Resources */,
+				FBE49E961B7BB1830020FAA6 /* Dash-Light.png in Resources */,
 				75D5F3DE191EC270004AB296 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1027,6 +1032,7 @@
 				FB00F6751B5101420061C2FB /* NSString+Bitcoin.m in Sources */,
 				75878BBF192ACD46002505AB /* BRAmountViewController.m in Sources */,
 				759816E719357D6F005060EA /* BRBubbleView.m in Sources */,
+				FBE49E991B7BB55C0020FAA6 /* UIImage+Color.m in Sources */,
 				75878BC6192B1AF0002505AB /* BRTxHistoryViewController.m in Sources */,
 				757BE7E3192C0E9D0061CB20 /* BRRestoreViewController.m in Sources */,
 				FB00F69D1B5AE2AA0061C2FB /* AxisX.m in Sources */,

@@ -61,7 +61,7 @@
 
     self.payButton = [[UIBarButtonItem alloc] initWithTitle:self.usingShapeshift?@"Shapeshift!":NSLocalizedString(@"pay", nil)
                       style:UIBarButtonItemStyleBordered target:self action:@selector(pay:)];
-    self.amountField.placeholder = [m stringForAmount:0];
+    self.amountField.attributedPlaceholder = [m attributedDashStringForAmount:0];
     [self.decimalButton setTitle:m.format.currencyDecimalSeparator forState:UIControlStateNormal];
 
     self.swapLeftLabel = [UILabel new];
@@ -82,9 +82,7 @@
         [[NSNotificationCenter defaultCenter] addObserverForName:BRWalletBalanceChangedNotification object:nil queue:nil
         usingBlock:^(NSNotification *note) {
             if ([[BRPeerManager sharedInstance] syncProgress] < 1.0) return; // wait for sync before updating balance
-
-            self.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:m.wallet.balance],
-                                         [m localCurrencyStringForAmount:m.wallet.balance]];
+            [self updateTitleView];
         }];
     
     self.backgroundObserver =
@@ -151,11 +149,24 @@
     self.swapLeftLabel.hidden = YES;
     self.localCurrencyLabel.hidden = NO;
     if (self.usingShapeshift) {
-        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(~%@)", (self.swapped) ? [m stringForAmount:amount]:[m bitcoinCurrencyStringForAmount:amount]];
+        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(~%@)", (self.swapped) ? [m attributedDashStringForAmount:amount]:[m bitcoinCurrencyStringForAmount:amount]];
     } else {
-        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m stringForAmount:amount]:[m localCurrencyStringForAmount:amount]];
+        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m attributedDashStringForAmount:amount]:[m localCurrencyStringForAmount:amount]];
     }
     self.localCurrencyLabel.textColor = (amount > 0) ? [UIColor grayColor] : [UIColor colorWithWhite:0.75 alpha:1.0];
+}
+
+-(void)updateTitleView {
+    BRWalletManager *m = [BRWalletManager sharedInstance];
+    UILabel * titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 1, 100)];
+    titleLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+    [titleLabel setBackgroundColor:[UIColor clearColor]];
+    NSMutableAttributedString * attributedDashString = [[m attributedDashStringForAmount:m.wallet.balance] mutableCopy];
+    NSString * titleString = [NSString stringWithFormat:@" (%@)",
+                              [m localCurrencyStringForAmount:m.wallet.balance]];
+    [attributedDashString appendAttributedString:[[NSAttributedString alloc] initWithString:titleString]];
+    titleLabel.attributedText = attributedDashString;
+    self.navigationItem.titleView = titleLabel;
 }
 
 #pragma mark - IBAction
@@ -250,13 +261,13 @@
         [m amountForLocalCurrencyString:(self.swapped) ? [s substringWithRange:NSMakeRange(1, s.length - 2)] : s];
 
     if (self.usingShapeshift) {
-        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(~%@)", (self.swapped) ? [m stringForAmount:amount] :
+        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(~%@)", (self.swapped) ? [m attributedDashStringForAmount:amount] :
                                         [m bitcoinCurrencyStringForAmount:amount]];
-        self.amountField.text = (self.swapped) ? [m bitcoinCurrencyStringForAmount:amount]:[m stringForAmount:amount];
+        self.amountField.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m bitcoinCurrencyStringForAmount:amount]]:[m attributedDashStringForAmount:amount];
     } else {
-        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m stringForAmount:amount] :
+        self.localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)", (self.swapped) ? [m attributedDashStringForAmount:amount] :
                                     [m localCurrencyStringForAmount:amount]];
-        self.amountField.text = (self.swapped) ? [m localCurrencyStringForAmount:amount]:[m stringForAmount:amount];
+        self.amountField.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForAmount:amount]]:[m attributedDashStringForAmount:amount];
     }
 
     if (amount == 0) {
@@ -417,9 +428,9 @@ replacementString:(NSString *)string
 
     if (t.length == 0 && textField.placeholder.length == 0) {
         if (self.usingShapeshift) {
-            textField.placeholder = (self.swapped) ? [m bitcoinCurrencyStringForAmount:0]:[m stringForAmount:0];
+            textField.attributedPlaceholder = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m bitcoinCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0];
         } else {
-            textField.placeholder = (self.swapped) ? [m localCurrencyStringForAmount:0]:[m stringForAmount:0];
+            textField.attributedPlaceholder = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0];
         }
     }
     

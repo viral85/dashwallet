@@ -95,8 +95,9 @@
     CGImageRelease(img);
     
     if (req.amount > 0) {
-        self.label.text = [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:req.amount],
-                           [m localCurrencyStringForAmount:req.amount]];
+        NSMutableAttributedString * attributedString = [[m attributedDashStringForAmount:req.amount] mutableCopy];
+        [attributedString appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)",[m localCurrencyStringForAmount:req.amount]]]];
+        self.label.attributedText = attributedString;
     }
 }
 
@@ -294,8 +295,8 @@ error:(NSError *)error
         BRWalletManager *m = [BRWalletManager sharedInstance];
     
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"amount too small", nil)
-          message:[NSString stringWithFormat:NSLocalizedString(@"bitcoin payments can't be less than %@", nil),
-                   [m stringForAmount:TX_MIN_OUTPUT_AMOUNT]] delegate:nil
+          message:[NSString stringWithFormat:NSLocalizedString(@"dash payments can't be less than %@", nil),
+                   [m dashStringForAmount:TX_MIN_OUTPUT_AMOUNT]] delegate:nil
           cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
         return;
     }

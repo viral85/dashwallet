@@ -64,7 +64,7 @@
                 if (self.selectorType == 0) {
                     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
                                                      [m.localFormat stringFromNumber:@(1)],
-                                                     [m stringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
+                                                     [m dashStringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
                 }
             }];
     }
@@ -132,11 +132,11 @@
         self.selectorType = 1;
         self.selectorOptions =
             @[NSLocalizedString(@"always require passcode", nil),
-              [NSString stringWithFormat:@"%@      (%@)", [m stringForAmount:DUFFS/10],
+              [NSString stringWithFormat:@"%@      (%@)", [m dashStringForAmount:DUFFS/10],
                [m localCurrencyStringForAmount:DUFFS/10]],
-              [NSString stringWithFormat:@"%@   (%@)", [m stringForAmount:DUFFS],
+              [NSString stringWithFormat:@"%@   (%@)", [m dashStringForAmount:DUFFS],
                [m localCurrencyStringForAmount:DUFFS]],
-              [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:DUFFS*10],
+              [NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:DUFFS*10],
                [m localCurrencyStringForAmount:DUFFS*10]]];
         if (m.spendingLimit > DUFFS*10) m.spendingLimit = DUFFS*10;
         self.selectedOption = self.selectorOptions[(log10(m.spendingLimit) < 6) ? 0 :
@@ -172,7 +172,7 @@
     m.localCurrencyCode = m.localCurrencyCode; // force balance notification
     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
                                      [m.localFormat stringFromNumber:@(1)],
-                                     [m stringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
+                                     [m dashStringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
     [self.tableView reloadData];
 }
 
@@ -244,7 +244,7 @@
                     if (self.touchId) {
                         cell = [tableView dequeueReusableCellWithIdentifier:selectorIdent];
                         cell.textLabel.text = NSLocalizedString(@"touch id limit", nil);
-                        cell.detailTextLabel.text = [m stringForAmount:m.spendingLimit];
+                        cell.detailTextLabel.text = [m dashStringForAmount:m.spendingLimit];
                         break;
                     }
                     // passthrough if ! self.touchId
@@ -402,7 +402,7 @@
                     if (i < options.count) self.selectedOption = options[i];
                     self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
                                                      [m.localFormat stringFromNumber:@(1)],
-                                                     [m stringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
+                                                     [m dashStringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
                     [self.navigationController pushViewController:self.selectorController animated:YES];
                     [self.selectorController.tableView reloadData];
                     

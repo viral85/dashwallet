@@ -225,12 +225,12 @@
                     localCurrencyLabel = (id)[cell viewWithTag:5];
 
                     if (self.sent > 0 && self.sent == self.received) {
-                        textLabel.text = [m stringForAmount:self.sent];
+                        textLabel.attributedText = [m attributedDashStringForAmount:self.sent];
                         localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
                                                    [m localCurrencyStringForAmount:self.sent]];
                     }
                     else {
-                        textLabel.text = [m stringForAmount:self.received - self.sent];
+                        textLabel.attributedText = [m attributedDashStringForAmount:self.received - self.sent];
                         localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
                                                    [m localCurrencyStringForAmount:self.received - self.sent]];
                     }
@@ -258,7 +258,7 @@
                 localCurrencyLabel = (id)[cell viewWithTag:5];
                 detailLabel.text = self.outputText[indexPath.row];
                 subtitleLabel.text = self.outputDetail[indexPath.row];
-                amountLabel.text = [m stringForAmount:[self.outputAmount[indexPath.row] longLongValue]];
+                amountLabel.attributedText = [m attributedDashStringForAmount:[self.outputAmount[indexPath.row] longLongValue]];
                 amountLabel.textColor = (self.sent > 0) ? [UIColor colorWithRed:1.0 green:0.33 blue:0.33 alpha:1.0] :
                                         [UIColor colorWithRed:0.0 green:0.75 blue:0.0 alpha:1.0];
                 localCurrencyLabel.textColor = amountLabel.textColor;
