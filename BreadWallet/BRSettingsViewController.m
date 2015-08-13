@@ -62,9 +62,8 @@
             [[NSNotificationCenter defaultCenter] addObserverForName:BRWalletBalanceChangedNotification object:nil
             queue:nil usingBlock:^(NSNotification *note) {
                 if (self.selectorType == 0) {
-                    self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m.localFormat stringFromNumber:@(1)],
-                                                     [m dashStringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
+                    self.selectorController.title = [NSString stringWithFormat:@"1 DASH = %@",
+                                                     [m.localFormat stringFromNumber:@(m.bitcoinDashPrice * m.localCurrencyBitcoinPrice)]];
                 }
             }];
     }
@@ -170,9 +169,8 @@
     m.format.maximum = @(MAX_MONEY/(int64_t)pow(10.0, m.format.maximumFractionDigits));
     [[NSUserDefaults standardUserDefaults] setInteger:digits forKey:SETTINGS_MAX_DIGITS_KEY];
     m.localCurrencyCode = m.localCurrencyCode; // force balance notification
-    self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                     [m.localFormat stringFromNumber:@(1)],
-                                     [m dashStringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
+    self.selectorController.title = [NSString stringWithFormat:@"1 DASH = %@",
+                                     [m.localFormat stringFromNumber:@(m.bitcoinDashPrice * m.localCurrencyBitcoinPrice)]];
     [self.tableView reloadData];
 }
 
@@ -400,9 +398,8 @@
                     self.selectorOptions = options;
                     i = [m.currencyCodes indexOfObject:m.localCurrencyCode];
                     if (i < options.count) self.selectedOption = options[i];
-                    self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m.localFormat stringFromNumber:@(1)],
-                                                     [m dashStringForAmount: DUFFS * m.bitcoinDashPrice * m.localCurrencyBitcoinPrice]];
+                    self.selectorController.title = [NSString stringWithFormat:@"1 DASH = %@",
+                                                     [m.localFormat stringFromNumber:@(m.bitcoinDashPrice * m.localCurrencyBitcoinPrice)]];
                     [self.navigationController pushViewController:self.selectorController animated:YES];
                     [self.selectorController.tableView reloadData];
                     
