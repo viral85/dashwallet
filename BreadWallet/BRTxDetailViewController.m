@@ -258,9 +258,10 @@
                 localCurrencyLabel = (id)[cell viewWithTag:5];
                 detailLabel.text = self.outputText[indexPath.row];
                 subtitleLabel.text = self.outputDetail[indexPath.row];
-                amountLabel.attributedText = [m attributedDashStringForAmount:[self.outputAmount[indexPath.row] longLongValue]];
                 amountLabel.textColor = (self.sent > 0) ? [UIColor colorWithRed:1.0 green:0.33 blue:0.33 alpha:1.0] :
-                                        [UIColor colorWithRed:0.0 green:0.75 blue:0.0 alpha:1.0];
+                [UIColor colorWithRed:0.0 green:0.75 blue:0.0 alpha:1.0];
+                amountLabel.attributedText = [m attributedDashStringForAmount:[self.outputAmount[indexPath.row] longLongValue] withTintColor:amountLabel.textColor dashSymbolSize:CGSizeMake(9, 9)];
+                
                 localCurrencyLabel.textColor = amountLabel.textColor;
                 localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
                                            [m localCurrencyStringForAmount:[self.outputAmount[indexPath.row]
@@ -349,9 +350,9 @@
     l.text = [self tableView:tableView titleForHeaderInSection:section];
     l.backgroundColor = [UIColor clearColor];
     l.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:17];
-    l.textColor = [UIColor blackColor];
-    l.shadowColor = [UIColor whiteColor];
-    l.shadowOffset = CGSizeMake(0.0, 1.0);
+    l.textColor = [UIColor whiteColor];
+    //l.shadowColor = [UIColor whiteColor];
+    //l.shadowOffset = CGSizeMake(0.0, 1.0);
     l.numberOfLines = 0;
     v.backgroundColor = [UIColor clearColor];
     [v addSubview:l];
