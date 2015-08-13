@@ -217,7 +217,7 @@
 }
 
 // fetches the request over HTTP and calls completion block
-+ (void)fetch:(NSString *)url timeout:(NSTimeInterval)timeout
++ (void)fetch:(NSString *)url type:(NSString*)type timeout:(NSTimeInterval)timeout
 completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
 {
     if (! completion) return;
@@ -227,7 +227,8 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
                                       cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:timeout] : nil;
 
     [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
-    [req setValue:@"application/bitcoin-paymentrequest" forHTTPHeaderField:@"Accept"];
+    
+    [req setValue:[NSString stringWithFormat:@"application/%@-paymentrequest",type] forHTTPHeaderField:@"Accept"];
 //  [req addValue:@"text/uri-list" forHTTPHeaderField:@"Accept"]; // breaks some BIP72 implementations, notably bitpay's
 
     if (! req || ! [NSURLConnection canHandleRequest:req]) {
@@ -250,7 +251,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
         network = @"test";
 #endif
         
-        if ([response.MIMEType.lowercaseString isEqual:@"application/dash-paymentrequest"] && data.length <= 50000) {
+        if ([response.MIMEType.lowercaseString isEqual:[NSString stringWithFormat:@"application/%@-paymentrequest",type]] && data.length <= 50000) {
             req = [BRPaymentProtocolRequest requestWithData:data];
         }
         else if ([response.MIMEType.lowercaseString isEqual:@"text/uri-list"] && data.length <= 50000) {
@@ -278,7 +279,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
     }];
 }
 
-+ (void)postPayment:(BRPaymentProtocolPayment *)payment to:(NSString *)paymentURL timeout:(NSTimeInterval)timeout
++ (void)postPayment:(BRPaymentProtocolPayment *)payment type:(NSString*)type to:(NSString *)paymentURL timeout:(NSTimeInterval)timeout
 completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
 {
     NSURL *u = [NSURL URLWithString:paymentURL];
@@ -293,8 +294,8 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
                                 cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:timeout];
 
     [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
-    [req setValue:@"application/dash-payment" forHTTPHeaderField:@"Content-Type"];
-    [req addValue:@"application/dash-paymentack" forHTTPHeaderField:@"Accept"];
+    [req setValue:[NSString stringWithFormat:@"application/%@-payment",type] forHTTPHeaderField:@"Content-Type"];
+    [req addValue:[NSString stringWithFormat:@"application/%@-paymentack",type] forHTTPHeaderField:@"Accept"];
     [req setHTTPMethod:@"POST"];
     [req setHTTPBody:payment.data];
 

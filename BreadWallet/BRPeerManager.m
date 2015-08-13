@@ -232,15 +232,14 @@ static const char *dns_seeds[] = {
             return _peers;
 #endif
             if (_peers.count < PEER_MAX_CONNECTIONS) {
-                NSAssert(FALSE, @"we need to do this");
-                // if DNS peer discovery fails, fall back on a hard coded list of peers (list taken from satoshi client)
-//                for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
-//                                           pathForResource:FIXED_PEERS ofType:@"plist"]]) {
-//                    // give hard coded peers a timestamp between 7 and 14 days ago
-//                    [_peers addObject:[[BRPeer alloc] initWithAddress:address.unsignedIntValue
-//                     port:DASH_STANDARD_PORT timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
-//                     services:SERVICES_NODE_NETWORK]];
-//                }
+//                 if DNS peer discovery fails, fall back on a hard coded list of peers (masternode list from dash core client)
+                for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
+                                           pathForResource:FIXED_PEERS ofType:@"plist"]]) {
+                    // give hard coded peers a timestamp between 7 and 14 days ago
+                    [_peers addObject:[[BRPeer alloc] initWithAddress:address.unsignedIntValue
+                     port:DASH_STANDARD_PORT timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
+                     services:SERVICES_NODE_NETWORK]];
+                }
             }
             
             [self sortPeers];

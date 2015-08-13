@@ -84,7 +84,7 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
 - (void)sweepPrivateKey:(NSString *)privKey withFee:(BOOL)fee
 completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion;
 
-- (int64_t)amountForString:(NSString *)string;
+- (int64_t)amountForDashString:(NSString *)string;
 - (int64_t)amountForBitcoinString:(NSString *)string;
 - (NSString *)dashStringForAmount:(int64_t)amount;
 - (NSAttributedString *)attributedDashStringForAmount:(int64_t)amount;

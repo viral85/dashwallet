@@ -57,6 +57,7 @@
 - (NSAttributedString*)attributedStringForDashSymbol;
 - (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color;
 - (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize;
++ (NSAttributedString*)dashSymbolAttributedStringWithTintColor:(UIColor*)color forDashSymbolSize:(CGSize)dashSymbolSize;
 
 - (NSData *)base58ToData;
 - (NSData *)base58checkToData;

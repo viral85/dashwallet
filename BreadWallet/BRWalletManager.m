@@ -32,6 +32,7 @@
 #import "BRTransactionEntity.h"
 #import "BRAddressEntity.h"
 #import "NSString+Dash.h"
+#import "NSAttributedString+Attachments.h"
 #import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
@@ -1137,10 +1138,10 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 
 #pragma mark - string helpers
 
-- (int64_t)amountForString:(NSString *)string
+- (int64_t)amountForDashString:(NSString *)string
 {
     if (! string.length) return 0;
-    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.format numberFromString:string] decimalValue]]
+    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.format numberFromString:[string stringByReplacingOccurrencesOfString:@"DASH" withString:DASH]] decimalValue]]
              decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits] longLongValue];
 }
 

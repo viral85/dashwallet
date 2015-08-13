@@ -367,19 +367,27 @@ static const UniChar base58chars[] = {
 }
 
 - (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color {
-    return [self attributedStringForDashSymbolWithTintColor:color dashSymbolSize:CGSizeMake(15, 12)];
+    return [self attributedStringForDashSymbolWithTintColor:color dashSymbolSize:CGSizeMake(12, 12)];
 }
 
-- (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize {
-    
++(NSAttributedString*)dashSymbolAttributedStringWithTintColor:(UIColor*)color forDashSymbolSize:(CGSize)dashSymbolSize {
     NSTextAttachment *dashSymbol = [[NSTextAttachment alloc] init];
+    
+    dashSymbol.bounds = CGRectMake(0, 0, dashSymbolSize.width, dashSymbolSize.height);
+    dashSymbol.image = [[UIImage imageNamed:@"Dash-Light.png"] imageWithTintColor:color];
+    return [NSAttributedString attributedStringWithAttachment:dashSymbol];
+    
+}
+
+
+- (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize {
+
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc]
                                                    initWithString:self];
-    dashSymbol.bounds = CGRectMake(0, 0, dashSymbolSize.width, dashSymbolSize.height);
-    dashSymbol.image = [[UIImage imageNamed:@"Dash-Light"] imageWithTintColor:color];
+
     NSRange range = [attributedString.string rangeOfString:DASH];
     [attributedString replaceCharactersInRange:range
-                          withAttributedString:[NSAttributedString attributedStringWithAttachment:dashSymbol]];
+                          withAttributedString:[NSString dashSymbolAttributedStringWithTintColor:color forDashSymbolSize:dashSymbolSize]];
     return attributedString;
 }
 

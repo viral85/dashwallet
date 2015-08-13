@@ -52,11 +52,11 @@
 
 // fetches a BIP70 request over HTTP and calls completion block
 // https://github.com/bitcoin/bips/blob/master/bip-0070.mediawiki
-+ (void)fetch:(NSString *)url timeout:(NSTimeInterval)timeout
++ (void)fetch:(NSString *)url type:(NSString*)type timeout:(NSTimeInterval)timeout
 completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion;
 
 // posts a BIP70 payment object to the specified URL
-+ (void)postPayment:(BRPaymentProtocolPayment *)payment to:(NSString *)paymentURL
++ (void)postPayment:(BRPaymentProtocolPayment *)payment type:(NSString*)type to:(NSString *)paymentURL
 timeout:(NSTimeInterval)timeout completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion;
 
 @end

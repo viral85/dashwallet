@@ -100,12 +100,23 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>DashFont-Light.otf</string>
-	</array>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>DASH Payment Request</string>
+			<key>UTTypeIdentifier</key>
+			<string>dash.paymentrequest</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.mime-type</key>
+				<string>application/dash-paymentrequest</string>
+			</dict>
+		</dict>
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
@@ -127,6 +138,21 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeDescription</key>
+			<string>DASH Payment</string>
+			<key>UTTypeIdentifier</key>
+			<string>dash.payment</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.mime-type</key>
+				<string>application/dash-payment</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
 			<string>Bitcoin Payment</string>
 			<key>UTTypeIdentifier</key>
 			<string>bitcoin.payment</string>
@@ -134,6 +160,21 @@
 			<dict>
 				<key>public.mime-type</key>
 				<string>application/bitcoin-payment</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>DASH Payment ACK</string>
+			<key>UTTypeIdentifier</key>
+			<string>dash.paymentack</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.mime-type</key>
+				<string>application/dash-paymentack</string>
 			</dict>
 		</dict>
 		<dict>

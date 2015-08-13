@@ -425,7 +425,7 @@ static NSString *dateFormat(NSString *template)
                 sentLabel.hidden = YES;
                 unconfirmedLabel.hidden = NO;
                 detailTextLabel.text = [self dateForTx:tx];
-                balanceLabel.attributedText = (m.didAuthenticate) ? [m attributedDashStringForAmount:balance withTintColor:balanceLabel.textColor dashSymbolSize:CGSizeMake(11, 9)] : nil;
+                balanceLabel.attributedText = (m.didAuthenticate) ? [m attributedDashStringForAmount:balance withTintColor:balanceLabel.textColor dashSymbolSize:CGSizeMake(9, 9)] : nil;
                 localBalanceLabel.text = (m.didAuthenticate) ?
                     [NSString stringWithFormat:@"(%@)", [m localCurrencyStringForAmount:balance]] : nil;
 

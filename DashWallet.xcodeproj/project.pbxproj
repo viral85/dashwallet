@@ -34,7 +34,6 @@
 		752E28EB19234DA200DB5A3C /* NSString+Dash.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28E619234DA200DB5A3C /* NSString+Dash.m */; };
 		752E28F119234E8100DB5A3C /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28F019234E8100DB5A3C /* Reachability.m */; settings = {COMPILER_FLAGS = "-w"; }; };
 		752E28F619235B3000DB5A3C /* BIP39EnglishWords.plist in Resources */ = {isa = PBXBuildFile; fileRef = 752E28F419235B3000DB5A3C /* BIP39EnglishWords.plist */; };
-		752E28F719235B3000DB5A3C /* FixedPeers.plist in Resources */ = {isa = PBXBuildFile; fileRef = 752E28F519235B3000DB5A3C /* FixedPeers.plist */; };
 		7548CF3719556FD700EF827F /* BRCopyLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7548CF3619556FD700EF827F /* BRCopyLabel.m */; };
 		75767C421A0EC6F9003E7DE9 /* UIImage+Blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 75767C411A0EC6F9003E7DE9 /* UIImage+Blur.m */; };
 		757BE7E3192C0E9D0061CB20 /* BRRestoreViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 757BE7E2192C0E9D0061CB20 /* BRRestoreViewController.m */; };
@@ -97,6 +96,8 @@
 		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBE49E961B7BB1830020FAA6 /* Dash-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = FBE49E951B7BB1830020FAA6 /* Dash-Light.png */; };
 		FBE49E991B7BB55C0020FAA6 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */; };
+		FBE49E9C1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE49E9B1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m */; };
+		FBE49E9E1B7C86770020FAA6 /* FixedPeers.plist in Resources */ = {isa = PBXBuildFile; fileRef = FBE49E9D1B7C86770020FAA6 /* FixedPeers.plist */; };
 		FBE689B81ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
 		FBE689B91ABF160000467F4C /* NSData+Blake.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689B71ABF160000467F4C /* NSData+Blake.m */; };
 		FBE689BC1ABF1F9B00467F4C /* NSData+Bmw.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689BB1ABF1F9B00467F4C /* NSData+Bmw.m */; };
@@ -239,7 +240,6 @@
 		752E28EF19234E8100DB5A3C /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = SOURCE_ROOT; };
 		752E28F019234E8100DB5A3C /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = SOURCE_ROOT; };
 		752E28F419235B3000DB5A3C /* BIP39EnglishWords.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BIP39EnglishWords.plist; sourceTree = "<group>"; };
-		752E28F519235B3000DB5A3C /* FixedPeers.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = FixedPeers.plist; sourceTree = "<group>"; };
 		7548CF3519556FD700EF827F /* BRCopyLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRCopyLabel.h; sourceTree = "<group>"; };
 		7548CF3619556FD700EF827F /* BRCopyLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRCopyLabel.m; sourceTree = "<group>"; };
 		75767C401A0EC6F9003E7DE9 /* UIImage+Blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Blur.h"; sourceTree = "<group>"; };
@@ -385,6 +385,10 @@
 		FBE49E951B7BB1830020FAA6 /* Dash-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Dash-Light.png"; sourceTree = "<group>"; };
 		FBE49E971B7BB55C0020FAA6 /* UIImage+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Color.h"; sourceTree = "<group>"; };
 		FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Color.m"; sourceTree = "<group>"; };
+		FBE49E9A1B7BE73C0020FAA6 /* NSAttributedString+Attachments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+Attachments.h"; sourceTree = "<group>"; };
+		FBE49E9B1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+Attachments.m"; sourceTree = "<group>"; };
+		FBE49E9D1B7C86770020FAA6 /* FixedPeers.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = FixedPeers.plist; sourceTree = "<group>"; };
+		FBE49E9F1B7C86AF0020FAA6 /* masternodeList.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = masternodeList.sh; sourceTree = "<group>"; };
 		FBE4D98A1ABD652B007C3BA6 /* sph_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sph_types.h; sourceTree = "<group>"; };
 		FBE689B61ABF160000467F4C /* NSData+Blake.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Blake.h"; sourceTree = "<group>"; };
 		FBE689B71ABF160000467F4C /* NSData+Blake.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Blake.m"; sourceTree = "<group>"; };
@@ -532,6 +536,8 @@
 				75767C411A0EC6F9003E7DE9 /* UIImage+Blur.m */,
 				FBE49E971B7BB55C0020FAA6 /* UIImage+Color.h */,
 				FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */,
+				FBE49E9A1B7BE73C0020FAA6 /* NSAttributedString+Attachments.h */,
+				FBE49E9B1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -675,7 +681,7 @@
 				75D5F3DC191EC270004AB296 /* Main.storyboard */,
 				752E2898192349CE00DB5A3C /* BreadWallet.xcdatamodeld */,
 				752E28F419235B3000DB5A3C /* BIP39EnglishWords.plist */,
-				752E28F519235B3000DB5A3C /* FixedPeers.plist */,
+				FBE49E9D1B7C86770020FAA6 /* FixedPeers.plist */,
 				7579F7FE19231D4600CA56F4 /* ThirdParty */,
 				75D5F3C8191EC270004AB296 /* Supporting Files */,
 				FB84DDF91AC80E5400A80499 /* Log.h */,
@@ -689,6 +695,7 @@
 		75D5F3C8191EC270004AB296 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				FBE49E9F1B7C86AF0020FAA6 /* masternodeList.sh */,
 				FBE49E951B7BB1830020FAA6 /* Dash-Light.png */,
 				75D5F3C9191EC270004AB296 /* DashWallet-Info.plist */,
 				75D5F3CA191EC270004AB296 /* InfoPlist.strings */,
@@ -965,7 +972,7 @@
 				757E09991ADB8EEB006FD352 /* Localizable.strings in Resources */,
 				752E28F619235B3000DB5A3C /* BIP39EnglishWords.plist in Resources */,
 				75D5F3CC191EC270004AB296 /* InfoPlist.strings in Resources */,
-				752E28F719235B3000DB5A3C /* FixedPeers.plist in Resources */,
+				FBE49E9E1B7C86770020FAA6 /* FixedPeers.plist in Resources */,
 				FBE49E961B7BB1830020FAA6 /* Dash-Light.png in Resources */,
 				75D5F3DE191EC270004AB296 /* Main.storyboard in Resources */,
 			);
@@ -986,6 +993,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBE49E9C1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m in Sources */,
 				752E28AA19234AE300DB5A3C /* BRAddressEntity.m in Sources */,
 				75AA5F55194143D5003F23BD /* BRBouncyBurgerButton.m in Sources */,
 				752E28AB19234AE300DB5A3C /* BRMerkleBlockEntity.m in Sources */,

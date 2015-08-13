@@ -296,7 +296,7 @@ static NSString *sanitizeString(NSString *s)
     else if (request.r.length > 0) { // payment protocol over HTTP
         [(id)self.parentViewController.parentViewController startActivityWithTimeout:20.0];
         
-        [BRPaymentRequest fetch:request.r timeout:20.0 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
+        [BRPaymentRequest fetch:request.r type:request.type timeout:20.0 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
             [(id)self.parentViewController.parentViewController stopActivityWithSuccess:(! error)];
             
             if (error) {
@@ -609,7 +609,7 @@ static NSString *sanitizeString(NSString *s)
         
         NSLog(@"posting payment to: %@", self.request.details.paymentURL);
         
-        [BRPaymentRequest postPayment:payment to:self.request.details.paymentURL timeout:20.0
+        [BRPaymentRequest postPayment:payment type:@"dash" to:self.request.details.paymentURL timeout:20.0
                            completion:^(BRPaymentProtocolACK *ack, NSError *error) {
                                [(id)self.parentViewController.parentViewController stopActivityWithSuccess:(! error)];
                                
@@ -842,8 +842,13 @@ static NSString *sanitizeString(NSString *s)
         [a addObjectsFromArray:[p componentsSeparatedByCharactersInSet:c]];
         
         if ([NSURL URLWithString:p]) { //maybe BIP73 url: https://github.com/bitcoin/bips/blob/master/bip-0073.mediawiki
-            [a addObject:[NSString stringWithFormat:@"dash:?r=%@",
+            if ([p isValidBitcoinAddress]) {
+                [a addObject:[NSString stringWithFormat:@"bitcoin:?r=%@",
+                              [p stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            } else {
+                [a addObject:[NSString stringWithFormat:@"dash:?r=%@",
                           [p stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            }
         }
     }
     
@@ -853,8 +858,13 @@ static NSString *sanitizeString(NSString *s)
             [a addObject:qr.messageString];
             
             if ([NSURL URLWithString:qr.messageString]) {
-                [a addObject:[NSString stringWithFormat:@"dash:?r=%@",
+                if ([p isValidBitcoinAddress]) {
+                    [a addObject:[NSString stringWithFormat:@"bitcoin:?r=%@",
+                                  [qr.messageString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+                } else {
+                    [a addObject:[NSString stringWithFormat:@"dash:?r=%@",
                               [qr.messageString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+                }
             }
         }
     }
@@ -869,7 +879,7 @@ static NSString *sanitizeString(NSString *s)
         // if the clipboard contains a known txHash, we know it's not a hex encoded private key
         if (d.length == 32 && [[m.wallet.recentTransactions valueForKey:@"txHash"] containsObject:d]) continue;
         
-        if ([req isValid] || [s isValidDigitalCashPrivateKey] || [s isValidDigitalCashBIP38Key]) {
+        if ([req isValid] || [s isValidDigitalCashPrivateKey] || [s isValidDigitalCashBIP38Key] || [s isValidBitcoinBIP38Key] || [s isValidBitcoinPrivateKey]) {
             [self performSelector:@selector(confirmRequest:) withObject:req afterDelay:0.1];// delayed to show highlight
             return;
         }
@@ -995,7 +1005,7 @@ static NSString *sanitizeString(NSString *s)
         if (![request isValid] && ![s isValidDigitalCashPrivateKey] && ![s isValidDigitalCashBIP38Key]) {
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetQRGuide) object:nil];
             self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-red"];
-            [BRPaymentRequest fetch:s timeout:5.0
+            [BRPaymentRequest fetch:s type:request.type timeout:5.0
                          completion:^(BRPaymentProtocolRequest *req, NSError *error) {
                              dispatch_async(dispatch_get_main_queue(), ^{
                                  [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetQRGuide) object:nil];
@@ -1028,7 +1038,7 @@ static NSString *sanitizeString(NSString *s)
             [self.scanController stop];
             
             if (request.r.length > 0) { // start fetching payment protocol request right away
-                [BRPaymentRequest fetch:request.r timeout:5.0
+                [BRPaymentRequest fetch:request.r type:request.type timeout:5.0
                              completion:^(BRPaymentProtocolRequest *req, NSError *error) {
                                  if (error) request.r = nil;
                                  
