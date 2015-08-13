@@ -83,8 +83,13 @@
     NSURL *url = [NSURL URLWithString:s];
     
     if (! url || ! url.scheme) {
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"dash://%@", s]];
-        self.type = @"dash";
+        if ([s isValidBitcoinAddress]) {
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"bitcoin://%@", s]];
+            self.type = @"bitcoin";
+        } else {
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"dash://%@", s]];
+            self.type = @"dash";
+        }
     }
     else if (! url.host && url.resourceSpecifier) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@", url.scheme, url.resourceSpecifier]];

@@ -886,7 +886,7 @@ static NSString *sanitizeString(NSString *s)
     }
     
     [[[UIAlertView alloc] initWithTitle:@""
-                                message:NSLocalizedString(@"clipboard doesn't contain a valid dash address", nil) delegate:nil
+                                message:NSLocalizedString(@"clipboard doesn't contain a valid Dash or Bitcoin address", nil) delegate:nil
                       cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
     [self performSelector:@selector(cancel:) withObject:self afterDelay:0.1];
 }
