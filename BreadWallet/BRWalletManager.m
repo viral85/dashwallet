@@ -1141,7 +1141,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (int64_t)amountForDashString:(NSString *)string
 {
     if (! string.length) return 0;
-    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.format numberFromString:[string stringByReplacingOccurrencesOfString:@"DASH" withString:DASH]] decimalValue]]
+    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.format numberFromString:string] decimalValue]]
              decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits] longLongValue];
 }
 
@@ -1156,7 +1156,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 {
     NSString * string = [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
                                                        decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
-    return [string stringByReplacingOccurrencesOfString:DASH withString:@"DASH"];
+    return string;
 }
 
 - (NSAttributedString *)attributedDashStringForAmount:(int64_t)amount

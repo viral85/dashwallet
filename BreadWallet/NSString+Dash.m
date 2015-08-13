@@ -383,11 +383,16 @@ static const UniChar base58chars[] = {
 - (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize {
 
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc]
-                                                   initWithString:self];
+                                                   initWithString:[self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
 
     NSRange range = [attributedString.string rangeOfString:DASH];
-    [attributedString replaceCharactersInRange:range
+    if (range.location == NSNotFound) {
+        [attributedString insertAttributedString:[[NSAttributedString alloc] initWithString:@" "] atIndex:0];
+        [attributedString insertAttributedString:[NSString dashSymbolAttributedStringWithTintColor:color forDashSymbolSize:dashSymbolSize] atIndex:0];
+    } else {
+        [attributedString replaceCharactersInRange:range
                           withAttributedString:[NSString dashSymbolAttributedStringWithTintColor:color forDashSymbolSize:dashSymbolSize]];
+    }
     return attributedString;
 }
 

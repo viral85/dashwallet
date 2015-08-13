@@ -33,7 +33,7 @@
 
 @interface BRAmountViewController ()
 
-@property (nonatomic, strong) IBOutlet UITextField *amountField;
+@property (nonatomic, strong) IBOutlet UILabel *amountField;
 @property (nonatomic, strong) IBOutlet UILabel *localCurrencyLabel, *addressLabel;
 @property (nonatomic, strong) IBOutlet UIBarButtonItem *payButton, *lock;
 @property (nonatomic, strong) IBOutlet UIButton *delButton, *decimalButton;
@@ -63,7 +63,7 @@
 
     self.payButton = [[UIBarButtonItem alloc] initWithTitle:self.usingShapeshift?@"Shapeshift!":NSLocalizedString(@"pay", nil)
                       style:UIBarButtonItemStyleBordered target:self action:@selector(pay:)];
-    self.amountField.attributedPlaceholder = [m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
+    self.amountField.attributedText = [m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
     [self.decimalButton setTitle:m.format.currencyDecimalSeparator forState:UIControlStateNormal];
 
     self.swapLeftLabel = [UILabel new];
@@ -143,10 +143,10 @@
     uint64_t amount;
     if (self.usingShapeshift) {
         amount = (self.swapped) ? [m amountForBitcoinCurrencyString:self.amountField.text] * 1.035 :
-        [m amountForDashString:[NSString stringWithFormat:@"%@ %@",DASH,self.amountField.text]] * 0.97;
+        [m amountForDashString:self.amountField.text] * 0.97;
     } else {
         amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text] :
-                      [m amountForDashString:[NSString stringWithFormat:@"%@ %@",DASH,self.amountField.text]];
+                      [m amountForDashString:self.amountField.text];
     }
 
     self.swapLeftLabel.hidden = YES;
@@ -204,10 +204,10 @@
     NSUInteger l = [self.amountField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
 
     l = (l < self.amountField.attributedText.length) ? l + 1 : self.amountField.attributedText.length;
-    [self textField:self.amountField shouldChangeCharactersInRange:NSMakeRange(l, 0)
+    [self updateAmountLabel:self.amountField shouldChangeCharactersInRange:NSMakeRange(l, 0)
      replacementString:[(UIButton *)sender titleLabel].text];
-    if (!self.swapped)
-        self.amountField.attributedText = [self.amountField.text attributedStringForDashSymbolWithTintColor:self.amountField.textColor dashSymbolSize:CGSizeMake(15, 17)];
+//    if (!self.swapped)
+//        self.amountField.attributedText = [self.amountField.text attributedStringForDashSymbolWithTintColor:self.amountField.textColor dashSymbolSize:CGSizeMake(15, 17)];
 }
 
 - (IBAction)del:(id)sender
@@ -215,7 +215,7 @@
     NSUInteger l = [self.amountField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
 
     if (l < self.amountField.text.length) {
-        [self textField:self.amountField shouldChangeCharactersInRange:NSMakeRange(l, 1) replacementString:@""];
+        [self updateAmountLabel:self.amountField shouldChangeCharactersInRange:NSMakeRange(l, 1) replacementString:@""];
     }
 }
 
@@ -264,8 +264,7 @@
     }
 
     if (self.swapRightLabel.hidden) {
-        self.swapRightLabel.attributedText = (self.amountField.attributedText.length > 0) ? self.amountField.attributedText :
-                                   self.amountField.attributedPlaceholder;
+        self.swapRightLabel.attributedText = self.amountField.attributedText;
         self.swapRightLabel.textColor = (self.amountField.text.length > 0) ? self.amountField.textColor :
                                         [UIColor colorWithWhite:0.75 alpha:1.0];
         self.swapRightLabel.frame = self.amountField.frame;
@@ -302,15 +301,6 @@
         self.amountField.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForAmount:amount]]:[m attributedDashStringForAmount:amount];
     }
 
-    if (amount == 0) {
-        self.amountField.placeholder = self.amountField.text;
-        self.amountField.attributedText = nil;
-        self.amountField.text = nil;
-    }
-    else {self.amountField.attributedPlaceholder = nil;
-        self.amountField.placeholder = nil;
-    }
-
     [self.view layoutIfNeeded];
     
     CGPoint p = CGPointMake(self.localCurrencyLabel.frame.origin.x + self.localCurrencyLabel.bounds.size.width/2.0 +
@@ -328,8 +318,7 @@
         self.swapLeftLabel.transform = CGAffineTransformMakeScale(0.85, 0.85);
         self.swapRightLabel.transform = CGAffineTransformMakeScale(1.0/0.85, 1.0/0.85);
         self.swapLeftLabel.attributedText = self.localCurrencyLabel.attributedText;
-        self.swapRightLabel.attributedText = (self.amountField.text.length > 0) ? self.amountField.attributedText :
-                                   self.amountField.attributedPlaceholder;
+        self.swapRightLabel.attributedText = self.amountField.attributedText;
         self.swapLeftLabel.textColor = self.localCurrencyLabel.textColor;
         self.swapRightLabel.textColor = (self.amountField.text.length > 0) ? self.amountField.textColor :
                                         [UIColor colorWithWhite:0.75 alpha:1.0];
@@ -364,8 +353,7 @@
     self.swapLeftLabel.textColor = self.localCurrencyLabel.textColor;
 
     if (self.swapRightLabel.hidden) {
-        self.swapRightLabel.attributedText = (self.amountField.attributedText.length > 0) ? self.amountField.attributedText :
-                                   self.amountField.attributedPlaceholder;
+        self.swapRightLabel.attributedText = self.amountField.attributedText;
         self.swapRightLabel.frame = self.amountField.frame;
         [self.amountField.superview addSubview:self.swapRightLabel];
         self.swapRightLabel.hidden = NO;
@@ -402,7 +390,7 @@
 
 #pragma mark - UITextFieldDelegate
 
-- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range
+-(void)updateAmountLabel:(UILabel *)amountLabel shouldChangeCharactersInRange:(NSRange)range
 replacementString:(NSString *)string
 {
     BRWalletManager *m = [BRWalletManager sharedInstance];
@@ -413,38 +401,38 @@ replacementString:(NSString *)string
         f = (self.swapped) ? m.localFormat:m.format;
     }
     NSUInteger mindigits = f.minimumFractionDigits;
-    NSUInteger point = [textField.text rangeOfString:f.currencyDecimalSeparator].location, l;
-    NSString *t = textField.text ? [textField.text stringByReplacingCharactersInRange:range withString:string] : string;
+    NSUInteger point = [amountLabel.text rangeOfString:f.currencyDecimalSeparator].location, l;
+    NSString *t = amountLabel.text ? [amountLabel.text stringByReplacingCharactersInRange:range withString:string] : string;
 
     f.minimumFractionDigits = 0;
     t = [f stringFromNumber:[f numberFromString:t]];
-    l = [textField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
-    l = (l < textField.text.length) ? l + 1 : textField.text.length;
+    l = [amountLabel.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
+    l = (l < amountLabel.text.length) ? l + 1 : amountLabel.text.length;
 
     if (! string.length && point != NSNotFound) { // delete trailing char
-        t = [textField.text stringByReplacingCharactersInRange:range withString:string];
+        t = [amountLabel.text stringByReplacingCharactersInRange:range withString:string];
         if ([t isEqual:[f stringFromNumber:@0]]) t = @"";
     }
-    else if ((string.length > 0 && textField.text.length > 0 && t == nil) ||
+    else if ((string.length > 0 && amountLabel.text.length > 0 && t == nil) ||
              (point != NSNotFound && l - point > f.maximumFractionDigits)) {
         f.minimumFractionDigits = mindigits;
-        return NO; // too many digits
+        return; // too many digits
     }
-    else if ([string isEqual:f.currencyDecimalSeparator] && (! textField.text.length || point == NSNotFound)) {
-        if (! textField.text.length) t = [f stringFromNumber:@0]; // if first char is '.', prepend a zero
+    else if ([string isEqual:f.currencyDecimalSeparator] && (! amountLabel.text.length || point == NSNotFound)) {
+        if (! amountLabel.text.length) t = [f stringFromNumber:@0]; // if first char is '.', prepend a zero
         l = [t rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
         l = (l < t.length) ? l + 1 : t.length;
         t = [t stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:f.currencyDecimalSeparator];
     }
     else if ([string isEqual:@"0"]) {
-        if (! textField.text.length) { // if first digit is zero, append a '.'
+        if (! amountLabel.text.length) { // if first digit is zero, append a '.'
             t = [f stringFromNumber:@0];
             l = [t rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
             l = (l < t.length) ? l + 1 : t.length;
             t = [t stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:f.currencyDecimalSeparator];
         }
         else if (point != NSNotFound) { // handle multiple zeros after '.'
-            t = [textField.text stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:@"0"];
+            t = [amountLabel.text stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:@"0"];
         }
     }
 
@@ -458,15 +446,15 @@ replacementString:(NSString *)string
 //        return NO;
 //    }
     f.minimumFractionDigits = mindigits;
-    textField.text = t;
-    if (t.length > 0 && textField.placeholder.length > 0) textField.attributedPlaceholder = nil;
-
-    if (t.length == 0 && textField.placeholder.length == 0) {
+    
+    if (t.length == 0) {
         if (self.usingShapeshift) {
-            textField.attributedPlaceholder = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m bitcoinCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
+            amountLabel.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m bitcoinCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
         } else {
-            textField.attributedPlaceholder = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
+            amountLabel.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
         }
+    } else {
+        amountLabel.attributedText = [t attributedStringForDashSymbolWithTintColor:self.amountField.textColor dashSymbolSize:CGSizeMake(15, 17)];
     }
     
     if (self.navigationController.viewControllers.firstObject != self) {
@@ -479,10 +467,8 @@ replacementString:(NSString *)string
     }
 
     self.swapRightLabel.hidden = YES;
-    textField.hidden = NO;
+    amountLabel.hidden = NO;
     [self updateLocalCurrencyLabel];
-
-    return NO;
 }
 
 @end
