@@ -191,11 +191,18 @@ static NSUInteger _fetchBatchSize = 100;
         NSURL *docURL =
             [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].lastObject;
         NSURL *modelURL = [NSBundle.mainBundle URLsForResourcesWithExtension:@"momd" subdirectory:nil].lastObject;
-        NSString *projName = [[modelURL lastPathComponent] stringByDeletingPathExtension];
-        NSURL *storeURL = [[docURL URLByAppendingPathComponent:projName] URLByAppendingPathExtension:@"sqlite"];
+        NSURL *storeURL;
+        if (modelURL) {
+            NSString *projName = [[modelURL lastPathComponent] stringByDeletingPathExtension];
+            storeURL = [[docURL URLByAppendingPathComponent:projName] URLByAppendingPathExtension:@"sqlite"];
+        } else {
+            modelURL = [NSBundle.mainBundle URLsForResourcesWithExtension:@"mom" subdirectory:nil].lastObject;
+            NSString *projName = [[modelURL lastPathComponent] stringByDeletingPathExtension];
+            storeURL = [[docURL URLByAppendingPathComponent:projName] URLByAppendingPathExtension:@"sqlite"];
+        }
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
         NSPersistentStoreCoordinator *coordinator =
-            [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
+        [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
         NSError *error = nil;
         
         if ([coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL

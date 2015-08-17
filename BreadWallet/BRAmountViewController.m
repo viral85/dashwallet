@@ -63,7 +63,8 @@
 
     self.payButton = [[UIBarButtonItem alloc] initWithTitle:self.usingShapeshift?@"Shapeshift!":NSLocalizedString(@"pay", nil)
                       style:UIBarButtonItemStyleBordered target:self action:@selector(pay:)];
-    self.amountField.attributedText = [m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
+    self.amountField.attributedText = [m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 16)];
+    self.amountField.textColor = [UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f];
     [self.decimalButton setTitle:m.format.currencyDecimalSeparator forState:UIControlStateNormal];
 
     self.swapLeftLabel = [UILabel new];
@@ -206,8 +207,6 @@
     l = (l < self.amountField.attributedText.length) ? l + 1 : self.amountField.attributedText.length;
     [self updateAmountLabel:self.amountField shouldChangeCharactersInRange:NSMakeRange(l, 0)
      replacementString:[(UIButton *)sender titleLabel].text];
-//    if (!self.swapped)
-//        self.amountField.attributedText = [self.amountField.text attributedStringForDashSymbolWithTintColor:self.amountField.textColor dashSymbolSize:CGSizeMake(15, 17)];
 }
 
 - (IBAction)del:(id)sender
@@ -402,37 +401,40 @@ replacementString:(NSString *)string
     }
     NSUInteger mindigits = f.minimumFractionDigits;
     NSUInteger point = [amountLabel.text rangeOfString:f.currencyDecimalSeparator].location, l;
+    NSNumber * oldNumber = [f numberFromString:amountLabel.text];
     NSString *t = amountLabel.text ? [amountLabel.text stringByReplacingCharactersInRange:range withString:string] : string;
-
+    if (!self.swapped && [t characterAtIndex:0] == NSAttachmentCharacter) {
+        t = [t stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:DASH];
+    }
     f.minimumFractionDigits = 0;
-    t = [f stringFromNumber:[f numberFromString:t]];
-    l = [amountLabel.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
-    l = (l < amountLabel.text.length) ? l + 1 : amountLabel.text.length;
+    NSNumber * number = [f numberFromString:t];
+    t = [f stringFromNumber:number];
+    l = [t rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
+    l = (l < t.length) ? l + 1 : t.length;
 
     if (! string.length && point != NSNotFound) { // delete trailing char
-        t = [amountLabel.text stringByReplacingCharactersInRange:range withString:string];
-        if ([t isEqual:[f stringFromNumber:@0]]) t = @"";
+        if (![number intValue]) t = @"";
     }
-    else if ((string.length > 0 && amountLabel.text.length > 0 && t == nil) ||
+    else if ((string.length > 0 && t.length > 0 && t == nil) ||
              (point != NSNotFound && l - point > f.maximumFractionDigits)) {
         f.minimumFractionDigits = mindigits;
         return; // too many digits
     }
-    else if ([string isEqual:f.currencyDecimalSeparator] && (! amountLabel.text.length || point == NSNotFound)) {
+    else if ([string isEqual:f.currencyDecimalSeparator] && (! t.length || point == NSNotFound)) {
         if (! amountLabel.text.length) t = [f stringFromNumber:@0]; // if first char is '.', prepend a zero
         l = [t rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
         l = (l < t.length) ? l + 1 : t.length;
         t = [t stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:f.currencyDecimalSeparator];
     }
     else if ([string isEqual:@"0"]) {
-        if (! amountLabel.text.length) { // if first digit is zero, append a '.'
+        if (! t.length) { // if first digit is zero, append a '.'
             t = [f stringFromNumber:@0];
             l = [t rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
             l = (l < t.length) ? l + 1 : t.length;
             t = [t stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:f.currencyDecimalSeparator];
         }
         else if (point != NSNotFound) { // handle multiple zeros after '.'
-            t = [amountLabel.text stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:@"0"];
+            t = [t stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:@"0"];
         }
     }
 
@@ -449,12 +451,19 @@ replacementString:(NSString *)string
     
     if (t.length == 0) {
         if (self.usingShapeshift) {
-            amountLabel.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m bitcoinCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
+            amountLabel.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m bitcoinCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 16)];
         } else {
-            amountLabel.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 17)];
+            amountLabel.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 16)];
         }
+        amountLabel.textColor = [UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f];
     } else {
-        amountLabel.attributedText = [t attributedStringForDashSymbolWithTintColor:self.amountField.textColor dashSymbolSize:CGSizeMake(15, 17)];
+        if (!self.swapped) {
+            amountLabel.textColor = [UIColor blackColor];
+            amountLabel.attributedText = [t attributedStringForDashSymbolWithTintColor:self.amountField.textColor dashSymbolSize:CGSizeMake(15, 16)];
+        } else {
+            amountLabel.textColor = [UIColor blackColor];
+            amountLabel.text = t;
+        }
     }
     
     if (self.navigationController.viewControllers.firstObject != self) {

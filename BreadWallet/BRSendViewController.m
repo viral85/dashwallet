@@ -38,6 +38,8 @@
 
 #import "DCShapeshiftManager.h"
 
+#import "FBShimmeringView.h"
+
 #import "NSString+Dash.h"
 #import "NSString+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
@@ -76,6 +78,7 @@ static NSString *sanitizeString(NSString *s)
 @property (nonatomic, strong) IBOutlet UIButton *scanButton, *clipboardButton;
 @property (nonatomic, strong) IBOutlet UITextView *clipboardText;
 @property (nonatomic, strong) IBOutlet NSLayoutConstraint *clipboardXLeft;
+@property (nonatomic, strong) IBOutlet FBShimmeringView * shapeshiftView;
 
 @end
 
@@ -106,6 +109,17 @@ static NSString *sanitizeString(NSString *s)
                                                       }
                                                       else [self updateClipboardText];
                                                   }];
+    
+    FBShimmeringView *shimmeringView = [[FBShimmeringView alloc] initWithFrame:self.shapeshiftView.frame];
+    [self.view addSubview:shimmeringView];
+    [self.shapeshiftView removeFromSuperview];
+    [shimmeringView addSubview:self.shapeshiftView];
+    shimmeringView.contentView = self.shapeshiftView;
+    // Start shimmering.
+    shimmeringView.shimmering = YES;
+    shimmeringView.shimmeringSpeed = 2400;
+    shimmeringView.shimmeringPauseDuration = 2.8;
+    self.shapeshiftView = shimmeringView;
 }
 
 - (void)viewWillAppear:(BOOL)animated

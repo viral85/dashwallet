@@ -41,6 +41,7 @@
 #define OP_EQUALVERIFY 0x88
 #define OP_HASH160     0xa9
 #define OP_CHECKSIG    0xac
+#define OP_RETURN      0x6a
 
 @interface NSData (Dash)
 

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		7525B619192453840041C0F2 /* BRNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 7525B618192453840041C0F2 /* BRNavigationBar.m */; };
-		752E289A192349CE00DB5A3C /* BreadWallet.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 752E2898192349CE00DB5A3C /* BreadWallet.xcdatamodeld */; };
 		752E28AA19234AE300DB5A3C /* BRAddressEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E289F19234AE300DB5A3C /* BRAddressEntity.m */; };
 		752E28AB19234AE300DB5A3C /* BRMerkleBlockEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28A119234AE300DB5A3C /* BRMerkleBlockEntity.m */; };
 		752E28AC19234AE300DB5A3C /* BRPeerEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = 752E28A319234AE300DB5A3C /* BRPeerEntity.m */; };
@@ -94,6 +93,10 @@
 		FB00F6B01B5AE2AA0061C2FB /* StockSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */; };
 		FBBFEF641ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
 		FBBFEF651ABD796000CA937F /* aes_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = FBBFEF631ABD796000CA937F /* aes_helper.c */; };
+		FBCFA6BB1B820C3C00831F99 /* DashWallet.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6BA1B820C3C00831F99 /* DashWallet.xcdatamodel */; };
+		FBCFA6BD1B8210E800831F99 /* Shapeshift.png in Resources */ = {isa = PBXBuildFile; fileRef = FBCFA6BC1B8210E800831F99 /* Shapeshift.png */; };
+		FBCFA6C51B82158600831F99 /* FBShimmeringLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6C21B82158600831F99 /* FBShimmeringLayer.m */; };
+		FBCFA6C61B82158600831F99 /* FBShimmeringView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6C41B82158600831F99 /* FBShimmeringView.m */; };
 		FBE49E961B7BB1830020FAA6 /* Dash-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = FBE49E951B7BB1830020FAA6 /* Dash-Light.png */; };
 		FBE49E991B7BB55C0020FAA6 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */; };
 		FBE49E9C1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE49E9B1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m */; };
@@ -188,7 +191,6 @@
 		7511E8EC1AE600220025F1B3 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7525B617192453840041C0F2 /* BRNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRNavigationBar.h; sourceTree = "<group>"; };
 		7525B618192453840041C0F2 /* BRNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRNavigationBar.m; sourceTree = "<group>"; };
-		752E2899192349CE00DB5A3C /* BreadWallet.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = BreadWallet.xcdatamodel; sourceTree = "<group>"; };
 		752E289E19234AE300DB5A3C /* BRAddressEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRAddressEntity.h; sourceTree = "<group>"; };
 		752E289F19234AE300DB5A3C /* BRAddressEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRAddressEntity.m; sourceTree = "<group>"; };
 		752E28A019234AE300DB5A3C /* BRMerkleBlockEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRMerkleBlockEntity.h; sourceTree = "<group>"; };
@@ -289,7 +291,6 @@
 		758DBD0D1980634900389E2A /* BRTxDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = BRTxDetailViewController.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		759816E519357D6F005060EA /* BRBubbleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRBubbleView.h; sourceTree = "<group>"; };
 		759816E619357D6F005060EA /* BRBubbleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRBubbleView.m; sourceTree = "<group>"; };
-		759AB7F71AB8F45900303AAB /* BreadWallet 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "BreadWallet 2.xcdatamodel"; sourceTree = "<group>"; };
 		759F2C221AAAD42D0029A5AB /* libsecp256k1-config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "libsecp256k1-config.h"; sourceTree = SOURCE_ROOT; };
 		759FBB31193290F600AB4465 /* BRReceiveViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRReceiveViewController.h; sourceTree = "<group>"; };
 		759FBB32193290F600AB4465 /* BRRootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRRootViewController.h; sourceTree = "<group>"; };
@@ -382,6 +383,13 @@
 		FBBFEF631ABD796000CA937F /* aes_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes_helper.c; sourceTree = "<group>"; };
 		FBC731631AEE74AF001355A4 /* DCDarksendQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendQueue.h; sourceTree = "<group>"; };
 		FBC731641AEE74AF001355A4 /* DCDarksendQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendQueue.m; sourceTree = "<group>"; };
+		FBCFA6BA1B820C3C00831F99 /* DashWallet.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DashWallet.xcdatamodel; sourceTree = "<group>"; };
+		FBCFA6BC1B8210E800831F99 /* Shapeshift.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Shapeshift.png; sourceTree = "<group>"; };
+		FBCFA6C01B82158600831F99 /* FBShimmering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBShimmering.h; sourceTree = "<group>"; };
+		FBCFA6C11B82158600831F99 /* FBShimmeringLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBShimmeringLayer.h; sourceTree = "<group>"; };
+		FBCFA6C21B82158600831F99 /* FBShimmeringLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBShimmeringLayer.m; sourceTree = "<group>"; };
+		FBCFA6C31B82158600831F99 /* FBShimmeringView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBShimmeringView.h; sourceTree = "<group>"; };
+		FBCFA6C41B82158600831F99 /* FBShimmeringView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBShimmeringView.m; sourceTree = "<group>"; };
 		FBE49E951B7BB1830020FAA6 /* Dash-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Dash-Light.png"; sourceTree = "<group>"; };
 		FBE49E971B7BB55C0020FAA6 /* UIImage+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Color.h"; sourceTree = "<group>"; };
 		FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Color.m"; sourceTree = "<group>"; };
@@ -545,6 +553,7 @@
 		7579F7FE19231D4600CA56F4 /* ThirdParty */ = {
 			isa = PBXGroup;
 			children = (
+				FBCFA6BF1B82158600831F99 /* FBShimmering */,
 				FB00F6801B5AE2AA0061C2FB /* BBStockChartView */,
 				752E28EF19234E8100DB5A3C /* Reachability.h */,
 				752E28F019234E8100DB5A3C /* Reachability.m */,
@@ -678,8 +687,8 @@
 				75D5F3D0191EC270004AB296 /* BRAppDelegate.h */,
 				75D5F3D1191EC270004AB296 /* BRAppDelegate.m */,
 				75D5F3DF191EC270004AB296 /* Images.xcassets */,
+				FBCFA6BA1B820C3C00831F99 /* DashWallet.xcdatamodel */,
 				75D5F3DC191EC270004AB296 /* Main.storyboard */,
-				752E2898192349CE00DB5A3C /* BreadWallet.xcdatamodeld */,
 				752E28F419235B3000DB5A3C /* BIP39EnglishWords.plist */,
 				FBE49E9D1B7C86770020FAA6 /* FixedPeers.plist */,
 				7579F7FE19231D4600CA56F4 /* ThirdParty */,
@@ -695,8 +704,8 @@
 		75D5F3C8191EC270004AB296 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				FBCFA6BE1B8210F000831F99 /* Images */,
 				FBE49E9F1B7C86AF0020FAA6 /* masternodeList.sh */,
-				FBE49E951B7BB1830020FAA6 /* Dash-Light.png */,
 				75D5F3C9191EC270004AB296 /* DashWallet-Info.plist */,
 				75D5F3CA191EC270004AB296 /* InfoPlist.strings */,
 				757E09971ADB8EEB006FD352 /* Localizable.strings */,
@@ -798,6 +807,28 @@
 				FBC731641AEE74AF001355A4 /* DCDarksendQueue.m */,
 			);
 			name = Darksend;
+			sourceTree = "<group>";
+		};
+		FBCFA6BE1B8210F000831F99 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				FBCFA6BC1B8210E800831F99 /* Shapeshift.png */,
+				FBE49E951B7BB1830020FAA6 /* Dash-Light.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
+		FBCFA6BF1B82158600831F99 /* FBShimmering */ = {
+			isa = PBXGroup;
+			children = (
+				FBCFA6C01B82158600831F99 /* FBShimmering.h */,
+				FBCFA6C11B82158600831F99 /* FBShimmeringLayer.h */,
+				FBCFA6C21B82158600831F99 /* FBShimmeringLayer.m */,
+				FBCFA6C31B82158600831F99 /* FBShimmeringView.h */,
+				FBCFA6C41B82158600831F99 /* FBShimmeringView.m */,
+			);
+			name = FBShimmering;
+			path = BBStockChartView/FBShimmering;
 			sourceTree = "<group>";
 		};
 		FBE4D97E1ABD64F3007C3BA6 /* Hash Utils */ = {
@@ -968,6 +999,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FBCFA6BD1B8210E800831F99 /* Shapeshift.png in Resources */,
 				75D5F3E0191EC270004AB296 /* Images.xcassets in Resources */,
 				757E09991ADB8EEB006FD352 /* Localizable.strings in Resources */,
 				752E28F619235B3000DB5A3C /* BIP39EnglishWords.plist in Resources */,
@@ -1014,6 +1046,7 @@
 				752E28CE19234C3600DB5A3C /* BRBIP32Sequence.m in Sources */,
 				752E28CF19234C3600DB5A3C /* BRBIP39Mnemonic.m in Sources */,
 				FBE689D31AC07BCD00467F4C /* NSData+Luffa.m in Sources */,
+				FBCFA6BB1B820C3C00831F99 /* DashWallet.xcdatamodel in Sources */,
 				FBE689DB1AC07BFF00467F4C /* NSData+Simd.m in Sources */,
 				752E28DA19234C3600DB5A3C /* BRWallet.m in Sources */,
 				FB00F6AB1B5AE2AA0061C2FB /* LineSeries.m in Sources */,
@@ -1034,6 +1067,7 @@
 				752E28D519234C3600DB5A3C /* BRPaymentRequest.m in Sources */,
 				7525B619192453840041C0F2 /* BRNavigationBar.m in Sources */,
 				FB00F67E1B5AE1E50061C2FB /* DCTickerViewController.m in Sources */,
+				FBCFA6C51B82158600831F99 /* FBShimmeringLayer.m in Sources */,
 				FBE689D71AC07BE400467F4C /* NSData+Shavite.m in Sources */,
 				FBE689CB1AC07ABF00467F4C /* NSData+Jh.m in Sources */,
 				75878BC1192AEC3F002505AB /* BRReceiveViewController.m in Sources */,
@@ -1058,10 +1092,10 @@
 				752E28EA19234DA200DB5A3C /* NSMutableData+Bitcoin.m in Sources */,
 				752E28EB19234DA200DB5A3C /* NSString+Dash.m in Sources */,
 				757C89521A2FCE420076B373 /* BRSettingsViewController.m in Sources */,
+				FBCFA6C61B82158600831F99 /* FBShimmeringView.m in Sources */,
 				75D5F3D2191EC270004AB296 /* BRAppDelegate.m in Sources */,
 				759FBB36193290F600AB4465 /* BRRootViewController.m in Sources */,
 				FBE689C71AC0785F00467F4C /* NSData+Groestl.m in Sources */,
-				752E289A192349CE00DB5A3C /* BreadWallet.xcdatamodeld in Sources */,
 				759FBB37193290F600AB4465 /* BRSendViewController.m in Sources */,
 				FBE689C31ABF9A1B00467F4C /* NSData+Echo.m in Sources */,
 				752E28F119234E8100DB5A3C /* Reachability.m in Sources */,
@@ -1546,20 +1580,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		752E2898192349CE00DB5A3C /* BreadWallet.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				759AB7F71AB8F45900303AAB /* BreadWallet 2.xcdatamodel */,
-				752E2899192349CE00DB5A3C /* BreadWallet.xcdatamodel */,
-			);
-			currentVersion = 759AB7F71AB8F45900303AAB /* BreadWallet 2.xcdatamodel */;
-			path = BreadWallet.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 75D5F3B6191EC270004AB296 /* Project object */;
 }

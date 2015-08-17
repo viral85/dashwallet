@@ -1141,7 +1141,11 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (int64_t)amountForDashString:(NSString *)string
 {
     if (! string.length) return 0;
-    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.format numberFromString:string] decimalValue]]
+    if ([string characterAtIndex:0] == NSAttachmentCharacter) {
+        string = [NSString stringWithFormat:@"%@%@",DASH,[string substringFromIndex:1]];
+    }
+    string = [[string stringByReplacingOccurrencesOfString:DASH withString:@""] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    return [[[NSDecimalNumber decimalNumberWithString:string]
              decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits] longLongValue];
 }
 
