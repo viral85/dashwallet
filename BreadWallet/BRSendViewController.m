@@ -78,7 +78,8 @@ static NSString *sanitizeString(NSString *s)
 @property (nonatomic, strong) IBOutlet UIButton *scanButton, *clipboardButton;
 @property (nonatomic, strong) IBOutlet UITextView *clipboardText;
 @property (nonatomic, strong) IBOutlet NSLayoutConstraint *clipboardXLeft;
-@property (nonatomic, strong) IBOutlet FBShimmeringView * shapeshiftView;
+@property (nonatomic, strong) IBOutlet UIView * shapeshiftView;
+@property (nonatomic, strong) IBOutlet UILabel * shapeshiftLabel;
 
 @end
 
@@ -117,9 +118,24 @@ static NSString *sanitizeString(NSString *s)
     shimmeringView.contentView = self.shapeshiftView;
     // Start shimmering.
     shimmeringView.shimmering = YES;
-    shimmeringView.shimmeringSpeed = 2400;
-    shimmeringView.shimmeringPauseDuration = 2.8;
+    shimmeringView.shimmeringSpeed = 5;
+    shimmeringView.shimmeringDirection = FBShimmerDirectionUp;
+    shimmeringView.shimmeringPauseDuration = 0.0;
+    shimmeringView.shimmeringHighlightLength = 1.0f;
+    shimmeringView.shimmeringAnimationOpacity = 0.8;
     self.shapeshiftView = shimmeringView;
+    
+    FBShimmeringView *shimmeringInnerLabelView = [[FBShimmeringView alloc] initWithFrame:self.shapeshiftLabel.frame];
+    [self.shapeshiftLabel removeFromSuperview];
+    [shimmeringInnerLabelView addSubview:self.shapeshiftLabel];
+    shimmeringInnerLabelView.contentView = self.shapeshiftLabel;
+    
+    shimmeringInnerLabelView.shimmering = YES;
+    shimmeringInnerLabelView.shimmeringSpeed = 100;
+    shimmeringInnerLabelView.shimmeringPauseDuration = 0.8;
+    shimmeringInnerLabelView.shimmeringAnimationOpacity = 0.2;
+    [self.shapeshiftView addSubview:shimmeringInnerLabelView];
+    self.shapeshiftView.hidden = TRUE;
 }
 
 - (void)viewWillAppear:(BOOL)animated

@@ -31,6 +31,8 @@
 
 #import "NSString+Dash.h"
 
+#import "BRBubbleView.h"
+
 @interface BRAmountViewController ()
 
 @property (nonatomic, strong) IBOutlet UILabel *amountField;
@@ -39,6 +41,9 @@
 @property (nonatomic, strong) IBOutlet UIButton *delButton, *decimalButton;
 @property (nonatomic, strong) IBOutlet UIImageView *wallpaper;
 @property (nonatomic, strong) IBOutlet UIView *logo;
+@property (nonatomic, strong) IBOutlet UIButton *bottomButton;
+
+@property (nonatomic, strong) BRBubbleView * tipView;
 
 @property (nonatomic, assign) uint64_t amount;
 @property (nonatomic, strong) NSCharacterSet *charset;
@@ -192,6 +197,11 @@
 
 - (IBAction)unlock:(id)sender
 {
+    if (self.tipView) {
+        [self.tipView popOut];
+        self.tipView = nil;
+    }
+    
     BRWalletManager *m = [BRWalletManager sharedInstance];
     
     if (sender && ! m.didAuthenticate && ! [m authenticateWithPrompt:nil andTouchId:YES]) return;
@@ -202,6 +212,11 @@
 
 - (IBAction)number:(id)sender
 {
+    if (self.tipView) {
+        [self.tipView popOut];
+        self.tipView = nil;
+    }
+    
     NSUInteger l = [self.amountField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
 
     l = (l < self.amountField.attributedText.length) ? l + 1 : self.amountField.attributedText.length;
@@ -211,6 +226,11 @@
 
 - (IBAction)del:(id)sender
 {
+    if (self.tipView) {
+        [self.tipView popOut];
+        self.tipView = nil;
+    }
+    
     NSUInteger l = [self.amountField.text rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
 
     if (l < self.amountField.text.length) {
@@ -220,6 +240,11 @@
 
 - (IBAction)pay:(id)sender
 {
+    if (self.tipView) {
+        [self.tipView popOut];
+        self.tipView = nil;
+    }
+    
     if (self.usingShapeshift) {
         BRWalletManager *m = [BRWalletManager sharedInstance];
         
@@ -250,6 +275,11 @@
 
 - (IBAction)swapCurrency:(id)sender
 {
+    if (self.tipView) {
+        [self.tipView popOut];
+        self.tipView = nil;
+    }
+    
     self.swapped = ! self.swapped;
 
     if (self.swapLeftLabel.hidden) {
@@ -341,6 +371,11 @@
 
 - (IBAction)pressSwapButton:(id)sender
 {
+    if (self.tipView) {
+        [self.tipView popOut];
+        self.tipView = nil;
+    }
+    
     if (self.swapLeftLabel.hidden) {
         self.swapLeftLabel.text = self.localCurrencyLabel.text;
         self.swapLeftLabel.frame = self.localCurrencyLabel.frame;
@@ -385,6 +420,24 @@
         self.swapLeftLabel.hidden = self.swapRightLabel.hidden = YES;
         self.localCurrencyLabel.hidden = self.amountField.hidden = NO;
     }];
+}
+
+-(IBAction)clickedBottomBar:(id)sender
+{
+    if (self.tipView) {
+        [self.tipView popOut];
+        self.tipView = nil;
+    } else {
+        BRBubbleView * tipView = [BRBubbleView viewWithText:self.to
+                                                   tipPoint:CGPointMake(self.bottomButton.center.x, self.bottomButton.center.y - 10.0)
+                                               tipDirection:BRBubbleTipDirectionDown];
+        tipView.font = [UIFont fontWithName:@"HelveticaNeue" size:15.0];
+        tipView.backgroundColor = [UIColor lightGrayColor];
+        //tipView.customView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        tipView.userInteractionEnabled = YES;
+        [self.view addSubview:[tipView popIn]];
+        self.tipView = tipView;
+    }
 }
 
 #pragma mark - UITextFieldDelegate

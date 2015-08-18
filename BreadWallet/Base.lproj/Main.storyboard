@@ -835,6 +835,15 @@
                                     <action selector="del:" destination="4fz-p1-NND" eventType="touchUpInside" id="9Ve-9y-xFG"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xqX-ti-OTb">
+                                <rect key="frame" x="0.0" y="524" width="320" height="44"/>
+                                <state key="normal">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="clickedBottomBar:" destination="4fz-p1-NND" eventType="touchUpInside" id="3Vp-im-G6e"/>
+                                </connections>
+                            </button>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9gG-xZ-TIV">
                                 <rect key="frame" x="20" y="522" width="280" height="1"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.25" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -954,6 +963,7 @@
                     <connections>
                         <outlet property="addressLabel" destination="ZXO-dD-jiQ" id="R5j-Jz-MxG"/>
                         <outlet property="amountField" destination="I85-he-Ujc" id="j1Q-FA-InN"/>
+                        <outlet property="bottomButton" destination="xqX-ti-OTb" id="5cN-pE-ENa"/>
                         <outlet property="decimalButton" destination="Ktu-9p-xOl" id="qyG-qy-iXG"/>
                         <outlet property="localCurrencyLabel" destination="ZH0-Ng-7xb" id="wMB-Kc-0v7"/>
                         <outlet property="lock" destination="f4B-BU-eu2" id="SwM-ce-Zcs"/>
@@ -1304,6 +1314,7 @@
                         <outlet property="clipboardXLeft" destination="tzu-xe-VUc" id="GHU-QA-qzJ"/>
                         <outlet property="scanButton" destination="ce6-Wi-wk4" id="tr9-fj-NRa"/>
                         <outlet property="sendLabel" destination="l5l-JR-LKA" id="uWh-qp-akV"/>
+                        <outlet property="shapeshiftLabel" destination="G1u-T3-eeg" id="Io3-Sf-3e0"/>
                         <outlet property="shapeshiftView" destination="WsX-Qx-WeT" id="fYA-4c-jix"/>
                     </connections>
                 </viewController>
