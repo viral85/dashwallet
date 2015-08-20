@@ -298,13 +298,13 @@ static NSString *sanitizeString(NSString *s)
     if (! isSecure || prompt.length == 0) prompt = [prompt stringByAppendingString:address];
     if (memo.length > 0) prompt = [prompt stringByAppendingFormat:@"\n\n%@", sanitizeString(memo)];
     prompt = [prompt stringByAppendingFormat:NSLocalizedString(@"\n\n     amount %@ (%@)", nil),
-              [m dashStringForAmount:amount - fee], [m localCurrencyStringForAmount:amount - fee]];
+              [m dashStringForAmount:amount - fee], [m localCurrencyStringForDashAmount:amount - fee]];
     
     if (fee > 0) {
         prompt = [prompt stringByAppendingFormat:NSLocalizedString(@"\nnetwork fee +%@ (%@)", nil),
-                  [m dashStringForAmount:fee], [m localCurrencyStringForAmount:fee]];
+                  [m dashStringForAmount:fee], [m localCurrencyStringForDashAmount:fee]];
         prompt = [prompt stringByAppendingFormat:NSLocalizedString(@"\n         total %@ (%@)", nil),
-                  [m dashStringForAmount:amount], [m localCurrencyStringForAmount:amount]];
+                  [m dashStringForAmount:amount], [m localCurrencyStringForDashAmount:amount]];
     }
     
     return prompt;
@@ -427,7 +427,7 @@ static NSString *sanitizeString(NSString *s)
             else c.to = address;
             
             c.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:m.wallet.balance],
-                                      [m localCurrencyStringForAmount:m.wallet.balance]];
+                                      [m localCurrencyStringForDashAmount:m.wallet.balance]];
             [self.navigationController pushViewController:c animated:YES];
             return;
         }
@@ -516,7 +516,7 @@ static NSString *sanitizeString(NSString *s)
             else c.to = address;
             
             c.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:m.wallet.balance],
-                                      [m localCurrencyStringForAmount:m.wallet.balance]];
+                                      [m localCurrencyStringForDashAmount:m.wallet.balance]];
             [self.navigationController pushViewController:c animated:YES];
             return;
         }
@@ -549,7 +549,7 @@ static NSString *sanitizeString(NSString *s)
         if (m.didAuthenticate || [m seedWithPrompt:prompt forAmount:amount]) {
             // if user selected an amount equal to or below wallet balance, but the fee will bring the total above the
             // balance, offer to reduce the amount to available funds minus fee
-            if ((self.amount <= [m amountForLocalCurrencyString:[m localCurrencyStringForAmount:m.wallet.balance]] ||
+            if ((self.amount <= [m amountForLocalCurrencyString:[m localCurrencyStringForDashAmount:m.wallet.balance]] ||
                  self.amount <= m.wallet.balance) && self.amount > 0) {
                 NSUInteger txSize = [m.wallet transactionForAmounts:@[@(m.wallet.balance)]
                                                     toOutputScripts:@[self.request.details.outputScripts.firstObject] withFee:NO].size,
@@ -566,10 +566,10 @@ static NSString *sanitizeString(NSString *s)
                   initWithTitle:NSLocalizedString(@"insufficient funds for dash network fee", nil)
                   message:[NSString stringWithFormat:NSLocalizedString(@"reduce payment amount by\n%@ (%@)?", nil),
                            [m dashStringForAmount:self.amount - amount],
-                           [m localCurrencyStringForAmount:self.amount - amount]] delegate:self
+                           [m localCurrencyStringForDashAmount:self.amount - amount]] delegate:self
                   cancelButtonTitle:NSLocalizedString(@"cancel", nil)
                   otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:amount - self.amount],
-                                     [m localCurrencyStringForAmount:amount - self.amount]], nil] show];
+                                     [m localCurrencyStringForDashAmount:amount - self.amount]], nil] show];
                 self.amount = amount;
             }
             else {
@@ -700,10 +700,10 @@ static NSString *sanitizeString(NSString *s)
             [[[UIAlertView alloc] initWithTitle:@"" message:[NSString
                                                              stringWithFormat:NSLocalizedString(@"Send %@ (%@) from this private key into your wallet? "
                                                                                                 "The dash network will receive a fee of %@ (%@).", nil),
-                                                             [m dashStringForAmount:amount], [m localCurrencyStringForAmount:amount], [m dashStringForAmount:fee],
-                                                             [m localCurrencyStringForAmount:fee]] delegate:self cancelButtonTitle:NSLocalizedString(@"cancel", nil)
+                                                             [m dashStringForAmount:amount], [m localCurrencyStringForDashAmount:amount], [m dashStringForAmount:fee],
+                                                             [m localCurrencyStringForDashAmount:fee]] delegate:self cancelButtonTitle:NSLocalizedString(@"cancel", nil)
                               otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:amount],
-                                                 [m localCurrencyStringForAmount:amount]], nil] show];
+                                                 [m localCurrencyStringForDashAmount:amount]], nil] show];
         }
         else [self cancel:nil];
     }];
@@ -737,7 +737,7 @@ static NSString *sanitizeString(NSString *s)
             
             [[[UIAlertView alloc] initWithTitle:@""
                                         message:[NSString stringWithFormat:NSLocalizedString(@"%@\n\nbalance: %@ (%@)", nil), address,
-                                                 [m dashStringForAmount:balance], [m localCurrencyStringForAmount:balance]] delegate:nil
+                                                 [m dashStringForAmount:balance], [m localCurrencyStringForDashAmount:balance]] delegate:nil
                               cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
         }
     }];

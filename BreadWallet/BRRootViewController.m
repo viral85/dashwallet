@@ -506,7 +506,7 @@
     if (balance > _balance && [[UIApplication sharedApplication] applicationState] != UIApplicationStateBackground) {
         [self.view addSubview:[[[BRBubbleView viewWithText:[NSString
          stringWithFormat:NSLocalizedString(@"received %@ (%@)", nil), [m dashStringForAmount:balance - _balance],
-                          [m localCurrencyStringForAmount:balance - _balance]]
+                          [m localCurrencyStringForDashAmount:balance - _balance]]
          center:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)] popIn]
          popOutAfterDelay:3.0]];
     }
@@ -743,7 +743,7 @@
     }
 
     UINavigationBar *b = self.navigationController.navigationBar;
-    NSString *tip = (self.percent.hidden) ? [NSString stringWithFormat:@"%@ \n 1%@ = %@%@ (%@)",BALANCE_TIP_START,DASH,@(m.bitcoinDashPrice),BTC,[m localCurrencyStringForAmount:DUFFS]] :
+    NSString *tip = (self.percent.hidden) ? [NSString stringWithFormat:@"%@ \n 1%@ = %@%@ (%@)",BALANCE_TIP_START,DASH,@(m.bitcoinDashPrice),BTC,[m localCurrencyStringForDashAmount:DUFFS]] :
                     [NSString stringWithFormat:NSLocalizedString(@"block #%d of %d", nil),
                      [[BRPeerManager sharedInstance] lastBlockHeight],
                      [[BRPeerManager sharedInstance] estimatedBlockHeight]];
@@ -765,7 +765,7 @@
     [titleLabel setBackgroundColor:[UIColor clearColor]];
     NSMutableAttributedString * attributedDashString = [[m attributedDashStringForAmount:_balance] mutableCopy];
     NSString * titleString = [NSString stringWithFormat:@" (%@)",
-                              [m localCurrencyStringForAmount:_balance]];
+                              [m localCurrencyStringForDashAmount:_balance]];
     [attributedDashString appendAttributedString:[[NSAttributedString alloc] initWithString:titleString]];
     titleLabel.attributedText = attributedDashString;
     self.navigationItem.titleView = titleLabel;

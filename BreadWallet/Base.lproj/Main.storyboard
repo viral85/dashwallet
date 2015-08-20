@@ -576,7 +576,13 @@
                             <imageView hidden="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="wallpaper-default" translatesAutoresizingMaskIntoConstraints="NO" id="ihm-bL-FFP">
                                 <rect key="frame" x="-59" y="0.0" width="480" height="568"/>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" alpha="0.67000000000000004" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="($0.00)" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZH0-Ng-7xb">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="550" verticalCompressionResistancePriority="550" text="($0.00)" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999999999999996" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hgw-jz-aMp">
+                                <rect key="frame" x="20" y="89" width="51" height="21"/>
+                                <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
+                                <color key="textColor" white="0.75081018518518516" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" alpha="0.67000000000000004" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="500" verticalCompressionResistancePriority="500" text="($0.00)" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999999999999996" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZH0-Ng-7xb">
                                 <rect key="frame" x="157" y="89" width="52" height="20"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <color key="textColor" white="0.75" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -875,10 +881,12 @@
                             <constraint firstItem="NyY-8N-uhK" firstAttribute="width" secondItem="LgR-qo-dYy" secondAttribute="width" id="5OR-8Q-Meb"/>
                             <constraint firstItem="Zbe-Kx-XvG" firstAttribute="centerY" secondItem="ZH0-Ng-7xb" secondAttribute="baseline" id="8Od-aB-qSh"/>
                             <constraint firstItem="MOQ-nc-fFL" firstAttribute="top" secondItem="NyY-8N-uhK" secondAttribute="bottom" constant="8" id="8S1-HS-oZ9"/>
+                            <constraint firstItem="hgw-jz-aMp" firstAttribute="leading" secondItem="YoG-MG-mOk" secondAttribute="leadingMargin" constant="4" id="8WB-Ek-RqN"/>
                             <constraint firstItem="Mvz-cZ-Yby" firstAttribute="top" secondItem="MOQ-nc-fFL" secondAttribute="bottom" constant="8" id="AYI-b1-qOf"/>
                             <constraint firstItem="ZXO-dD-jiQ" firstAttribute="leading" secondItem="YoG-MG-mOk" secondAttribute="leading" constant="20" id="BDN-kQ-gEZ"/>
                             <constraint firstItem="ijm-XE-G03" firstAttribute="top" secondItem="Ktu-9p-xOl" secondAttribute="bottom" constant="58" id="BJ5-8X-wBF"/>
                             <constraint firstItem="E2i-Cd-bly" firstAttribute="width" secondItem="Lbu-bB-iV8" secondAttribute="width" id="BRH-9p-Pby"/>
+                            <constraint firstItem="ZH0-Ng-7xb" firstAttribute="baseline" secondItem="hgw-jz-aMp" secondAttribute="baseline" id="DD1-Ob-bmx"/>
                             <constraint firstItem="p8P-3o-INx" firstAttribute="leading" secondItem="YoG-MG-mOk" secondAttribute="leading" constant="20" id="Det-QX-D0F"/>
                             <constraint firstItem="dBP-3X-1o6" firstAttribute="leading" secondItem="MOQ-nc-fFL" secondAttribute="trailing" constant="8" id="E5Q-Na-Xf1"/>
                             <constraint firstItem="I85-he-Ujc" firstAttribute="centerY" secondItem="Lbu-bB-iV8" secondAttribute="centerY" constant="-85.5" id="Eoj-Cc-Wxh"/>
@@ -887,6 +895,7 @@
                             <constraint firstItem="Ktu-9p-xOl" firstAttribute="top" secondItem="p8P-3o-INx" secondAttribute="bottom" constant="8" id="KMY-l6-hGB"/>
                             <constraint firstAttribute="trailing" secondItem="9gG-xZ-TIV" secondAttribute="trailing" constant="20" id="Khh-an-Wiq"/>
                             <constraint firstItem="MOQ-nc-fFL" firstAttribute="height" secondItem="NyY-8N-uhK" secondAttribute="height" id="OYE-7C-hSn"/>
+                            <constraint firstItem="ZH0-Ng-7xb" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="hgw-jz-aMp" secondAttribute="trailing" constant="5" id="PI3-T1-iYh"/>
                             <constraint firstAttribute="centerY" secondItem="I85-he-Ujc" secondAttribute="centerY" constant="188" id="QjU-tq-MeJ"/>
                             <constraint firstItem="Mvz-cZ-Yby" firstAttribute="bottom" secondItem="Ktu-9p-xOl" secondAttribute="bottom" id="Qu3-ow-vSz"/>
                             <constraint firstItem="0kA-9K-S7C" firstAttribute="height" secondItem="LgR-qo-dYy" secondAttribute="height" id="Rdp-8s-3SM"/>
@@ -968,6 +977,7 @@
                         <outlet property="localCurrencyLabel" destination="ZH0-Ng-7xb" id="wMB-Kc-0v7"/>
                         <outlet property="lock" destination="f4B-BU-eu2" id="SwM-ce-Zcs"/>
                         <outlet property="logo" destination="kcu-Y5-KKx" id="A38-Nr-VHh"/>
+                        <outlet property="shapeshiftLocalCurrencyLabel" destination="hgw-jz-aMp" id="9tb-N3-AS2"/>
                         <outlet property="wallpaper" destination="ihm-bL-FFP" id="NCc-Ta-T3E"/>
                     </connections>
                 </viewController>

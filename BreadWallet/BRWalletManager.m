@@ -898,7 +898,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                    [defs synchronize];
                                    [self refreshBitcoinDashPrice];
                                }
-                               NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:DUFFS],
+                               NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
                                      [self dashStringForAmount:DUFFS]);
                            }
      ];
@@ -922,7 +922,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                [defs setObject:[NSDate date] forKey:BITFINEX_DASH_BTC_UPDATE_TIME_KEY];
                                [defs synchronize];
                                [self refreshBitcoinDashPrice];
-                               NSLog(@"bitfinex exchange rate updated to %@/%@", [self localCurrencyStringForAmount:DUFFS],
+                               NSLog(@"bitfinex exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
                                      [self dashStringForAmount:DUFFS]);
                            }
     ];
@@ -987,7 +987,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         [defs setObject:self.currencyNames forKey:CURRENCY_NAMES_KEY];
         [defs setObject:self.currencyPrices forKey:CURRENCY_PRICES_KEY];
         [defs synchronize];
-        NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:DUFFS],
+        NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
               [self dashStringForAmount:DUFFS]);
     }];
 }
@@ -1260,7 +1260,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 }
 
 
-- (NSString *)localCurrencyStringForAmount:(int64_t)amount
+- (NSString *)localCurrencyStringForDashAmount:(int64_t)amount
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
 
@@ -1273,6 +1273,26 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
                           decimalNumberByDividingBy:(id)[NSDecimalNumber numberWithLongLong:DUFFS]],
                      *min = [[NSDecimalNumber one]
                              decimalNumberByMultiplyingByPowerOf10:-self.localFormat.maximumFractionDigits];
+    
+    // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
+    if ([n compare:min] == NSOrderedAscending) n = min;
+    if (amount < 0) n = [n decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithInt:-1]];
+    return [self.localFormat stringFromNumber:n];
+}
+
+- (NSString *)localCurrencyStringForBitcoinAmount:(int64_t)amount
+{
+    if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
+    
+    
+    NSNumber * local = [NSNumber numberWithDouble:self.localCurrencyBitcoinPrice];
+    
+    
+    NSDecimalNumber *n = [[[NSDecimalNumber decimalNumberWithDecimal:local.decimalValue]
+                           decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:llabs(amount)]]
+                          decimalNumberByDividingBy:(id)[NSDecimalNumber numberWithLongLong:DUFFS]],
+    *min = [[NSDecimalNumber one]
+            decimalNumberByMultiplyingByPowerOf10:-self.localFormat.maximumFractionDigits];
     
     // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
     if ([n compare:min] == NSOrderedAscending) n = min;

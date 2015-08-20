@@ -132,11 +132,11 @@
         self.selectorOptions =
             @[NSLocalizedString(@"always require passcode", nil),
               [NSString stringWithFormat:@"%@      (%@)", [m dashStringForAmount:DUFFS/10],
-               [m localCurrencyStringForAmount:DUFFS/10]],
+               [m localCurrencyStringForDashAmount:DUFFS/10]],
               [NSString stringWithFormat:@"%@   (%@)", [m dashStringForAmount:DUFFS],
-               [m localCurrencyStringForAmount:DUFFS]],
+               [m localCurrencyStringForDashAmount:DUFFS]],
               [NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:DUFFS*10],
-               [m localCurrencyStringForAmount:DUFFS*10]]];
+               [m localCurrencyStringForDashAmount:DUFFS*10]]];
         if (m.spendingLimit > DUFFS*10) m.spendingLimit = DUFFS*10;
         self.selectedOption = self.selectorOptions[(log10(m.spendingLimit) < 6) ? 0 :
                                                    (NSUInteger)log10(m.spendingLimit) - 6];

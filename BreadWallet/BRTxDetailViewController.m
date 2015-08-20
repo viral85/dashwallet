@@ -227,12 +227,12 @@
                     if (self.sent > 0 && self.sent == self.received) {
                         textLabel.attributedText = [m attributedDashStringForAmount:self.sent];
                         localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
-                                                   [m localCurrencyStringForAmount:self.sent]];
+                                                   [m localCurrencyStringForDashAmount:self.sent]];
                     }
                     else {
                         textLabel.attributedText = [m attributedDashStringForAmount:self.received - self.sent];
                         localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
-                                                   [m localCurrencyStringForAmount:self.received - self.sent]];
+                                                   [m localCurrencyStringForDashAmount:self.received - self.sent]];
                     }
                     
                     break;
@@ -264,7 +264,7 @@
                 
                 localCurrencyLabel.textColor = amountLabel.textColor;
                 localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
-                                           [m localCurrencyStringForAmount:[self.outputAmount[indexPath.row]
+                                           [m localCurrencyStringForDashAmount:[self.outputAmount[indexPath.row]
                                                                             longLongValue]]];
             }
             else if (self.transaction.inputAddresses[indexPath.row] != (id)[NSNull null]) {

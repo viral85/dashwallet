@@ -171,7 +171,7 @@ static NSString *dateFormat(NSString *template)
     [titleLabel setBackgroundColor:[UIColor clearColor]];
     NSMutableAttributedString * attributedDashString = [[m attributedDashStringForAmount:m.wallet.balance] mutableCopy];
     NSString * titleString = [NSString stringWithFormat:@" (%@)",
-                              [m localCurrencyStringForAmount:m.wallet.balance]];
+                              [m localCurrencyStringForDashAmount:m.wallet.balance]];
     [attributedDashString appendAttributedString:[[NSAttributedString alloc] initWithString:titleString]];
     titleLabel.attributedText = attributedDashString;
     self.navigationItem.titleView = titleLabel;
@@ -427,7 +427,7 @@ static NSString *dateFormat(NSString *template)
                 detailTextLabel.text = [self dateForTx:tx];
                 balanceLabel.attributedText = (m.didAuthenticate) ? [m attributedDashStringForAmount:balance withTintColor:balanceLabel.textColor dashSymbolSize:CGSizeMake(9, 9)] : nil;
                 localBalanceLabel.text = (m.didAuthenticate) ?
-                    [NSString stringWithFormat:@"(%@)", [m localCurrencyStringForAmount:balance]] : nil;
+                    [NSString stringWithFormat:@"(%@)", [m localCurrencyStringForDashAmount:balance]] : nil;
 
                 if (confirms == 0 && ! [m.wallet transactionIsValid:tx]) {
                     unconfirmedLabel.text = NSLocalizedString(@"INVALID", nil);
@@ -455,21 +455,21 @@ static NSString *dateFormat(NSString *template)
                 if (sent > 0 && received == sent) {
                     textLabel.attributedText = [m attributedDashStringForAmount:sent];
                     localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
-                                               [m localCurrencyStringForAmount:sent]];
+                                               [m localCurrencyStringForDashAmount:sent]];
                     sentLabel.text = NSLocalizedString(@"moved", nil);
                     sentLabel.textColor = [UIColor blackColor];
                 }
                 else if (sent > 0) {
                     textLabel.attributedText = [m attributedDashStringForAmount:received - sent];
                     localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
-                                               [m localCurrencyStringForAmount:received - sent]];
+                                               [m localCurrencyStringForDashAmount:received - sent]];
                     sentLabel.text = NSLocalizedString(@"sent", nil);
                     sentLabel.textColor = [UIColor colorWithRed:1.0 green:0.33 blue:0.33 alpha:1.0];
                 }
                 else {
                     textLabel.attributedText = [m attributedDashStringForAmount:received];
                     localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
-                                               [m localCurrencyStringForAmount:received]];
+                                               [m localCurrencyStringForDashAmount:received]];
                     sentLabel.text = NSLocalizedString(@"received", nil);
                     sentLabel.textColor = [UIColor colorWithRed:0.0 green:0.75 blue:0.0 alpha:1.0];
                 }

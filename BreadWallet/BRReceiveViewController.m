@@ -96,7 +96,7 @@
     
     if (req.amount > 0) {
         NSMutableAttributedString * attributedString = [[m attributedDashStringForAmount:req.amount] mutableCopy];
-        [attributedString appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)",[m localCurrencyStringForAmount:req.amount]]]];
+        [attributedString appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)",[m localCurrencyStringForDashAmount:req.amount]]]];
         self.label.attributedText = attributedString;
     }
 }
