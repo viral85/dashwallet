@@ -10,6 +10,9 @@
 
 @interface DCShapeshiftManager : NSObject
 
+#define CURRENT_SHIFT_DEPOSIT_ADDRESS @"currentShiftDepositAddress"
+#define CURRENT_SHIFT_WITHDRAWAL_ADDRESS @"currentShiftWithdrawalAddress"
+
 @property (nonatomic,strong) NSDate * lastMarketInfoCheck;
 @property (nonatomic,assign) double rate;
 @property (nonatomic,assign) unsigned long long limit;

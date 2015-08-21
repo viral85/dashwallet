@@ -60,7 +60,7 @@
 @property (nonatomic, readonly) BOOL isSigned; // checks if all signatures exist, but does not verify them
 @property (nonatomic, readonly, getter = toData) NSData *data;
 
-@property (nonatomic, strong) NSNumber * isShapeshift;
+@property (nonatomic, strong) NSString * shapeshiftOutputAddress;
 
 + (instancetype)transactionWithMessage:(NSData *)message;
 

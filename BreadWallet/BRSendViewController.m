@@ -339,14 +339,14 @@ static NSString *sanitizeString(NSString *s)
             else [self confirmProtocolRequest:req];
         }];
     }
-    else [self confirmProtocolRequest:request.protocolRequest currency:request.type isShapeshift:FALSE];
+    else [self confirmProtocolRequest:request.protocolRequest currency:request.type shapeshiftAddress:nil];
 }
 
 - (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq {
-    [self confirmProtocolRequest:protoReq currency:@"dash" isShapeshift:FALSE];
+    [self confirmProtocolRequest:protoReq currency:@"dash" shapeshiftAddress:nil];
 }
 
-- (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq currency:(NSString*)currency isShapeshift:(BOOL)isShapeshift
+- (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq currency:(NSString*)currency shapeshiftAddress:(NSString*)shapeshiftAddress
 {
     NSString *address;
     if ([currency isEqualToString:@"bitcoin"]) {
@@ -454,15 +454,15 @@ static NSString *sanitizeString(NSString *s)
         if (self.amount == 0) {
             tx = [m.wallet transactionForAmounts:protoReq.details.outputAmounts
                                  toOutputScripts:protoReq.details.outputScripts withFee:YES];
-            if (isShapeshift) {
-                tx.isShapeshift = @TRUE;
+            if (shapeshiftAddress) {
+                tx.shapeshiftOutputAddress = shapeshiftAddress;
             }
         }
         else {
             tx = [m.wallet transactionForAmounts:@[@(self.amount)]
                                  toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES];
-            if (isShapeshift) {
-                tx.isShapeshift = @TRUE;
+            if (shapeshiftAddress) {
+                tx.shapeshiftOutputAddress = shapeshiftAddress;
             }
         }
         
@@ -1033,21 +1033,34 @@ static NSString *sanitizeString(NSString *s)
         NSString * address = [NSString bitcoinAddressWithScriptPubKey:self.request.details.outputScripts.firstObject];
         NSString * returnAddress = m.wallet.receiveAddress;
         self.amount = amount;
-        [[DCShapeshiftManager sharedInstance] POST_ShiftWithAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
-            [hud hide:TRUE];
-            if (error) {
-                NSLog(@"shapeshiftDashAmount Error %@",error);
-                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Shapeshift failed", nil)
-                                            message:error.localizedDescription
-                                           delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
-                                  otherButtonTitles:nil] show];
-                return;
-            }
-            NSString * depositAddress = shiftInfo[@"deposit"];
-            NSString * withdrawalAddress = shiftInfo[@"withdrawal"];
-            BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=Shapeshift",depositAddress,self.amount,sanitizeString(self.request.commonName)]];
-            [self confirmProtocolRequest:request.protocolRequest currency:@"dash" isShapeshift:TRUE];
-        }];
+        NSUserDefaults * userDefaults = [NSUserDefaults standardUserDefaults];
+        if ([[userDefaults stringForKey:CURRENT_SHIFT_WITHDRAWAL_ADDRESS] isEqualToString:address]) {
+            NSString * depositAddress = [userDefaults stringForKey:CURRENT_SHIFT_DEPOSIT_ADDRESS];
+            BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=Shapeshift to %@",depositAddress,self.amount,sanitizeString(self.request.commonName),address]];
+            [self confirmProtocolRequest:request.protocolRequest currency:@"dash" shapeshiftAddress:address];
+        } else {
+            [[DCShapeshiftManager sharedInstance] POST_ShiftWithAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
+                [hud hide:TRUE];
+                if (error) {
+                    NSLog(@"shapeshiftDashAmount Error %@",error);
+                    [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Shapeshift failed", nil)
+                                                message:error.localizedDescription
+                                               delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                                      otherButtonTitles:nil] show];
+                    return;
+                }
+                NSString * depositAddress = shiftInfo[@"deposit"];
+                NSString * withdrawalAddress = shiftInfo[@"withdrawal"];
+                if (withdrawalAddress) {
+                    NSUserDefaults * userDefaults = [NSUserDefaults standardUserDefaults];
+                    [userDefaults setObject:depositAddress forKey:CURRENT_SHIFT_DEPOSIT_ADDRESS];
+                    [userDefaults setObject:withdrawalAddress forKey:CURRENT_SHIFT_WITHDRAWAL_ADDRESS];
+                    [userDefaults synchronize];
+                    BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=Shapeshift to %@",depositAddress,self.amount,sanitizeString(self.request.commonName),withdrawalAddress]];
+                    [self confirmProtocolRequest:request.protocolRequest currency:@"dash" shapeshiftAddress:withdrawalAddress];
+                }
+            }];
+        }
     } failureBlock:^{
         [hud hide:TRUE];
     }];
