@@ -179,6 +179,65 @@
 
 ////////////////////////////////////////////////////////////////////
 /*
+url: shapeshift.io/cancelpending
+method: POST
+data type: JSON
+data required: address  = The deposit address associated with the pending transaction
+
+Example data : {address : "1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v"}
+
+Success Output:
+
+{  success  : " Pending Transaction cancelled "  }
+
+Error Output:
+
+{  error  : {errorMessage}  }
+ */
+////////////////////////////////////////////////////////////////////
+
+-(void)POST_CancelShiftToAddress:(NSString*)withdrawalAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock {
+    NSDictionary *params = @{@"address": withdrawalAddress};
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/shift"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[self httpBodyForParamsDictionary:params]];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+                                   NSError * returnError = connectionError;
+                                   if (!returnError) {
+                                       returnError = [NSError errorWithDomain:@"DashWallet" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
+                                   }
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,returnError);
+                                   });
+                                   return;
+                               }
+                               NSError *error = nil;
+                               NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                               if (error) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,error);
+                                   });
+                                   return;
+                               }
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                   if ([dictionary objectForKey:@"error"]) {
+                                       completionBlock(nil,[NSError errorWithDomain:@"DashWallet" code:500 userInfo:@{NSLocalizedDescriptionKey:[dictionary objectForKey:@"error"]
+                                                                                                                      }]);
+                                   } else {
+                                       completionBlock(dictionary,nil);
+                                   }
+                               });
+                               
+                           }];
+}
+
+////////////////////////////////////////////////////////////////////
+/*
  url: shapeshift.io/sendamount
  method: POST
  data type: JSON

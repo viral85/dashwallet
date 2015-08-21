@@ -270,7 +270,7 @@
         BRWalletManager *m = [BRWalletManager sharedInstance];
 
         self.amount = (self.swapped) ? [m amountForLocalCurrencyString:self.amountField.text] :
-                      [m amountForDashString:[NSString stringWithFormat:@"%@ %@",DASH,self.amountField.text]];
+                      [m amountForDashString:self.amountField.text];
 
         if (self.amount == 0) return;
         

@@ -339,14 +339,14 @@ static NSString *sanitizeString(NSString *s)
             else [self confirmProtocolRequest:req];
         }];
     }
-    else [self confirmProtocolRequest:request.protocolRequest currency:request.type];
+    else [self confirmProtocolRequest:request.protocolRequest currency:request.type isShapeshift:FALSE];
 }
 
 - (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq {
-    [self confirmProtocolRequest:protoReq currency:@"dash"];
+    [self confirmProtocolRequest:protoReq currency:@"dash" isShapeshift:FALSE];
 }
 
-- (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq currency:(NSString*)currency
+- (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq currency:(NSString*)currency isShapeshift:(BOOL)isShapeshift
 {
     NSString *address;
     if ([currency isEqualToString:@"bitcoin"]) {
@@ -454,10 +454,16 @@ static NSString *sanitizeString(NSString *s)
         if (self.amount == 0) {
             tx = [m.wallet transactionForAmounts:protoReq.details.outputAmounts
                                  toOutputScripts:protoReq.details.outputScripts withFee:YES];
+            if (isShapeshift) {
+                tx.isShapeshift = @TRUE;
+            }
         }
         else {
             tx = [m.wallet transactionForAmounts:@[@(self.amount)]
                                  toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES];
+            if (isShapeshift) {
+                tx.isShapeshift = @TRUE;
+            }
         }
         
         if (tx) {
@@ -957,15 +963,15 @@ static NSString *sanitizeString(NSString *s)
     [[DCShapeshiftManager sharedInstance] GET_marketInfo:^(NSDictionary *marketInfo, NSError *error) {
         if (error) {
             failureBlock();
-            [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
-                                        message:error.localizedFailureReason
+            [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Shapeshift failed", nil)
+                                        message:error.localizedDescription
                                        delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
                               otherButtonTitles:nil] show];
         } else {
             BRWalletManager *m = [BRWalletManager sharedInstance];
             if ([DCShapeshiftManager sharedInstance].min > (amount * .97)) {
                 failureBlock();
-                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
+                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Shapeshift failed", nil)
                                             message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too low, "
                                                                                                  @"please input a value over %@", nil),[m dashStringForAmount:[DCShapeshiftManager sharedInstance].min / .97]]
                                            delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
@@ -973,7 +979,7 @@ static NSString *sanitizeString(NSString *s)
                 return;
             } else if ([DCShapeshiftManager sharedInstance].limit < (amount * 1.03)) {
                 failureBlock();
-                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
+                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Shapeshift failed", nil)
                                             message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too high, "
                                                                                                  @"please input a value under %@", nil),[m dashStringForAmount:[DCShapeshiftManager sharedInstance].limit / 1.03]]
                                            delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
@@ -988,7 +994,7 @@ static NSString *sanitizeString(NSString *s)
 
 - (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftBitcoinAmount:(uint64_t)amount approximateDashAmount:(uint64_t)dashAmount
 {
-    MBProgressHUD *hud  = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    MBProgressHUD *hud  = [MBProgressHUD showHUDAddedTo:self.navigationController.topViewController.view animated:YES];
     hud.labelText       = NSLocalizedString(@"Starting Shapeshift!", nil);
     
     [self verifyShapeshiftAmountIsInBounds:dashAmount completionBlock:^{
@@ -1019,7 +1025,7 @@ static NSString *sanitizeString(NSString *s)
 
 - (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftDashAmount:(uint64_t)amount
 {
-    MBProgressHUD *hud  = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    MBProgressHUD *hud  = [MBProgressHUD showHUDAddedTo:self.navigationController.topViewController.view animated:YES];
     hud.labelText       = NSLocalizedString(@"Starting Shapeshift!", nil);
     [self verifyShapeshiftAmountIsInBounds:amount completionBlock:^{
         //we don't know the exact amount of bitcoins we want to send, we are just sending dash
@@ -1029,12 +1035,18 @@ static NSString *sanitizeString(NSString *s)
         self.amount = amount;
         [[DCShapeshiftManager sharedInstance] POST_ShiftWithAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
             [hud hide:TRUE];
-            if (error)
+            if (error) {
                 NSLog(@"shapeshiftDashAmount Error %@",error);
+                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Shapeshift failed", nil)
+                                            message:error.localizedDescription
+                                           delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                                  otherButtonTitles:nil] show];
+                return;
+            }
             NSString * depositAddress = shiftInfo[@"deposit"];
             NSString * withdrawalAddress = shiftInfo[@"withdrawal"];
-            BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=shapeshift",depositAddress,self.amount,sanitizeString(self.request.commonName)]];
-            [self confirmProtocolRequest:request.protocolRequest];
+            BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=Shapeshift",depositAddress,self.amount,sanitizeString(self.request.commonName)]];
+            [self confirmProtocolRequest:request.protocolRequest currency:@"dash" isShapeshift:TRUE];
         }];
     } failureBlock:^{
         [hud hide:TRUE];
