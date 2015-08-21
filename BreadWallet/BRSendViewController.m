@@ -39,6 +39,7 @@
 #import "DCShapeshiftManager.h"
 
 #import "FBShimmeringView.h"
+#import "MBProgressHUD.h"
 
 #import "NSString+Dash.h"
 #import "NSString+Bitcoin.h"
@@ -952,31 +953,44 @@ static NSString *sanitizeString(NSString *s)
     [self confirmProtocolRequest:self.request];
 }
 
--(void)verifyShapeshiftAmountIsInBounds:(uint64_t)amount completionBlock:(void (^)())completionBlock {
+-(void)verifyShapeshiftAmountIsInBounds:(uint64_t)amount completionBlock:(void (^)())completionBlock failureBlock:(void (^)())failureBlock {
     [[DCShapeshiftManager sharedInstance] GET_marketInfo:^(NSDictionary *marketInfo, NSError *error) {
-        BRWalletManager *m = [BRWalletManager sharedInstance];
-        if ([DCShapeshiftManager sharedInstance].min > (amount * .97)) {
+        if (error) {
+            failureBlock();
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
-                                        message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too low, "
-                                                                                             @"please input a value over %@", nil),[m dashStringForAmount:[DCShapeshiftManager sharedInstance].min / .97]]
+                                        message:error.localizedFailureReason
                                        delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
                               otherButtonTitles:nil] show];
-            return;
-        } else if ([DCShapeshiftManager sharedInstance].limit < (amount * 1.03)) {
-            [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
-                                        message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too high, "
-                                                                                             @"please input a value under %@", nil),[m dashStringForAmount:[DCShapeshiftManager sharedInstance].limit / 1.03]]
-                                       delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
-                              otherButtonTitles:nil] show];
-            return;
+        } else {
+            BRWalletManager *m = [BRWalletManager sharedInstance];
+            if ([DCShapeshiftManager sharedInstance].min > (amount * .97)) {
+                failureBlock();
+                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
+                                            message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too low, "
+                                                                                                 @"please input a value over %@", nil),[m dashStringForAmount:[DCShapeshiftManager sharedInstance].min / .97]]
+                                           delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                                  otherButtonTitles:nil] show];
+                return;
+            } else if ([DCShapeshiftManager sharedInstance].limit < (amount * 1.03)) {
+                failureBlock();
+                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"SHAPESHIFT FAILED", nil)
+                                            message:[NSString stringWithFormat:NSLocalizedString(@"The amount you wanted to shapeshift is too high, "
+                                                                                                 @"please input a value under %@", nil),[m dashStringForAmount:[DCShapeshiftManager sharedInstance].limit / 1.03]]
+                                           delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                                  otherButtonTitles:nil] show];
+                return;
+            }
+            completionBlock();
         }
-        completionBlock();
     }];
 
 }
 
 - (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftBitcoinAmount:(uint64_t)amount approximateDashAmount:(uint64_t)dashAmount
 {
+    MBProgressHUD *hud  = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText       = NSLocalizedString(@"Starting Shapeshift!", nil);
+    
     [self verifyShapeshiftAmountIsInBounds:dashAmount completionBlock:^{
         //we know the exact amount of bitcoins we want to send
         BRWalletManager *m = [BRWalletManager sharedInstance];
@@ -998,11 +1012,15 @@ static NSString *sanitizeString(NSString *s)
                 [self confirmProtocolRequest:request.protocolRequest];
             }
         }];
+    } failureBlock:^{
+        
     }];
 }
 
 - (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftDashAmount:(uint64_t)amount
 {
+    MBProgressHUD *hud  = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText       = NSLocalizedString(@"Starting Shapeshift!", nil);
     [self verifyShapeshiftAmountIsInBounds:amount completionBlock:^{
         //we don't know the exact amount of bitcoins we want to send, we are just sending dash
         BRWalletManager *m = [BRWalletManager sharedInstance];
@@ -1010,6 +1028,7 @@ static NSString *sanitizeString(NSString *s)
         NSString * returnAddress = m.wallet.receiveAddress;
         self.amount = amount;
         [[DCShapeshiftManager sharedInstance] POST_ShiftWithAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
+            [hud hide:TRUE];
             if (error)
                 NSLog(@"shapeshiftDashAmount Error %@",error);
             NSString * depositAddress = shiftInfo[@"deposit"];
@@ -1017,6 +1036,8 @@ static NSString *sanitizeString(NSString *s)
             BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=shapeshift",depositAddress,self.amount,sanitizeString(self.request.commonName)]];
             [self confirmProtocolRequest:request.protocolRequest];
         }];
+    } failureBlock:^{
+        [hud hide:TRUE];
     }];
 }
 

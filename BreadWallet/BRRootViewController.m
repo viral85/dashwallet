@@ -336,16 +336,16 @@
 #endif
 
     if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 5) {
-        m.format.currencyCode = @"mDASH";
-        m.format.currencySymbol = @"m" DASH NARROW_NBSP;
-        m.format.maximumFractionDigits = 5;
-        m.format.maximum = @((MAX_MONEY/DUFFS)*1000);
+        m.dashFormat.currencyCode = @"mDASH";
+        m.dashFormat.currencySymbol = @"m" DASH NARROW_NBSP;
+        m.dashFormat.maximumFractionDigits = 5;
+        m.dashFormat.maximum = @((MAX_MONEY/DUFFS)*1000);
     }
     else if ([defs integerForKey:SETTINGS_MAX_DIGITS_KEY] == 8) {
-        m.format.currencyCode = @"DASH";
-        m.format.currencySymbol = DASH NARROW_NBSP;
-        m.format.maximumFractionDigits = 8;
-        m.format.maximum = @(MAX_MONEY/DUFFS);
+        m.dashFormat.currencyCode = @"DASH";
+        m.dashFormat.currencySymbol = DASH NARROW_NBSP;
+        m.dashFormat.maximumFractionDigits = 8;
+        m.dashFormat.maximum = @(MAX_MONEY/DUFFS);
     }
 
     if (! m.noWallet) {
@@ -692,7 +692,7 @@
     if ([v.text hasPrefix:BALANCE_TIP_START]) {
         BRWalletManager *m = [BRWalletManager sharedInstance];
         UINavigationBar *b = self.navigationController.navigationBar;
-        NSString *text = [NSString stringWithFormat:DITS_TIP, m.format.currencySymbol, [m dashStringForAmount:DUFFS]];
+        NSString *text = [NSString stringWithFormat:DITS_TIP, m.dashFormat.currencySymbol, [m dashStringForAmount:DUFFS]];
         CGRect r = [self.navigationItem.title boundingRectWithSize:b.bounds.size options:0
                     attributes:b.titleTextAttributes context:nil];
 

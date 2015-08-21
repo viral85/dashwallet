@@ -83,6 +83,7 @@
                                    dispatch_async(dispatch_get_main_queue(), ^{
                                        completionBlock(nil,returnError);
                                    });
+                                   return;
                                }
                                NSError *error = nil;
                                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -154,6 +155,7 @@
                                    dispatch_async(dispatch_get_main_queue(), ^{
                                        completionBlock(nil,returnError);
                                    });
+                                   return;
                                }
                                NSError *error = nil;
                                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -164,7 +166,12 @@
                                    return;
                                }
                                dispatch_async(dispatch_get_main_queue(), ^{
-                                   completionBlock(dictionary,nil);
+                                   if ([dictionary objectForKey:@"error"]) {
+                                       completionBlock(nil,[NSError errorWithDomain:@"DashWallet" code:500 userInfo:@{NSLocalizedDescriptionKey:[dictionary objectForKey:@"error"]
+                                                                                                                      }]);
+                                   } else {
+                                       completionBlock(dictionary,nil);
+                                   }
                                });
 
                            }];

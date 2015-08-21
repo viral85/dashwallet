@@ -57,7 +57,7 @@ NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"]]
 @property (nonatomic, readonly, getter=isTouchIdEnabled) BOOL touchIdEnabled; // true if touch id is enabled
 @property (nonatomic, readonly, getter=isPasscodeEnabled) BOOL passcodeEnabled; // true if device passcode is enabled
 @property (nonatomic, assign) BOOL didAuthenticate; // true if the user authenticated after this was last set to false
-@property (nonatomic, readonly) NSNumberFormatter *format; // dash currency formatter
+@property (nonatomic, readonly) NSNumberFormatter *dashFormat; // dash currency formatter
 @property (nonatomic, readonly) NSNumberFormatter *bitcoinFormat; // dash currency formatter
 @property (nonatomic, readonly) NSNumberFormatter *localFormat; // local currency formatter
 @property (nonatomic, copy) NSString *localCurrencyCode; // local currency ISO code

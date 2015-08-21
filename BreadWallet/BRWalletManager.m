@@ -217,25 +217,25 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     self.mnemonic = [BRBIP39Mnemonic new];
     self.reachability = [Reachability reachabilityForInternetConnection];
     self.failedPins = [NSMutableSet set];
-    _format = [NSNumberFormatter new];
-    self.format.lenient = YES;
-    self.format.numberStyle = NSNumberFormatterCurrencyStyle;
-    self.format.generatesDecimalNumbers = YES;
-    self.format.negativeFormat = [self.format.positiveFormat
-                                  stringByReplacingCharactersInRange:[self.format.positiveFormat rangeOfString:@"#"]
+    _dashFormat = [NSNumberFormatter new];
+    self.dashFormat.lenient = YES;
+    self.dashFormat.numberStyle = NSNumberFormatterCurrencyStyle;
+    self.dashFormat.generatesDecimalNumbers = YES;
+    self.dashFormat.negativeFormat = [self.dashFormat.positiveFormat
+                                  stringByReplacingCharactersInRange:[self.dashFormat.positiveFormat rangeOfString:@"#"]
                                   withString:@"-#"];
-    self.format.currencyCode = @"XDC";
-    self.format.currencySymbol = DASH NARROW_NBSP;
-    self.format.maximumFractionDigits = 8;
-    self.format.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
-    self.format.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.format.maximumFractionDigits));
+    self.dashFormat.currencyCode = @"XDC";
+    self.dashFormat.currencySymbol = DASH NARROW_NBSP;
+    self.dashFormat.maximumFractionDigits = 8;
+    self.dashFormat.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
+    self.dashFormat.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.dashFormat.maximumFractionDigits));
     
     _bitcoinFormat = [NSNumberFormatter new];
     self.bitcoinFormat.lenient = YES;
     self.bitcoinFormat.numberStyle = NSNumberFormatterCurrencyStyle;
     self.bitcoinFormat.generatesDecimalNumbers = YES;
-    self.bitcoinFormat.negativeFormat = [self.format.positiveFormat
-                                  stringByReplacingCharactersInRange:[self.format.positiveFormat rangeOfString:@"#"]
+    self.bitcoinFormat.negativeFormat = [self.dashFormat.positiveFormat
+                                  stringByReplacingCharactersInRange:[self.dashFormat.positiveFormat rangeOfString:@"#"]
                                   withString:@"-#"];
     self.bitcoinFormat.currencyCode = @"BTC";
     self.bitcoinFormat.currencySymbol = BTC NARROW_NBSP;
@@ -247,7 +247,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     self.localFormat.lenient = YES;
     self.localFormat.numberStyle = NSNumberFormatterCurrencyStyle;
     self.localFormat.generatesDecimalNumbers = YES;
-    self.localFormat.negativeFormat = self.format.negativeFormat;
+    self.localFormat.negativeFormat = self.dashFormat.negativeFormat;
 
     self.protectedObserver =
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationProtectedDataDidBecomeAvailable object:nil
@@ -1146,7 +1146,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
     }
     string = [[string stringByReplacingOccurrencesOfString:DASH withString:@""] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     return [[[NSDecimalNumber decimalNumberWithString:string]
-             decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits] longLongValue];
+             decimalNumberByMultiplyingByPowerOf10:self.dashFormat.maximumFractionDigits] longLongValue];
 }
 
 - (int64_t)amountForBitcoinString:(NSString *)string
@@ -1158,29 +1158,29 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 
 - (NSString *)dashStringForAmount:(int64_t)amount
 {
-    NSString * string = [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
-                                                       decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+    NSString * string = [self.dashFormat stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                                       decimalNumberByMultiplyingByPowerOf10:-self.dashFormat.maximumFractionDigits]];
     return string;
 }
 
 - (NSAttributedString *)attributedDashStringForAmount:(int64_t)amount
 {
-    NSString * string = [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
-                                          decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+    NSString * string = [self.dashFormat stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                          decimalNumberByMultiplyingByPowerOf10:-self.dashFormat.maximumFractionDigits]];
     return [string attributedStringForDashSymbol];
 }
 
 - (NSAttributedString *)attributedDashStringForAmount:(int64_t)amount withTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize
 {
-    NSString * string = [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
-                                                       decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
+    NSString * string = [self.dashFormat stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                                       decimalNumberByMultiplyingByPowerOf10:-self.dashFormat.maximumFractionDigits]];
     return [string attributedStringForDashSymbolWithTintColor:color dashSymbolSize:dashSymbolSize];
 }
 
 - (NSNumber *)numberForAmount:(int64_t)amount
 {
     return (id)[(id)[NSDecimalNumber numberWithLongLong:amount]
-                                          decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits];
+                                          decimalNumberByMultiplyingByPowerOf10:-self.dashFormat.maximumFractionDigits];
 }
 
 - (NSString *)bitcoinStringForAmount:(int64_t)amount

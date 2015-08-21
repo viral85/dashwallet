@@ -150,23 +150,23 @@
 - (IBAction)navBarSwipe:(id)sender
 {
     BRWalletManager *m = [BRWalletManager sharedInstance];
-    NSUInteger digits = (((m.format.maximumFractionDigits - 2)/3 + 1) % 3)*3 + 2;
+    NSUInteger digits = (((m.dashFormat.maximumFractionDigits - 2)/3 + 1) % 3)*3 + 2;
     
     if (digits == 5) {
-        m.format.currencyCode = @"mDASH";
-        m.format.currencySymbol = @"m" DASH NARROW_NBSP;
+        m.dashFormat.currencyCode = @"mDASH";
+        m.dashFormat.currencySymbol = @"m" DASH NARROW_NBSP;
     }
     else if (digits == 8) {
-        m.format.currencyCode = @"DASH";
-        m.format.currencySymbol = DASH NARROW_NBSP;
+        m.dashFormat.currencyCode = @"DASH";
+        m.dashFormat.currencySymbol = DASH NARROW_NBSP;
     }
     else {
-        m.format.currencyCode = @"XDC";
-        m.format.currencySymbol = DITS NARROW_NBSP;
+        m.dashFormat.currencyCode = @"XDC";
+        m.dashFormat.currencySymbol = DITS NARROW_NBSP;
     }
 
-    m.format.maximumFractionDigits = digits;
-    m.format.maximum = @(MAX_MONEY/(int64_t)pow(10.0, m.format.maximumFractionDigits));
+    m.dashFormat.maximumFractionDigits = digits;
+    m.dashFormat.maximum = @(MAX_MONEY/(int64_t)pow(10.0, m.dashFormat.maximumFractionDigits));
     [[NSUserDefaults standardUserDefaults] setInteger:digits forKey:SETTINGS_MAX_DIGITS_KEY];
     m.localCurrencyCode = m.localCurrencyCode; // force balance notification
     self.selectorController.title = [NSString stringWithFormat:@"1 DASH = %@",
