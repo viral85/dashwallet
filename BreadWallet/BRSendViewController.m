@@ -453,17 +453,25 @@ static NSString *sanitizeString(NSString *s)
         self.request = protoReq;
         
         if (self.amount == 0) {
-            tx = [m.wallet transactionForAmounts:protoReq.details.outputAmounts
-                                 toOutputScripts:protoReq.details.outputScripts withFee:YES];
+            
             if (shapeshift) {
+                tx = [m.wallet transactionForAmounts:protoReq.details.outputAmounts
+                                     toOutputScripts:protoReq.details.outputScripts withFee:YES toShapeshiftAddress:shapeshift.withdrawalAddress];
                 tx.associatedShapeshift = shapeshift;
+            } else {
+                tx = [m.wallet transactionForAmounts:protoReq.details.outputAmounts
+                                     toOutputScripts:protoReq.details.outputScripts withFee:YES];
             }
         }
         else {
-            tx = [m.wallet transactionForAmounts:@[@(self.amount)]
-                                 toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES];
+            
             if (shapeshift) {
+                tx = [m.wallet transactionForAmounts:@[@(self.amount)]
+                                     toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES toShapeshiftAddress:shapeshift.withdrawalAddress];
                 tx.associatedShapeshift = shapeshift;
+            } else {
+                tx = [m.wallet transactionForAmounts:@[@(self.amount)]
+                                     toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES];
             }
         }
         
@@ -841,8 +849,19 @@ static NSString *sanitizeString(NSString *s)
 
 #pragma mark - Shapeshift
 
+-(void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    DCShapeshiftEntity * shapeshift = (DCShapeshiftEntity *)object;
+    if ([shapeshift.shapeshiftStatus integerValue] == eShapeshiftAddressStatus_Complete) {
+        self.shapeshiftView.hidden = TRUE;
+        [self.view addSubview:[[[BRBubbleView viewWithText:NSLocalizedString(@"shapeshift succeeded", nil)
+                                                    center:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)] popIn]
+                               popOutAfterDelay:2.0]];
+    }
+}
+
 -(void)startObservingShapeshift:(DCShapeshiftEntity*)shapeshift {
-    [shapeshift startObservingAtInterval:15];
+    [self addObserver:shapeshift forKeyPath:@"shapeshiftStatus" options:NSKeyValueObservingOptionNew context:nil];
+    [shapeshift routinelyCheckStatusAtInterval:15];
     self.shapeshiftView.hidden = FALSE;
 }
 

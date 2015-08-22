@@ -81,9 +81,14 @@ static NSUInteger _fetchBatchSize = 100;
 
 + (instancetype)anyObjectMatching:(NSString *)predicateFormat, ...
 {
-    NSArray * array = [self objectsMatching:predicateFormat];
-    if ([array count]) {
-        return [array objectAtIndex:0];
+    NSArray *a;
+    va_list args;
+    
+    va_start(args, predicateFormat);
+    a = [self objectsMatching:predicateFormat arguments:args];
+    va_end(args);
+    if ([a count]) {
+        return [a objectAtIndex:0];
     } else return nil;
 }
 

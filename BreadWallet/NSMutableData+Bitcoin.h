@@ -53,6 +53,8 @@ CFAllocatorRef SecureAllocator();
 - (void)appendScriptPubKeyForAddress:(NSString *)address;
 - (void)appendScriptPushData:(NSData *)d;
 
+- (void)appendShapeshiftMemoForAddress:(NSString *)address;
+
 - (void)appendMessage:(NSData *)message type:(NSString *)type;
 - (void)appendNullPaddedString:(NSString *)s length:(NSUInteger)length;
 - (void)appendNetAddress:(uint32_t)address port:(uint16_t)port services:(uint64_t)services;

@@ -111,6 +111,14 @@
     
     _lockTime = [message UInt32AtOffset:off]; // tx locktime
     _txHash = self.data.SHA256_2;
+    
+    NSString * outboundShapeshiftAddress = [self shapeshiftOutboundAddress];
+    if (outboundShapeshiftAddress) {
+        self.associatedShapeshift = [DCShapeshiftEntity shapeshiftHavingWithdrawalAddress:outboundShapeshiftAddress];
+        if (!self.associatedShapeshift && [self.outputAddresses count]) {
+            self.associatedShapeshift = [DCShapeshiftEntity registerShapeshiftWithInputAddress:[self.outputAddresses firstObject] andWithdrawalAddress:outboundShapeshiftAddress];
+        }
+    }
     return self;
 }
 
@@ -247,6 +255,14 @@ sequence:(uint32_t)sequence
     [self.addresses addObject:address];
     [self.outScripts addObject:[NSMutableData data]];
     [self.outScripts.lastObject appendScriptPubKeyForAddress:address];
+}
+
+- (void)addOutputShapeshiftAddress:(NSString *)address
+{
+    [self.amounts addObject:@(0)];
+    [self.addresses addObject:[NSNull null]];
+    [self.outScripts addObject:[NSMutableData data]];
+    [self.outScripts.lastObject appendShapeshiftMemoForAddress:address];
 }
 
 - (void)addOutputScript:(NSData *)script amount:(uint64_t)amount;
@@ -423,6 +439,26 @@ sequence:(uint32_t)sequence
 - (BOOL)isEqual:(id)object
 {
     return self == object || ([object isKindOfClass:[BRTransaction class]] && [[object txHash] isEqual:self.txHash]);
+}
+
+#pragma mark - Extra shapeshift methods
+
+- (NSString*)shapeshiftOutboundAddress {
+    for (NSData * script in self.outputScripts) {
+        if ([script UInt8AtOffset:0] == OP_RETURN) {
+            UInt8 length = [script UInt8AtOffset:1];
+            if ([script UInt8AtOffset:2] == OP_SHAPESHIFT) {
+                NSMutableData * data = [NSMutableData data];
+                uint8_t v = BITCOIN_PUBKEY_ADDRESS;
+                [data appendBytes:&v length:1];
+                NSData * addressData = [script subdataWithRange:NSMakeRange(3, length - 1)];
+                
+                [data appendData:addressData];
+                return [NSString base58checkWithData:data];
+            }
+        }
+    }
+    return nil;
 }
 
 @end

@@ -36,9 +36,11 @@ typedef enum eShapeshiftAddressStatus {
 
 @property (nonatomic, strong) NSTimer * checkStatusTimer;
 
+-(NSString*)shapeshiftStatusString;
+
 +(DCShapeshiftEntity*)shapeshiftHavingWithdrawalAddress:(NSString*)withdrawalAddress;
 +(DCShapeshiftEntity*)registerShapeshiftWithInputAddress:(NSString*)inputAddress andWithdrawalAddress:(NSString*)withdrawalAddress;
 
--(void)startObservingAtInterval:(NSTimeInterval)timeInterval;
+-(void)routinelyCheckStatusAtInterval:(NSTimeInterval)timeInterval;
 
 @end

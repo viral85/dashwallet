@@ -89,13 +89,33 @@
     self.received = [m.wallet amountReceivedFromTransaction:transaction];
 
     for (NSString *address in transaction.outputAddresses) {
+        NSData * script = transaction.outputScripts[i];
         uint64_t amt = [transaction.outputAmounts[i++] unsignedLongLongValue];
     
         if (address == (id)[NSNull null]) {
             if (self.sent > 0) {
-                [text addObject:NSLocalizedString(@"unknown address", nil)];
-                [detail addObject:NSLocalizedString(@"payment output", nil)];
-                [amount addObject:@(-amt)];
+                if ([script UInt8AtOffset:0] == OP_RETURN) {
+                    UInt8 length = [script UInt8AtOffset:1];
+                    if ([script UInt8AtOffset:2] == OP_SHAPESHIFT) {
+                        NSMutableData * data = [NSMutableData data];
+                        uint8_t v = BITCOIN_PUBKEY_ADDRESS;
+                        [data appendBytes:&v length:1];
+                        NSData * addressData = [script subdataWithRange:NSMakeRange(3, length - 1)];
+                        
+                        [data appendData:addressData];
+                        [text addObject:[NSString base58checkWithData:data]];
+                        [detail addObject:NSLocalizedString(@"Bitcoin address (shapeshift)", nil)];
+                        if (transaction.associatedShapeshift.outputCoinAmount) {
+                            [amount addObject:transaction.associatedShapeshift.outputCoinAmount];
+                        } else {
+                            [amount addObject:@(UINT64_MAX)];
+                        }
+                    }
+                } else {
+                    [text addObject:NSLocalizedString(@"unknown address", nil)];
+                    [detail addObject:NSLocalizedString(@"payment output", nil)];
+                    [amount addObject:@(-amt)];
+                }
             }
         }
         else if ([m.wallet containsAddress:address]) {
@@ -148,14 +168,14 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return 3;
+    return 3 + !!self.transaction.associatedShapeshift;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
     switch (section) {
-        case 0: return 3;
+        case 0: return self.transaction.associatedShapeshift?4:3;
         case 1: return (self.sent > 0) ? self.outputText.count : self.transaction.inputAddresses.count;
         case 2: return (self.sent > 0) ? self.transaction.inputAddresses.count : self.outputText.count;
     }
@@ -171,11 +191,14 @@
     BRWalletManager *m = [BRWalletManager sharedInstance];
     NSUInteger peerCount = [[BRPeerManager sharedInstance] peerCount],
                relayCount = [[BRPeerManager sharedInstance] relayCountForTransaction:self.transaction.txHash];
-    
+    NSInteger indexPathRow = indexPath.row;
+    if (!self.transaction.associatedShapeshift) {
+        if (indexPathRow > 0) indexPathRow++;
+    }
     // Configure the cell...
     switch (indexPath.section) {
         case 0:
-            switch (indexPath.row) {
+            switch (indexPathRow) {
                 case 0:
                     cell = [tableView dequeueReusableCellWithIdentifier:@"TitleCell" forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleDefault;
@@ -187,8 +210,19 @@
                     detailLabel.text = [NSString hexWithData:self.transaction.txHash.reverse];
                     subtitleLabel.text = nil;
                     break;
-                    
                 case 1:
+                    cell = [tableView dequeueReusableCellWithIdentifier:@"TitleCell" forIndexPath:indexPath];
+                    cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+                    textLabel = (id)[cell viewWithTag:1];
+                    detailLabel = (id)[cell viewWithTag:2];
+                    subtitleLabel = (id)[cell viewWithTag:3];
+                    [self setBackgroundForCell:cell indexPath:indexPath];
+                    textLabel.text = NSLocalizedString(@"shapeshift status:", nil);
+                    detailLabel.text = [self.transaction.associatedShapeshift shapeshiftStatusString];
+                    subtitleLabel.text = nil;
+                    break;
+                    
+                case 2:
                     cell = [tableView dequeueReusableCellWithIdentifier:@"TitleCell" forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     textLabel = (id)[cell viewWithTag:1];
@@ -218,7 +252,7 @@
                     
                     break;
                     
-                case 2:
+                case 3:
                     cell = [tableView dequeueReusableCellWithIdentifier:@"TransactionCell"];
                     [self setBackgroundForCell:cell indexPath:indexPath];
                     textLabel = (id)[cell viewWithTag:1];
@@ -260,12 +294,21 @@
                 subtitleLabel.text = self.outputDetail[indexPath.row];
                 amountLabel.textColor = (self.sent > 0) ? [UIColor colorWithRed:1.0 green:0.33 blue:0.33 alpha:1.0] :
                 [UIColor colorWithRed:0.0 green:0.75 blue:0.0 alpha:1.0];
-                amountLabel.attributedText = [m attributedDashStringForAmount:[self.outputAmount[indexPath.row] longLongValue] withTintColor:amountLabel.textColor dashSymbolSize:CGSizeMake(9, 9)];
-                
-                localCurrencyLabel.textColor = amountLabel.textColor;
-                localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
-                                           [m localCurrencyStringForDashAmount:[self.outputAmount[indexPath.row]
-                                                                            longLongValue]]];
+                long long outputAmount = [self.outputAmount[indexPath.row] longLongValue];
+                if (outputAmount == UINT64_MAX) {
+                    NSAttributedString * attributedString = [[NSAttributedString alloc] initWithString:@"fetching amount" attributes:@{NSFontAttributeName: [UIFont fontWithName:@"HelveticaNeue-LightItalic" size:13]}];
+                    
+                    amountLabel.attributedText = attributedString;
+                    localCurrencyLabel.textColor = amountLabel.textColor;
+                    localCurrencyLabel.text = @"";
+                } else {
+                    amountLabel.attributedText = [m attributedDashStringForAmount:[self.outputAmount[indexPath.row] longLongValue] withTintColor:amountLabel.textColor dashSymbolSize:CGSizeMake(9, 9)];
+                    localCurrencyLabel.textColor = amountLabel.textColor;
+                    localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
+                                               [m localCurrencyStringForDashAmount:[self.outputAmount[indexPath.row]
+                                                                                    longLongValue]]];
+                }
+
             }
             else if (self.transaction.inputAddresses[indexPath.row] != (id)[NSNull null]) {
                 cell = [tableView dequeueReusableCellWithIdentifier:@"DetailCell" forIndexPath:indexPath];

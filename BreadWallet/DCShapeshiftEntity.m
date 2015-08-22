@@ -26,8 +26,29 @@
 @dynamic isFixedAmount;
 @dynamic transaction;
 
+@synthesize checkStatusTimer;
+
+-(NSString*)shapeshiftStatusString {
+    switch ([self.shapeshiftStatus integerValue]) {
+        case eShapeshiftAddressStatus_Complete:
+            return @"Completed";
+            break;
+        case eShapeshiftAddressStatus_Failed:
+            return self.errorMessage;
+            break;
+        case eShapeshiftAddressStatus_NoDeposits:
+            return @"Waiting for Deposit";
+            break;
+        case eShapeshiftAddressStatus_Received:
+            return @"Shapeshift in Progress";
+            break;
+        default:
+            return @"Unknown";
+    }
+}
+
 +(DCShapeshiftEntity*)shapeshiftHavingWithdrawalAddress:(NSString*)withdrawalAddress {
-    DCShapeshiftEntity * previousShapeshift = [DCShapeshiftEntity anyObjectMatching:[NSString stringWithFormat:@"withdrawalAddress == %@ && shapeshiftStatus == %@",withdrawalAddress, @(eShapeshiftAddressStatus_NoDeposits)]];
+    DCShapeshiftEntity * previousShapeshift = [DCShapeshiftEntity anyObjectMatching:@"withdrawalAddress == %@ && shapeshiftStatus == %@",withdrawalAddress, @(eShapeshiftAddressStatus_NoDeposits)];
     return previousShapeshift;
 }
 
@@ -42,24 +63,49 @@
 }
 
 -(void)checkStatus {
-    [[DCShapeshiftManager sharedInstance] GET_transactionStatusWithAddress:self.withdrawalAddress completionBlock:^(NSDictionary *transactionInfo, NSError *error) {
+    [[DCShapeshiftManager sharedInstance] GET_transactionStatusWithAddress:self.inputAddress completionBlock:^(NSDictionary *transactionInfo, NSError *error) {
         if (transactionInfo) {
             NSString * status = transactionInfo[@"status"];
             if ([status isEqualToString:@"received"]) {
-                self.shapeshiftStatus = @(eShapeshiftAddressStatus_Received);
+                if ([self.shapeshiftStatus integerValue] != eShapeshiftAddressStatus_Received)
+                    self.shapeshiftStatus = @(eShapeshiftAddressStatus_Received);
+                self.inputCoinAmount = transactionInfo[@"incomingCoin"];
+                id inputCoinAmount = transactionInfo[@"incomingCoin"];
+                if ([inputCoinAmount isKindOfClass:[NSNumber class]]) {
+                    self.inputCoinAmount = inputCoinAmount;
+                } else if ([inputCoinAmount isKindOfClass:[NSString class]]) {
+                    self.inputCoinAmount = @([inputCoinAmount doubleValue]);
+                }
+                [DCShapeshiftEntity saveContext];
             } else if ([status isEqualToString:@"complete"]) {
                 self.shapeshiftStatus = @(eShapeshiftAddressStatus_Complete);
                 self.outputTransactionId = transactionInfo[@"transaction"];
-                self.outputCoinAmount = transactionInfo[@"outgoingCoin"];
+                id inputCoinAmount = transactionInfo[@"incomingCoin"];
+                if ([inputCoinAmount isKindOfClass:[NSNumber class]]) {
+                    self.inputCoinAmount = inputCoinAmount;
+                } else if ([inputCoinAmount isKindOfClass:[NSString class]]) {
+                    self.inputCoinAmount = @([inputCoinAmount doubleValue]);
+                }
+                self.inputCoinAmount = transactionInfo[@"incomingCoin"];
+                id outputCoinAmount = transactionInfo[@"outgoingCoin"];
+                if ([outputCoinAmount isKindOfClass:[NSNumber class]]) {
+                    self.outputCoinAmount = outputCoinAmount;
+                } else if ([outputCoinAmount isKindOfClass:[NSString class]]) {
+                    self.outputCoinAmount = @([outputCoinAmount doubleValue]);
+                }
+                [DCShapeshiftEntity saveContext];
+                [self.checkStatusTimer invalidate];
             } else if ([status isEqualToString:@"failed"]) {
                 self.shapeshiftStatus = @(eShapeshiftAddressStatus_Failed);
                 self.errorMessage = transactionInfo[@"error"];
+                [DCShapeshiftEntity saveContext];
+                [self.checkStatusTimer invalidate];
             }
         }
     }];
 }
 
--(void)startObservingAtInterval:(NSTimeInterval)timeInterval {
+-(void)routinelyCheckStatusAtInterval:(NSTimeInterval)timeInterval {
     self.checkStatusTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(checkStatus) userInfo:nil repeats:YES];
 }
 

@@ -43,6 +43,8 @@
 #define OP_CHECKSIG    0xac
 #define OP_RETURN      0x6a
 
+#define OP_SHAPESHIFT  0xb1 //not a bitcoin op code, used to identify shapeshift when placed after OP_RETURN
+
 @interface NSData (Dash)
 
 - (NSData *)SHA1;

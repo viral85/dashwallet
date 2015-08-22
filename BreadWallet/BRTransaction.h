@@ -26,11 +26,7 @@
 #import <Foundation/Foundation.h>
 #import "DCShapeshiftEntity.h"
 
-#if TX_FEE_0_8_RULES
-#define TX_FEE_PER_KB        10000ULL    // standard tx fee per kb of tx size, rounded up to nearest kb (0.8 rules)
-#else
-#define TX_FEE_PER_KB        1000ULL     // standard tx fee per kb of tx size, rounded up to nearest kb
-#endif
+#define TX_FEE_PER_KB        10000ULL     // standard tx fee per kb of tx size, rounded up to nearest kb
 #define TX_MIN_OUTPUT_AMOUNT (TX_FEE_PER_KB*3*(34 + 148)/1000) // no txout can be below this amount (or it won't relay)
 #define TX_MAX_SIZE          100000      // no tx can be larger than this size in bytes
 #define TX_FREE_MAX_SIZE     1000        // tx must not be larger than this size in bytes without a fee
@@ -73,10 +69,13 @@ outputAddresses:(NSArray *)addresses outputAmounts:(NSArray *)amounts;
 - (void)addInputHash:(NSData *)hash index:(NSUInteger)index script:(NSData *)script signature:(NSData *)signature
 sequence:(uint32_t)sequence;
 - (void)addOutputAddress:(NSString *)address amount:(uint64_t)amount;
+- (void)addOutputShapeshiftAddress:(NSString *)address;
 - (void)addOutputScript:(NSData *)script amount:(uint64_t)amount;
 - (void)setInputAddress:(NSString *)address atIndex:(NSUInteger)index;
 - (void)shuffleOutputOrder;
 - (BOOL)signWithPrivateKeys:(NSArray *)privateKeys;
+
+- (NSString*)shapeshiftOutboundAddress;
 
 // priority = sum(input_amount_in_DUFFS*input_age_in_blocks)/tx_size_in_bytes
 - (uint64_t)priorityForAmounts:(NSArray *)amounts withAges:(NSArray *)ages;
