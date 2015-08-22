@@ -98,7 +98,7 @@
 		FBCFA6C51B82158600831F99 /* FBShimmeringLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6C21B82158600831F99 /* FBShimmeringLayer.m */; };
 		FBCFA6C61B82158600831F99 /* FBShimmeringView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6C41B82158600831F99 /* FBShimmeringView.m */; };
 		FBCFA6C91B87B9EF00831F99 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6C81B87B9EF00831F99 /* MBProgressHUD.m */; };
-		FBCFA6CD1B884F0900831F99 /* DCShapeshiftEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6CC1B884F0900831F99 /* DCShapeshiftEntity.m */; };
+		FBCFA6D01B88D49100831F99 /* DCShapeshiftEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6CF1B88D49100831F99 /* DCShapeshiftEntity.m */; };
 		FBE49E961B7BB1830020FAA6 /* Dash-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = FBE49E951B7BB1830020FAA6 /* Dash-Light.png */; };
 		FBE49E991B7BB55C0020FAA6 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */; };
 		FBE49E9C1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE49E9B1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m */; };
@@ -394,8 +394,8 @@
 		FBCFA6C41B82158600831F99 /* FBShimmeringView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FBShimmeringView.m; sourceTree = "<group>"; };
 		FBCFA6C71B87B9EF00831F99 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		FBCFA6C81B87B9EF00831F99 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
-		FBCFA6CB1B884F0900831F99 /* DCShapeshiftEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCShapeshiftEntity.h; sourceTree = "<group>"; };
-		FBCFA6CC1B884F0900831F99 /* DCShapeshiftEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCShapeshiftEntity.m; sourceTree = "<group>"; };
+		FBCFA6CE1B88D49100831F99 /* DCShapeshiftEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCShapeshiftEntity.h; sourceTree = "<group>"; };
+		FBCFA6CF1B88D49100831F99 /* DCShapeshiftEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCShapeshiftEntity.m; sourceTree = "<group>"; };
 		FBE49E951B7BB1830020FAA6 /* Dash-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Dash-Light.png"; sourceTree = "<group>"; };
 		FBE49E971B7BB55C0020FAA6 /* UIImage+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Color.h"; sourceTree = "<group>"; };
 		FBE49E981B7BB55C0020FAA6 /* UIImage+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Color.m"; sourceTree = "<group>"; };
@@ -529,8 +529,8 @@
 				752E28A719234AE300DB5A3C /* BRTxInputEntity.m */,
 				752E28A819234AE300DB5A3C /* BRTxOutputEntity.h */,
 				752E28A919234AE300DB5A3C /* BRTxOutputEntity.m */,
-				FBCFA6CB1B884F0900831F99 /* DCShapeshiftEntity.h */,
-				FBCFA6CC1B884F0900831F99 /* DCShapeshiftEntity.m */,
+				FBCFA6CE1B88D49100831F99 /* DCShapeshiftEntity.h */,
+				FBCFA6CF1B88D49100831F99 /* DCShapeshiftEntity.m */,
 			);
 			name = Entities;
 			sourceTree = "<group>";
@@ -1053,7 +1053,6 @@
 				752E28AE19234AE300DB5A3C /* BRTxInputEntity.m in Sources */,
 				752E28AF19234AE300DB5A3C /* BRTxOutputEntity.m in Sources */,
 				758DBD0E1980634900389E2A /* BRTxDetailViewController.m in Sources */,
-				FBCFA6CD1B884F0900831F99 /* DCShapeshiftEntity.m in Sources */,
 				FB00F67A1B542A340061C2FB /* DCShapeshiftManager.m in Sources */,
 				7548CF3719556FD700EF827F /* BRCopyLabel.m in Sources */,
 				75767C421A0EC6F9003E7DE9 /* UIImage+Blur.m in Sources */,
@@ -1085,6 +1084,7 @@
 				752E28D419234C3600DB5A3C /* BRPaymentProtocol.m in Sources */,
 				752E28D519234C3600DB5A3C /* BRPaymentRequest.m in Sources */,
 				7525B619192453840041C0F2 /* BRNavigationBar.m in Sources */,
+				FBCFA6D01B88D49100831F99 /* DCShapeshiftEntity.m in Sources */,
 				FB00F67E1B5AE1E50061C2FB /* DCTickerViewController.m in Sources */,
 				FBCFA6C51B82158600831F99 /* FBShimmeringLayer.m in Sources */,
 				FBE689D71AC07BE400467F4C /* NSData+Shavite.m in Sources */,

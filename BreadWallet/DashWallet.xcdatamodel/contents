@@ -56,9 +56,14 @@
         <relationship name="transaction" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="BRTransactionEntity" inverseName="outputs" inverseEntity="BRTransactionEntity" syncable="YES"/>
     </entity>
     <entity name="DCShapeshiftEntity" representedClassName="DCShapeshiftEntity" syncable="YES">
+        <attribute name="errorMessage" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="expiresAt" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="inputAddress" attributeType="String" syncable="YES"/>
-        <attribute name="inputCoin" attributeType="String" defaultValueString="dash" syncable="YES"/>
-        <attribute name="outputCoin" attributeType="String" defaultValueString="bitcoin" syncable="YES"/>
+        <attribute name="inputCoinAmount" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="inputCoinType" attributeType="String" defaultValueString="dash" syncable="YES"/>
+        <attribute name="isFixedAmount" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="outputCoinAmount" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="outputCoinType" attributeType="String" defaultValueString="bitcoin" syncable="YES"/>
         <attribute name="outputTransactionId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="shapeshiftStatus" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
         <attribute name="withdrawalAddress" attributeType="String" indexed="YES" syncable="YES"/>
@@ -72,6 +77,6 @@
         <element name="BRTxInputEntity" positionX="0" positionY="0" width="128" height="120"/>
         <element name="BRTxMetadataEntity" positionX="0" positionY="0" width="128" height="90"/>
         <element name="BRTxOutputEntity" positionX="0" positionY="0" width="128" height="150"/>
-        <element name="DCShapeshiftEntity" positionX="0" positionY="0" width="128" height="150"/>
+        <element name="DCShapeshiftEntity" positionX="0" positionY="0" width="128" height="225"/>
     </elements>
 </model>

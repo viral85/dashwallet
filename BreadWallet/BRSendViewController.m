@@ -842,7 +842,7 @@ static NSString *sanitizeString(NSString *s)
 #pragma mark - Shapeshift
 
 -(void)startObservingShapeshift:(DCShapeshiftEntity*)shapeshift {
-    shapeshift.transaction
+    [shapeshift startObservingAtInterval:15];
     self.shapeshiftView.hidden = FALSE;
 }
 

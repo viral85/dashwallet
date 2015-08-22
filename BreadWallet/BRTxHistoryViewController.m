@@ -396,6 +396,7 @@ static NSString *dateFormat(NSString *template)
     UITableViewCell *cell = nil;
     UILabel *textLabel, *unconfirmedLabel, *sentLabel, *localCurrencyLabel, *balanceLabel, *localBalanceLabel,
             *detailTextLabel;
+    UIImageView * shapeshiftImageView;
     BRWalletManager *m = [BRWalletManager sharedInstance];
 
     switch (indexPath.section) {
@@ -415,6 +416,7 @@ static NSString *dateFormat(NSString *template)
                 sentLabel = (id)[cell viewWithTag:6];
                 balanceLabel = (id)[cell viewWithTag:7];
                 localBalanceLabel = (id)[cell viewWithTag:8];
+                shapeshiftImageView = (id)[cell viewWithTag:9];
 
                 BRTransaction *tx = self.transactions[indexPath.row];
                 uint64_t received = [m.wallet amountReceivedFromTransaction:tx],
@@ -428,6 +430,7 @@ static NSString *dateFormat(NSString *template)
                 balanceLabel.attributedText = (m.didAuthenticate) ? [m attributedDashStringForAmount:balance withTintColor:balanceLabel.textColor dashSymbolSize:CGSizeMake(9, 9)] : nil;
                 localBalanceLabel.text = (m.didAuthenticate) ?
                     [NSString stringWithFormat:@"(%@)", [m localCurrencyStringForDashAmount:balance]] : nil;
+                shapeshiftImageView.hidden = !tx.associatedShapeshift;
 
                 if (confirms == 0 && ! [m.wallet transactionIsValid:tx]) {
                     unconfirmedLabel.text = NSLocalizedString(@"INVALID", nil);
