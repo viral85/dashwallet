@@ -29,6 +29,8 @@
 
 -(void)POST_SendAmount:(NSNumber*)amount withAddress:(NSString*)withdrawalAddress returnAddress:(NSString*)returnAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock;
 
+-(void)POST_RequestEmailReceiptOfShapeshiftWithOutputTransactionId:(NSString*)shapeshiftOutputTransactionId toEmailAddress:(NSString*)validEmailAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock;
+
 -(void)GET_transactionStatusWithAddress:(NSString*)withdrawalAddress completionBlock:(void (^)(NSDictionary *transactionInfo, NSError *error))completionBlock;
 
 @end

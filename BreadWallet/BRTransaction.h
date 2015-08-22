@@ -24,6 +24,7 @@
 //  THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import "DCShapeshiftEntity.h"
 
 #if TX_FEE_0_8_RULES
 #define TX_FEE_PER_KB        10000ULL    // standard tx fee per kb of tx size, rounded up to nearest kb (0.8 rules)
@@ -60,7 +61,7 @@
 @property (nonatomic, readonly) BOOL isSigned; // checks if all signatures exist, but does not verify them
 @property (nonatomic, readonly, getter = toData) NSData *data;
 
-@property (nonatomic, strong) NSString * shapeshiftOutputAddress;
+@property (nonatomic, strong) DCShapeshiftEntity * associatedShapeshift;
 
 + (instancetype)transactionWithMessage:(NSData *)message;
 

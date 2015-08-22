@@ -25,10 +25,12 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "DCShapeshiftManager.h"
 
 @class BRTxInputEntity;
 @class BRTxOutputEntity;
 @class BRTransaction;
+@class DCShapeshiftEntity;
 
 @interface BRTransactionEntity : NSManagedObject
 
@@ -38,6 +40,7 @@
 @property (nonatomic, retain) NSOrderedSet *inputs;
 @property (nonatomic, retain) NSOrderedSet *outputs;
 @property (nonatomic) int32_t lockTime;
+@property (nonatomic, retain) DCShapeshiftEntity *associatedShapeshift;
 
 - (instancetype)setAttributesFromTx:(BRTransaction *)tx;
 - (BRTransaction *)transaction;

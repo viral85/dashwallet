@@ -111,6 +111,78 @@
 
 ////////////////////////////////////////////////////////////////////
 /*
+ url: shapeshift.io/txStat/[address]
+ method: GET
+  
+ [address] is the deposit address to look up.
+  
+ Success Output:  (various depending on status)
+  
+ Status: No Deposits Received
+     {
+         status:"no_deposits",
+         address:[address]           //matches address submitted
+     }
+  
+ Status: Received (we see a new deposit but have not finished processing it)
+     {
+         status:"received",
+         address:[address]           //matches address submitted
+     }
+  
+ Status: Complete
+ {
+     status : "complete",
+     address: [address],
+     withdraw: [withdrawal address],
+     incomingCoin: [amount deposited],
+     incomingType: [coin type of deposit],
+     outgoingCoin: [amount sent to withdrawal address],
+     outgoingType: [coin type of withdrawal],
+     transaction: [transaction id of coin sent to withdrawal address]
+ }
+  
+ Status: Failed
+ {
+     status : "failed",
+     error: [Text describing failure]
+ }
+ */
+////////////////////////////////////////////////////////////////////
+
+-(void)GET_transactionStatusWithAddress:(NSString*)withdrawalAddress completionBlock:(void (^)(NSDictionary *transactionInfo, NSError *error))completionBlock {
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://shapeshift.io/txStat/%@",withdrawalAddress]]
+                                             cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
+                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+                                   NSError * returnError = connectionError;
+                                   if (!returnError) {
+                                       returnError = [NSError errorWithDomain:@"DashWallet" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
+                                   }
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,returnError);
+                                   });
+                               }
+                               NSError *error = nil;
+                               NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+                               if (error) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,error);
+                                   });
+                                   return;
+                               }
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                   completionBlock(dictionary,nil);
+                               });
+                           }];
+}
+
+#pragma mark - POST requests
+
+////////////////////////////////////////////////////////////////////
+/*
  url:  shapeshift.io/shift
  method: POST
  data type: JSON
@@ -179,42 +251,41 @@
 
 ////////////////////////////////////////////////////////////////////
 /*
-url: shapeshift.io/cancelpending
-method: POST
-data type: JSON
-data required: address  = The deposit address associated with the pending transaction
-
-Example data : {address : "1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v"}
-
-Success Output:
-
-{  success  : " Pending Transaction cancelled "  }
-
-Error Output:
-
-{  error  : {errorMessage}  }
+ url:  shapeshift.io/mail
+ method: POST
+ data type: JSON
+ data required:
+ email    = the address for receipt email to be sent to
+ txid       = the transaction id of the transaction TO the user (ie the txid for the withdrawal NOT the deposit)
+ 
+ Success Output:
+ {"email":
+ {
+ "status":"success",
+ "message":"Email receipt sent"
+ }
+ }
  */
 ////////////////////////////////////////////////////////////////////
 
--(void)POST_CancelShiftToAddress:(NSString*)withdrawalAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock {
-    NSDictionary *params = @{@"address": withdrawalAddress};
+-(void)POST_RequestEmailReceiptOfShapeshiftWithOutputTransactionId:(NSString*)shapeshiftOutputTransactionId toEmailAddress:(NSString*)validEmailAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock {
+    NSDictionary *params = @{@"email":validEmailAddress,@"txid": shapeshiftOutputTransactionId};
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/shift"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/mail"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[self httpBodyForParamsDictionary:params]];
-    
+    NSString * s = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
                                    NSError * returnError = connectionError;
                                    if (!returnError) {
-                                       returnError = [NSError errorWithDomain:@"DashWallet" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
+                                       returnError = [NSError errorWithDomain:@"Shapeshift" code:((NSHTTPURLResponse*)response).statusCode userInfo:nil];
                                    }
                                    dispatch_async(dispatch_get_main_queue(), ^{
                                        completionBlock(nil,returnError);
                                    });
-                                   return;
                                }
                                NSError *error = nil;
                                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -224,17 +295,22 @@ Error Output:
                                    });
                                    return;
                                }
-                               dispatch_async(dispatch_get_main_queue(), ^{
-                                   if ([dictionary objectForKey:@"error"]) {
-                                       completionBlock(nil,[NSError errorWithDomain:@"DashWallet" code:500 userInfo:@{NSLocalizedDescriptionKey:[dictionary objectForKey:@"error"]
+                               if (dictionary[@"error"]) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                       completionBlock(nil,[NSError errorWithDomain:@"Shapeshift" code:416 userInfo:@{NSLocalizedDescriptionKey:
+                                                                                                                          dictionary[@"error"]
                                                                                                                       }]);
-                                   } else {
-                                       completionBlock(dictionary,nil);
-                                   }
+                                   });
+                                   return;
+                               }
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                   completionBlock(dictionary[@"success"],nil);
                                });
                                
                            }];
+    
 }
+
 
 ////////////////////////////////////////////////////////////////////
 /*
@@ -322,48 +398,30 @@ Error Output:
 
 ////////////////////////////////////////////////////////////////////
 /*
- url: shapeshift.io/txStat/[address]
- method: GET
-  
- [address] is the deposit address to look up.
-  
- Success Output:  (various depending on status)
-  
- Status: No Deposits Received
-     {
-         status:"no_deposits",
-         address:[address]           //matches address submitted
-     }
-  
- Status: Received (we see a new deposit but have not finished processing it)
-     {
-         status:"received",
-         address:[address]           //matches address submitted
-     }
-  
- Status: Complete
- {
-     status : "complete",
-     address: [address],
-     withdraw: [withdrawal address],
-     incomingCoin: [amount deposited],
-     incomingType: [coin type of deposit],
-     outgoingCoin: [amount sent to withdrawal address],
-     outgoingType: [coin type of withdrawal],
-     transaction: [transaction id of coin sent to withdrawal address]
- }
-  
- Status: Failed
- {
-     status : "failed",
-     error: [Text describing failure]
- }
+ url: shapeshift.io/cancelpending
+ method: POST
+ data type: JSON
+ data required: address  = The deposit address associated with the pending transaction
+ 
+ Example data : {address : "1HB5XMLmzFVj8ALj6mfBsbifRoD4miY36v"}
+ 
+ Success Output:
+ 
+ {  success  : " Pending Transaction cancelled "  }
+ 
+ Error Output:
+ 
+ {  error  : {errorMessage}  }
  */
 ////////////////////////////////////////////////////////////////////
 
--(void)GET_transactionStatusWithAddress:(NSString*)withdrawalAddress completionBlock:(void (^)(NSDictionary *transactionInfo, NSError *error))completionBlock {
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://shapeshift.io/txStat/%@",withdrawalAddress]]
-                                             cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+-(void)POST_CancelShiftToAddress:(NSString*)withdrawalAddress completionBlock:(void (^)(NSDictionary *shiftInfo, NSError *error))completionBlock {
+    NSDictionary *params = @{@"address": withdrawalAddress};
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://shapeshift.io/shift"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[self httpBodyForParamsDictionary:params]];
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
@@ -375,6 +433,7 @@ Error Output:
                                    dispatch_async(dispatch_get_main_queue(), ^{
                                        completionBlock(nil,returnError);
                                    });
+                                   return;
                                }
                                NSError *error = nil;
                                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
@@ -385,9 +444,17 @@ Error Output:
                                    return;
                                }
                                dispatch_async(dispatch_get_main_queue(), ^{
-                                   completionBlock(dictionary,nil);
+                                   if ([dictionary objectForKey:@"error"]) {
+                                       completionBlock(nil,[NSError errorWithDomain:@"DashWallet" code:500 userInfo:@{NSLocalizedDescriptionKey:[dictionary objectForKey:@"error"]
+                                                                                                                      }]);
+                                   } else {
+                                       completionBlock(dictionary,nil);
+                                   }
                                });
+                               
                            }];
 }
+
+
 
 @end

@@ -41,6 +41,7 @@
 @dynamic inputs;
 @dynamic outputs;
 @dynamic lockTime;
+@dynamic associatedShapeshift;
 
 + (void)setContext:(NSManagedObjectContext *)context
 {
@@ -59,6 +60,7 @@
         self.txHash = tx.txHash;
         self.blockHeight = tx.blockHeight;
         self.timestamp = tx.timestamp;
+        self.associatedShapeshift = tx.associatedShapeshift;
     
         while (inputs.count < tx.inputHashes.count) {
             [inputs addObject:[BRTxInputEntity managedObject]];
@@ -101,6 +103,7 @@
         tx.lockTime = self.lockTime;
         tx.blockHeight = self.blockHeight;
         tx.timestamp = self.timestamp;
+        tx.associatedShapeshift = self.associatedShapeshift;
     
         for (BRTxInputEntity *e in self.inputs) {
             [tx addInputHash:e.txHash index:e.n script:nil signature:e.signature sequence:e.sequence];
