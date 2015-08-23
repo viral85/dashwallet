@@ -116,16 +116,19 @@
     NSString * outboundShapeshiftAddress = [self shapeshiftOutboundAddress];
     if (outboundShapeshiftAddress) {
         self.associatedShapeshift = [DCShapeshiftEntity shapeshiftHavingWithdrawalAddress:outboundShapeshiftAddress];
+        if (self.associatedShapeshift && [self.associatedShapeshift.shapeshiftStatus integerValue] == eShapeshiftAddressStatus_Unused) {
+            self.associatedShapeshift.shapeshiftStatus = @(eShapeshiftAddressStatus_NoDeposits);
+        }
         if (!self.associatedShapeshift && [self.outputAddresses count]) {
             NSString * mainOutputAddress = nil;
             BRWalletManager *m = [BRWalletManager sharedInstance];
             for (NSString * outputAddress in self.outputAddresses) {
-                if ([m.wallet containsAddress:address]) continue;
+                if ([m.wallet containsAddress:outputAddress]) continue;
                 if ([outputAddress isEqual:[NSNull null]]) continue;
                 mainOutputAddress = outputAddress;
             }
             NSAssert(mainOutputAddress, @"there should always be an output address");
-            self.associatedShapeshift = [DCShapeshiftEntity registerShapeshiftWithInputAddress:mainOutputAddress andWithdrawalAddress:outboundShapeshiftAddress];
+            self.associatedShapeshift = [DCShapeshiftEntity registerShapeshiftWithInputAddress:mainOutputAddress andWithdrawalAddress:outboundShapeshiftAddress withStatus:eShapeshiftAddressStatus_NoDeposits];
         }
     }
     return self;

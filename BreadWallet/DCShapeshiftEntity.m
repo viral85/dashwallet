@@ -13,7 +13,7 @@
 
 @interface DCShapeshiftEntity()
 
-@property(nonatomic,assign) BOOL checkingStatus;
+@property(atomic,assign) BOOL checkingStatus;
 @property (nonatomic, strong) NSTimer * checkStatusTimer;
 
 @end
@@ -44,8 +44,11 @@
         case eShapeshiftAddressStatus_Failed:
             return self.errorMessage;
             break;
+        case eShapeshiftAddressStatus_Unused:
+            return @"Started Shapeshift";
+            break;
         case eShapeshiftAddressStatus_NoDeposits:
-            return @"Waiting for Deposit";
+            return @"Shapeshift Depositing";
             break;
         case eShapeshiftAddressStatus_Received:
             return @"Shapeshift in Progress";
@@ -56,27 +59,31 @@
 }
 
 +(DCShapeshiftEntity*)shapeshiftHavingWithdrawalAddress:(NSString*)withdrawalAddress {
-    DCShapeshiftEntity * previousShapeshift = [DCShapeshiftEntity anyObjectMatching:@"withdrawalAddress == %@ && shapeshiftStatus == %@",withdrawalAddress, @(eShapeshiftAddressStatus_NoDeposits)];
+    DCShapeshiftEntity * previousShapeshift = [DCShapeshiftEntity anyObjectMatching:@"withdrawalAddress == %@ && shapeshiftStatus == %@",withdrawalAddress, @(eShapeshiftAddressStatus_Unused)];
     return previousShapeshift;
 }
 
-+(DCShapeshiftEntity*)registerShapeshiftWithInputAddress:(NSString*)inputAddress andWithdrawalAddress:(NSString*)withdrawalAddress {
++(DCShapeshiftEntity*)registerShapeshiftWithInputAddress:(NSString*)inputAddress andWithdrawalAddress:(NSString*)withdrawalAddress withStatus:(eShapeshiftAddressStatus)shapeshiftAddressStatus{
     DCShapeshiftEntity * shapeshift = [DCShapeshiftEntity managedObject];
     shapeshift.inputAddress = inputAddress;
     shapeshift.withdrawalAddress = withdrawalAddress;
-    shapeshift.shapeshiftStatus = @(eShapeshiftAddressStatus_NoDeposits);
+    shapeshift.shapeshiftStatus = @(shapeshiftAddressStatus);
     shapeshift.isFixedAmount = @NO;
     [self saveContext];
     return shapeshift;
+}
+
++(NSArray*)shapeshiftsInProgress {
+    return [DCShapeshiftEntity objectsMatching:@"shapeshiftStatus == %@ || shapeshiftStatus == %@",@(eShapeshiftAddressStatus_NoDeposits), @(eShapeshiftAddressStatus_Received)];
 }
 
 -(void)checkStatus {
     if (self.checkingStatus) {
         return;
     }
-    checkingStatus = TRUE;
+    self.checkingStatus = TRUE;
     [[DCShapeshiftManager sharedInstance] GET_transactionStatusWithAddress:self.inputAddress completionBlock:^(NSDictionary *transactionInfo, NSError *error) {
-        checkingStatus = FALSE;
+        self.checkingStatus = FALSE;
         if (transactionInfo) {
             NSString * status = transactionInfo[@"status"];
             if ([status isEqualToString:@"received"]) {
@@ -119,7 +126,12 @@
 }
 
 -(void)routinelyCheckStatusAtInterval:(NSTimeInterval)timeInterval {
-    self.checkStatusTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(checkStatus) userInfo:nil repeats:YES];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.checkStatusTimer) {
+            [self.checkStatusTimer invalidate];
+        }
+        self.checkStatusTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval target:self selector:@selector(checkStatus) userInfo:nil repeats:YES];
+    });
 }
 
 -(void)deleteObject {

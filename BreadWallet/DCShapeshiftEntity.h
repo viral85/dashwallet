@@ -10,10 +10,11 @@
 #import <CoreData/CoreData.h>
 
 typedef enum eShapeshiftAddressStatus {
-    eShapeshiftAddressStatus_NoDeposits = 0,
-    eShapeshiftAddressStatus_Received = 1,
-    eShapeshiftAddressStatus_Complete = 2,
-    eShapeshiftAddressStatus_Failed = 4,
+    eShapeshiftAddressStatus_Unused = 0,
+    eShapeshiftAddressStatus_NoDeposits = 1,
+    eShapeshiftAddressStatus_Received = 2,
+    eShapeshiftAddressStatus_Complete = 4,
+    eShapeshiftAddressStatus_Failed = 8,
     eShapeshiftAddressStatus_Finished = eShapeshiftAddressStatus_Complete | eShapeshiftAddressStatus_Failed,
 } eShapeshiftAddressStatus;
 
@@ -39,8 +40,10 @@ typedef enum eShapeshiftAddressStatus {
 
 -(void)checkStatus;
 
++(NSArray*)shapeshiftsInProgress;
+
 +(DCShapeshiftEntity*)shapeshiftHavingWithdrawalAddress:(NSString*)withdrawalAddress;
-+(DCShapeshiftEntity*)registerShapeshiftWithInputAddress:(NSString*)inputAddress andWithdrawalAddress:(NSString*)withdrawalAddress;
++(DCShapeshiftEntity*)registerShapeshiftWithInputAddress:(NSString*)inputAddress andWithdrawalAddress:(NSString*)withdrawalAddress withStatus:(eShapeshiftAddressStatus)shapeshiftAddressStatus;
 
 -(void)routinelyCheckStatusAtInterval:(NSTimeInterval)timeInterval;
 

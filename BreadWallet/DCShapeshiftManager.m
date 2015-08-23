@@ -103,7 +103,7 @@
     [fetchRequest setSortDescriptors:sortDescriptors];
     
     NSPredicate *filterPredicate = [self shapeshiftsNeedingInfo];
-    //[fetchRequest setPredicate:filterPredicate];
+    [fetchRequest setPredicate:filterPredicate];
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
