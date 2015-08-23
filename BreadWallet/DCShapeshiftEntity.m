@@ -11,6 +11,13 @@
 #import "NSManagedObject+Sugar.h"
 #import "DCShapeshiftManager.h"
 
+@interface DCShapeshiftEntity()
+
+@property(nonatomic,assign) BOOL checkingStatus;
+@property (nonatomic, strong) NSTimer * checkStatusTimer;
+
+@end
+
 @implementation DCShapeshiftEntity
 
 @dynamic inputAddress;
@@ -26,6 +33,7 @@
 @dynamic isFixedAmount;
 @dynamic transaction;
 
+@synthesize checkingStatus;
 @synthesize checkStatusTimer;
 
 -(NSString*)shapeshiftStatusString {
@@ -63,7 +71,12 @@
 }
 
 -(void)checkStatus {
+    if (self.checkingStatus) {
+        return;
+    }
+    checkingStatus = TRUE;
     [[DCShapeshiftManager sharedInstance] GET_transactionStatusWithAddress:self.inputAddress completionBlock:^(NSDictionary *transactionInfo, NSError *error) {
+        checkingStatus = FALSE;
         if (transactionInfo) {
             NSString * status = transactionInfo[@"status"];
             if ([status isEqualToString:@"received"]) {

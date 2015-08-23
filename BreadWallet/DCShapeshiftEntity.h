@@ -14,6 +14,7 @@ typedef enum eShapeshiftAddressStatus {
     eShapeshiftAddressStatus_Received = 1,
     eShapeshiftAddressStatus_Complete = 2,
     eShapeshiftAddressStatus_Failed = 4,
+    eShapeshiftAddressStatus_Finished = eShapeshiftAddressStatus_Complete | eShapeshiftAddressStatus_Failed,
 } eShapeshiftAddressStatus;
 
 
@@ -34,9 +35,9 @@ typedef enum eShapeshiftAddressStatus {
 @property (nonatomic, retain) NSNumber * isFixedAmount;
 @property (nonatomic, retain) BRTransactionEntity *transaction;
 
-@property (nonatomic, strong) NSTimer * checkStatusTimer;
-
 -(NSString*)shapeshiftStatusString;
+
+-(void)checkStatus;
 
 +(DCShapeshiftEntity*)shapeshiftHavingWithdrawalAddress:(NSString*)withdrawalAddress;
 +(DCShapeshiftEntity*)registerShapeshiftWithInputAddress:(NSString*)inputAddress andWithdrawalAddress:(NSString*)withdrawalAddress;

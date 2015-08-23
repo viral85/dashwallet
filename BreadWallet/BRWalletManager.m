@@ -234,14 +234,25 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     self.bitcoinFormat.lenient = YES;
     self.bitcoinFormat.numberStyle = NSNumberFormatterCurrencyStyle;
     self.bitcoinFormat.generatesDecimalNumbers = YES;
-    self.bitcoinFormat.negativeFormat = [self.dashFormat.positiveFormat
-                                  stringByReplacingCharactersInRange:[self.dashFormat.positiveFormat rangeOfString:@"#"]
+    self.bitcoinFormat.negativeFormat = [self.bitcoinFormat.positiveFormat
+                                  stringByReplacingCharactersInRange:[self.bitcoinFormat.positiveFormat rangeOfString:@"#"]
                                   withString:@"-#"];
     self.bitcoinFormat.currencyCode = @"BTC";
     self.bitcoinFormat.currencySymbol = BTC NARROW_NBSP;
     self.bitcoinFormat.maximumFractionDigits = 8;
     self.bitcoinFormat.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
     self.bitcoinFormat.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.bitcoinFormat.maximumFractionDigits));
+    
+    _unknownFormat = [NSNumberFormatter new];
+    self.unknownFormat.lenient = YES;
+    self.unknownFormat.numberStyle = NSNumberFormatterCurrencyStyle;
+    self.unknownFormat.generatesDecimalNumbers = YES;
+    self.unknownFormat.negativeFormat = [self.unknownFormat.positiveFormat
+                                         stringByReplacingCharactersInRange:[self.unknownFormat.positiveFormat rangeOfString:@"#"]
+                                         withString:@"-#"];
+    self.unknownFormat.maximumFractionDigits = 8;
+    self.unknownFormat.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
+    self.unknownFormat.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.unknownFormat.maximumFractionDigits));
     
     _localFormat = [NSNumberFormatter new];
     self.localFormat.lenient = YES;
@@ -1137,6 +1148,13 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 }
 
 #pragma mark - string helpers
+
+- (int64_t)amountForUnknownCurrencyString:(NSString *)string
+{
+    if (! string.length) return 0;
+    return [[[NSDecimalNumber decimalNumberWithString:string]
+             decimalNumberByMultiplyingByPowerOf10:self.unknownFormat.maximumFractionDigits] longLongValue];
+}
 
 - (int64_t)amountForDashString:(NSString *)string
 {

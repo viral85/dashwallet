@@ -35,7 +35,7 @@
 
 @interface BRTxDetailViewController ()
 
-@property (nonatomic, strong) NSArray *outputText, *outputDetail, *outputAmount;
+@property (nonatomic, strong) NSArray *outputText, *outputDetail, *outputAmount, *outputIsBitcoin;
 @property (nonatomic, assign) int64_t sent, received;
 @property (nonatomic, strong) id txStatusObserver;
 
@@ -80,7 +80,7 @@
 - (void)setTransaction:(BRTransaction *)transaction
 {
     BRWalletManager *m = [BRWalletManager sharedInstance];
-    NSMutableArray *text = [NSMutableArray array], *detail = [NSMutableArray array], *amount = [NSMutableArray array];
+    NSMutableArray *text = [NSMutableArray array], *detail = [NSMutableArray array], *amount = [NSMutableArray array], *currencyIsBitcoinInstead = [NSMutableArray array];
     uint64_t fee = [m.wallet feeForTransaction:transaction];
     NSUInteger i = 0;
     
@@ -106,12 +106,14 @@
                         [text addObject:[NSString base58checkWithData:data]];
                         [detail addObject:NSLocalizedString(@"Bitcoin address (shapeshift)", nil)];
                         if (transaction.associatedShapeshift.outputCoinAmount) {
-                            [amount addObject:transaction.associatedShapeshift.outputCoinAmount];
+                            [amount addObject:@([m amountForUnknownCurrencyString:[transaction.associatedShapeshift.outputCoinAmount stringValue]])];
                         } else {
                             [amount addObject:@(UINT64_MAX)];
                         }
+                        [currencyIsBitcoinInstead addObject:@TRUE];
                     }
                 } else {
+                    [currencyIsBitcoinInstead addObject:@FALSE];
                     [text addObject:NSLocalizedString(@"unknown address", nil)];
                     [detail addObject:NSLocalizedString(@"payment output", nil)];
                     [amount addObject:@(-amt)];
@@ -123,12 +125,14 @@
                 [text addObject:address];
                 [detail addObject:NSLocalizedString(@"wallet address", nil)];
                 [amount addObject:@(amt)];
+                [currencyIsBitcoinInstead addObject:@FALSE];
             }
         }
         else if (self.sent > 0) {
             [text addObject:address];
             [detail addObject:NSLocalizedString(@"payment address", nil)];
             [amount addObject:@(-amt)];
+            [currencyIsBitcoinInstead addObject:@FALSE];
         }
     }
 
@@ -136,11 +140,13 @@
         [text addObject:@""];
         [detail addObject:NSLocalizedString(@"dash network fee", nil)];
         [amount addObject:@(-fee)];
+        [currencyIsBitcoinInstead addObject:@FALSE];
     }
     
     self.outputText = text;
     self.outputDetail = detail;
     self.outputAmount = amount;
+    self.outputIsBitcoin = currencyIsBitcoinInstead;
 }
 
 - (void)setBackgroundForCell:(UITableViewCell *)cell indexPath:(NSIndexPath *)path
@@ -168,14 +174,14 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return 3 + !!self.transaction.associatedShapeshift;
+    return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
     switch (section) {
-        case 0: return self.transaction.associatedShapeshift?4:3;
+        case 0: return self.transaction.associatedShapeshift?(([self.transaction.associatedShapeshift.shapeshiftStatus integerValue]| eShapeshiftAddressStatus_Finished)?5:4):3;
         case 1: return (self.sent > 0) ? self.outputText.count : self.transaction.inputAddresses.count;
         case 2: return (self.sent > 0) ? self.transaction.inputAddresses.count : self.outputText.count;
     }
@@ -192,12 +198,15 @@
     NSUInteger peerCount = [[BRPeerManager sharedInstance] peerCount],
                relayCount = [[BRPeerManager sharedInstance] relayCountForTransaction:self.transaction.txHash];
     NSInteger indexPathRow = indexPath.row;
-    if (!self.transaction.associatedShapeshift) {
-        if (indexPathRow > 0) indexPathRow++;
-    }
+
     // Configure the cell...
     switch (indexPath.section) {
         case 0:
+            if (!self.transaction.associatedShapeshift) {
+                if (indexPathRow > 0) indexPathRow += 2; // no assoc
+            } else if (!([self.transaction.associatedShapeshift.shapeshiftStatus integerValue] | eShapeshiftAddressStatus_Finished)) {
+                if (indexPathRow > 0) indexPathRow += 1;
+            }
             switch (indexPathRow) {
                 case 0:
                     cell = [tableView dequeueReusableCellWithIdentifier:@"TitleCell" forIndexPath:indexPath];
@@ -217,12 +226,22 @@
                     detailLabel = (id)[cell viewWithTag:2];
                     subtitleLabel = (id)[cell viewWithTag:3];
                     [self setBackgroundForCell:cell indexPath:indexPath];
+                    textLabel.text = NSLocalizedString(@"shapeshift bitcoin id:", nil);
+                    detailLabel.text = [self.transaction.associatedShapeshift outputTransactionId];
+                    subtitleLabel.text = nil;
+                    break;
+                case 2:
+                    cell = [tableView dequeueReusableCellWithIdentifier:@"TitleCell" forIndexPath:indexPath];
+                    cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+                    textLabel = (id)[cell viewWithTag:1];
+                    detailLabel = (id)[cell viewWithTag:2];
+                    subtitleLabel = (id)[cell viewWithTag:3];
+                    [self setBackgroundForCell:cell indexPath:indexPath];
                     textLabel.text = NSLocalizedString(@"shapeshift status:", nil);
                     detailLabel.text = [self.transaction.associatedShapeshift shapeshiftStatusString];
                     subtitleLabel.text = nil;
                     break;
-                    
-                case 2:
+                case 3:
                     cell = [tableView dequeueReusableCellWithIdentifier:@"TitleCell" forIndexPath:indexPath];
                     cell.selectionStyle = UITableViewCellSelectionStyleNone;
                     textLabel = (id)[cell viewWithTag:1];
@@ -252,7 +271,7 @@
                     
                     break;
                     
-                case 3:
+                case 4:
                     cell = [tableView dequeueReusableCellWithIdentifier:@"TransactionCell"];
                     [self setBackgroundForCell:cell indexPath:indexPath];
                     textLabel = (id)[cell viewWithTag:1];
@@ -302,11 +321,23 @@
                     localCurrencyLabel.textColor = amountLabel.textColor;
                     localCurrencyLabel.text = @"";
                 } else {
-                    amountLabel.attributedText = [m attributedDashStringForAmount:[self.outputAmount[indexPath.row] longLongValue] withTintColor:amountLabel.textColor dashSymbolSize:CGSizeMake(9, 9)];
-                    localCurrencyLabel.textColor = amountLabel.textColor;
-                    localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
-                                               [m localCurrencyStringForDashAmount:[self.outputAmount[indexPath.row]
-                                                                                    longLongValue]]];
+
+
+                    BOOL isBitcoinInstead = [self.outputIsBitcoin[indexPath.row] boolValue];
+                    if (isBitcoinInstead) {
+                        amountLabel.text = [m bitcoinStringForAmount:[self.outputAmount[indexPath.row] longLongValue]];
+                        amountLabel.textColor = [UIColor colorWithRed:0.0 green:0.75 blue:0.0 alpha:1.0];
+                        localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
+                                                   [m localCurrencyStringForBitcoinAmount:[self.outputAmount[indexPath.row]
+                                                                                        longLongValue]]];
+                    } else {
+                        amountLabel.attributedText = [m attributedDashStringForAmount:[self.outputAmount[indexPath.row] longLongValue] withTintColor:amountLabel.textColor dashSymbolSize:CGSizeMake(9, 9)];
+                        localCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",
+                                                   [m localCurrencyStringForDashAmount:[self.outputAmount[indexPath.row]
+                                                                                        longLongValue]]];
+                    }
+                                        localCurrencyLabel.textColor = amountLabel.textColor;
+                    
                 }
 
             }
@@ -342,7 +373,7 @@
             [self setBackgroundForCell:cell indexPath:indexPath];
             break;
     }
-    
+    NSAssert(cell, @"there must be a cell");
     return cell;
 }
 

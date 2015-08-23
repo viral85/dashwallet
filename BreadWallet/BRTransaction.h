@@ -76,6 +76,7 @@ sequence:(uint32_t)sequence;
 - (BOOL)signWithPrivateKeys:(NSArray *)privateKeys;
 
 - (NSString*)shapeshiftOutboundAddress;
++ (NSString*)shapeshiftOutboundAddressForScript:(NSData*)script;
 
 // priority = sum(input_amount_in_DUFFS*input_age_in_blocks)/tx_size_in_bytes
 - (uint64_t)priorityForAmounts:(NSArray *)amounts withAges:(NSArray *)ages;

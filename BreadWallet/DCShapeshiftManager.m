@@ -7,10 +7,31 @@
 //
 
 #import "DCShapeshiftManager.h"
+#import <CoreData/CoreData.h>
+#import "NSManagedObject+Sugar.h"
+#import "DCShapeshiftEntity.h"
+#import "BRTransactionEntity.h"
+#import "BRTxOutputEntity.h"
 
 #define SHAPESHIFT_PUBLIC_KEY @"9bcdf9343a4548c6268e1ee99e6bb43af95e88eb532f4e807b423adb7a96e54664b9c3d1130f3386c005b353402c9e7698236d1e21807b8b87d64dc605552f4a"
 
+@interface DCShapeshiftManager() <NSFetchedResultsControllerDelegate>
+
+@property (nonatomic,strong) NSFetchedResultsController * shapeshiftFetchedResultsController;
+
+@end
+
+
 @implementation DCShapeshiftManager
+
+-(id)init {
+    self = [super init];
+    if (self) {
+        [self shapeshiftFetchedResultsController];
+        [self queryInitialShapeshiftsNeedingInfo];
+    }
+    return self;
+}
 
 + (instancetype)sharedInstance
 {
@@ -52,6 +73,100 @@
     
     return [string dataUsingEncoding:NSUTF8StringEncoding];
 }
+
+#pragma mark - Automation KVO
+
+-(NSManagedObjectContext*)managedObjectContext {
+    return [NSManagedObject context];
+}
+
+-(NSPredicate*)shapeshiftsNeedingInfo {
+    // Get all shapeshifts that have been received by shapeshift.io or all shapeshifts that have no deposits but where we can verify a transaction has been pushed on the blockchain
+    return [NSPredicate predicateWithFormat:@"(shapeshiftStatus == %@) || ((shapeshiftStatus == %@) && (SUBQUERY(transaction.outputs, $output, ($output.shapeshiftOutboundAddress != NIL)).@count == 1))",@(eShapeshiftAddressStatus_Received),@(eShapeshiftAddressStatus_NoDeposits)];
+}
+
+- (NSFetchedResultsController *)fetchedResultsController
+{
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    // Edit the entity name as appropriate.
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"DCShapeshiftEntity" inManagedObjectContext:self.managedObjectContext];
+    [fetchRequest setEntity:entity];
+    
+    // Set the batch size to a suitable number.
+    [fetchRequest setFetchBatchSize:12];
+    
+    // Edit the sort key as appropriate.
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"expiresAt" ascending:NO];
+    NSArray *sortDescriptors = @[sortDescriptor];
+    
+    [fetchRequest setSortDescriptors:sortDescriptors];
+    
+    NSPredicate *filterPredicate = [self shapeshiftsNeedingInfo];
+    //[fetchRequest setPredicate:filterPredicate];
+    
+    // Edit the section name key path and cache name if appropriate.
+    // nil for section name key path means "no sections".
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:nil];
+    aFetchedResultsController.delegate = self;
+    NSError *error = nil;
+    if (![aFetchedResultsController performFetch:&error]) {
+        // Replace this implementation with code to handle the error appropriately.
+        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+    
+    return aFetchedResultsController;
+}
+
+-(NSFetchedResultsController*)shapeshiftFetchedResultsController {
+    
+    if (_shapeshiftFetchedResultsController != nil)
+    {
+        return _shapeshiftFetchedResultsController;
+    }
+    _shapeshiftFetchedResultsController = [self fetchedResultsController];
+    return _shapeshiftFetchedResultsController;
+}
+
+- (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
+    
+}
+
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo
+           atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
+    
+}
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject
+       atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)changeType
+      newIndexPath:(NSIndexPath *)newIndexPath {
+    if (changeType == NSFetchedResultsChangeInsert) {
+        [(DCShapeshiftEntity*)anObject routinelyCheckStatusAtInterval:10];
+        NSLog(@"BLOP %@",anObject);
+    }
+}
+
+
+- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
+    
+    
+}
+
+#pragma mark - Shapeshift Helper calls
+
+-(void)queryInitialShapeshiftsNeedingInfo {
+    for (DCShapeshiftEntity * shapeshift in self.shapeshiftFetchedResultsController.fetchedObjects) {
+//        for (BRTxOutputEntity * output in  shapeshift.transaction.outputs) {
+//            NSLog(@"o %@", output.shapeshiftOutboundAddress);
+//        }
+        [shapeshift routinelyCheckStatusAtInterval:10];
+    }
+}
+
+#pragma mark - Shapeshift API calls
 
 ////////////////////////////////////////////////////////////////////
 /*
@@ -164,6 +279,7 @@
                                    dispatch_async(dispatch_get_main_queue(), ^{
                                        completionBlock(nil,returnError);
                                    });
+                                   return ;
                                }
                                NSError *error = nil;
                                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];

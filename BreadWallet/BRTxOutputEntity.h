@@ -36,6 +36,7 @@
 @property (nonatomic, retain) NSData *script;
 @property (nonatomic) int64_t value;
 @property (nonatomic) BOOL spent;
+@property (nonatomic, retain) NSString *shapeshiftOutboundAddress;
 @property (nonatomic, retain) BRTransactionEntity *transaction;
 
 - (instancetype)setAttributesFromTx:(BRTransaction *)tx outputIndex:(NSUInteger)index;

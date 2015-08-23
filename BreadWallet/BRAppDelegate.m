@@ -26,6 +26,7 @@
 #import "BRAppDelegate.h"
 #import "BRPeerManager.h"
 #import "BRWalletManager.h"
+#import "DCShapeshiftManager.h"
 
 #if DASH_TESTNET
 #pragma message "testnet build"
@@ -60,6 +61,8 @@
              userInfo:@{@"file":file}];
         }
     }
+    
+    [DCShapeshiftManager sharedInstance];
 
     //TODO: bitcoin protocol/payment protocol over multipeer connectivity
 

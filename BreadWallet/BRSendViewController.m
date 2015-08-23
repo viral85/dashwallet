@@ -861,7 +861,7 @@ static NSString *sanitizeString(NSString *s)
 
 -(void)startObservingShapeshift:(DCShapeshiftEntity*)shapeshift {
     [self addObserver:shapeshift forKeyPath:@"shapeshiftStatus" options:NSKeyValueObservingOptionNew context:nil];
-    [shapeshift routinelyCheckStatusAtInterval:15];
+    [shapeshift routinelyCheckStatusAtInterval:10];
     self.shapeshiftView.hidden = FALSE;
 }
 

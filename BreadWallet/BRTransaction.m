@@ -29,6 +29,7 @@
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Dash.h"
 #import <CommonCrypto/CommonHMAC.h>
+#import "BRWalletManager.h"
 
 #define TX_VERSION    0x00000001u
 #define TX_LOCKTIME   0x00000000u
@@ -116,7 +117,15 @@
     if (outboundShapeshiftAddress) {
         self.associatedShapeshift = [DCShapeshiftEntity shapeshiftHavingWithdrawalAddress:outboundShapeshiftAddress];
         if (!self.associatedShapeshift && [self.outputAddresses count]) {
-            self.associatedShapeshift = [DCShapeshiftEntity registerShapeshiftWithInputAddress:[self.outputAddresses firstObject] andWithdrawalAddress:outboundShapeshiftAddress];
+            NSString * mainOutputAddress = nil;
+            BRWalletManager *m = [BRWalletManager sharedInstance];
+            for (NSString * outputAddress in self.outputAddresses) {
+                if ([m.wallet containsAddress:address]) continue;
+                if ([outputAddress isEqual:[NSNull null]]) continue;
+                mainOutputAddress = outputAddress;
+            }
+            NSAssert(mainOutputAddress, @"there should always be an output address");
+            self.associatedShapeshift = [DCShapeshiftEntity registerShapeshiftWithInputAddress:mainOutputAddress andWithdrawalAddress:outboundShapeshiftAddress];
         }
     }
     return self;
@@ -445,17 +454,23 @@ sequence:(uint32_t)sequence
 
 - (NSString*)shapeshiftOutboundAddress {
     for (NSData * script in self.outputScripts) {
-        if ([script UInt8AtOffset:0] == OP_RETURN) {
-            UInt8 length = [script UInt8AtOffset:1];
-            if ([script UInt8AtOffset:2] == OP_SHAPESHIFT) {
-                NSMutableData * data = [NSMutableData data];
-                uint8_t v = BITCOIN_PUBKEY_ADDRESS;
-                [data appendBytes:&v length:1];
-                NSData * addressData = [script subdataWithRange:NSMakeRange(3, length - 1)];
-                
-                [data appendData:addressData];
-                return [NSString base58checkWithData:data];
-            }
+        NSString * outboundAddress = [BRTransaction shapeshiftOutboundAddressForScript:script];
+        if (outboundAddress) return outboundAddress;
+    }
+    return nil;
+}
+
++ (NSString*)shapeshiftOutboundAddressForScript:(NSData*)script {
+    if ([script UInt8AtOffset:0] == OP_RETURN) {
+        UInt8 length = [script UInt8AtOffset:1];
+        if ([script UInt8AtOffset:2] == OP_SHAPESHIFT) {
+            NSMutableData * data = [NSMutableData data];
+            uint8_t v = BITCOIN_PUBKEY_ADDRESS;
+            [data appendBytes:&v length:1];
+            NSData * addressData = [script subdataWithRange:NSMakeRange(3, length - 1)];
+            
+            [data appendData:addressData];
+            return [NSString base58checkWithData:data];
         }
     }
     return nil;
