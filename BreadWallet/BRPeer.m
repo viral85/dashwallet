@@ -269,7 +269,9 @@ services:(uint64_t)services
     if (! self.runLoop) return;
 
     CFRunLoopPerformBlock([self.runLoop getCFRunLoop], kCFRunLoopCommonModes, ^{
+        #if DEBUG
         NSLog(@"%@:%u sending %@", self.host, self.port, type);
+#endif
 
         [self.outputBuffer appendMessage:message type:type];
         

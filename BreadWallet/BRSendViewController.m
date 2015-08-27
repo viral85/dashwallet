@@ -143,6 +143,7 @@ static NSString *sanitizeString(NSString *s)
         self.shapeshiftView.hidden = TRUE;
     } else {
         for (DCShapeshiftEntity * shapeshift in shapeshiftsInProgress) {
+            [shapeshift transaction];
             [self startObservingShapeshift:shapeshift];
         }
     }
@@ -862,9 +863,9 @@ static NSString *sanitizeString(NSString *s)
     switch ([shapeshift.shapeshiftStatus integerValue]) {
         case eShapeshiftAddressStatus_Complete:
         {
-            self.shapeshiftLabel.text = shapeshift.shapeshiftStatusString;
             NSArray * shapeshiftsInProgress = [DCShapeshiftEntity shapeshiftsInProgress];
             if (![shapeshiftsInProgress count]) {
+                self.shapeshiftLabel.text = shapeshift.shapeshiftStatusString;
                 self.shapeshiftView.hidden = TRUE;
             }
             [self.view addSubview:[[[BRBubbleView viewWithText:NSLocalizedString(@"shapeshift succeeded", nil)
@@ -1057,22 +1058,32 @@ static NSString *sanitizeString(NSString *s)
         NSString * returnAddress = m.wallet.receiveAddress;
         NSNumber * numberAmount = [m numberForAmount:amount];
         [[DCShapeshiftManager sharedInstance] POST_SendAmount:numberAmount withAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
-            if (error)
+            [hud hide:TRUE];
+            if (error) {
                 NSLog(@"shapeshiftBitcoinAmount Error %@",error);
+                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Shapeshift failed", nil)
+                                            message:error.localizedDescription
+                                           delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                                  otherButtonTitles:nil] show];
+                return;
+            }
             NSString * depositAddress = shiftInfo[@"deposit"];
             NSString * withdrawalAddress = shiftInfo[@"withdrawal"];
             NSNumber * withdrawalAmount = shiftInfo[@"withdrawalAmount"];
             NSNumber * depositAmountNumber = @([shiftInfo[@"depositAmount"] doubleValue]);
-            if (depositAmountNumber) {
+            if (depositAmountNumber && [withdrawalAmount floatValue] && [depositAmountNumber floatValue]) {
                 uint64_t depositAmount = [[[NSDecimalNumber decimalNumberWithString:[NSString stringWithFormat:@"%@",depositAmountNumber]] decimalNumberByMultiplyingByPowerOf10:8]
                                           unsignedLongLongValue];
                 self.amount = depositAmount;
-                BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=shapeshift",depositAddress,depositAmount,sanitizeString(self.request.commonName)]];
-                [self confirmProtocolRequest:request.protocolRequest];
+                
+                DCShapeshiftEntity * shapeshift = [DCShapeshiftEntity registerShapeshiftWithInputAddress:depositAddress andWithdrawalAddress:withdrawalAddress withStatus:eShapeshiftAddressStatus_Unused fixedAmountOut:depositAmountNumber amountIn:depositAmountNumber];
+                
+                BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=Shapeshift to %@",depositAddress,depositAmount,sanitizeString(self.request.commonName),withdrawalAddress]];
+                [self confirmProtocolRequest:request.protocolRequest currency:@"dash" associatedShapeshift:shapeshift];
             }
         }];
     } failureBlock:^{
-        
+        [hud hide:TRUE];
     }];
 }
 

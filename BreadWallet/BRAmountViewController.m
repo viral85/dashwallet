@@ -468,13 +468,23 @@ replacementString:(NSString *)string
     }
     NSUInteger minDigits = formatter.minimumFractionDigits;
     NSUInteger maxDigits = formatter.maximumFractionDigits;
-    NSUInteger point = [amountLabel.text rangeOfString:formatter.currencyDecimalSeparator].location, l;
+    
+    formatter.minimumFractionDigits = 0;
+    
+    NSString * previousString = amountLabel.text;
+    if (!self.swapped && [previousString characterAtIndex:0] == NSAttachmentCharacter) {
+        previousString = [previousString stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:DASH];
+    }
+    
+    NSUInteger digitLocationOld = [previousString rangeOfString:formatter.currencyDecimalSeparator].location;
+
     NSNumber * inputNumber = [formatter numberFromString:string];
-    NSNumber * previousNumber = [formatter numberFromString:amountLabel.text];
+    
+    NSNumber * previousNumber = [formatter numberFromString:previousString];
     NSString *formattedAmount;
     
     if (!self.amountFieldIsEmpty) {
-        if (![previousNumber floatValue] && point == NSNotFound && !([formatter.currencyDecimalSeparator isEqualToString:string])) {
+        if (![previousNumber floatValue] && digitLocationOld == NSNotFound && !([formatter.currencyDecimalSeparator isEqualToString:string])) {
             formattedAmount = [formatter stringFromNumber:inputNumber];
         } else {
             formattedAmount = [amountLabel.text stringByReplacingCharactersInRange:range withString:string];
@@ -489,71 +499,38 @@ replacementString:(NSString *)string
     if (!self.swapped && [formattedAmount characterAtIndex:0] == NSAttachmentCharacter) {
         formattedAmount = [formattedAmount stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:DASH];
     }
-    formatter.minimumFractionDigits = 0;
-    
+    NSUInteger digitLocationNew = [formattedAmount rangeOfString:formatter.currencyDecimalSeparator].location;
+    NSUInteger digits = 0;
+    if (digitLocationNew != NSNotFound) {
+        digits = formattedAmount.length - digitLocationNew - 1;
+    }
     NSNumber * number = [formatter numberFromString:formattedAmount];
-    NSString * numberString = [formatter stringFromNumber:number];
-    l = [numberString rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
-    l = (l < numberString.length) ? l + 1 : numberString.length;
+    
+    formatter.minimumFractionDigits = minDigits;
 
+    //special cases
     if (! string.length) { // delete trailing char
-        if (point != NSNotFound) { // there was a point before
-            if (![number floatValue] && [formattedAmount rangeOfString:formatter.currencyDecimalSeparator].location == NSNotFound) {
-                self.amountFieldIsEmpty = TRUE;
-                formattedAmount = [formatter stringFromNumber:@0];
-            } else {
-                formattedAmount = formattedAmount;
-            }
-        } else {
-            if (![number floatValue]) {
-                self.amountFieldIsEmpty = TRUE;
-                formattedAmount = [formatter stringFromNumber:@0];
-            }
+        if (![number floatValue] && digitLocationNew == NSNotFound) { // there is no decimal
+            self.amountFieldIsEmpty = TRUE;
+            formattedAmount = [formatter stringFromNumber:@0];
         }
     }
-    else if ((string.length > 0 && formattedAmount.length > 0 && formattedAmount == nil) ||
-             (point != NSNotFound && l - point > formatter.maximumFractionDigits)) {
-        formatter.minimumFractionDigits = minDigits;
+    else if (digits > formatter.maximumFractionDigits) { //can't send too small a value
         return; // too many digits
     }
-    else if ([string isEqual:formatter.currencyDecimalSeparator] && (! numberString.length || point == NSNotFound)) {
-        if (! amountLabel.text.length) formattedAmount = [formatter stringFromNumber:@0]; // if first char is '.', prepend a zero
-        l = [numberString rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
-        l = (l < numberString.length) ? l + 1 : numberString.length;
-        formattedAmount = [numberString stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:formatter.currencyDecimalSeparator];
-        self.amountFieldIsEmpty = FALSE;
-    }
-    else if ([string isEqual:@"0"]) {
-        self.amountFieldIsEmpty = FALSE;
-        if (! numberString.length) { // if first digit is zero, append a '.'
-            formattedAmount = [formatter stringFromNumber:@0];
-            l = [numberString rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
-            l = (l < numberString.length) ? l + 1 : numberString.length;
-            formattedAmount = [numberString stringByReplacingCharactersInRange:NSMakeRange(l, 0) withString:formatter.currencyDecimalSeparator];
+    else if ([string isEqualToString:formatter.currencyDecimalSeparator]) {  //adding a digit
+        if (digitLocationOld != NSNotFound) {
+            return;
         }
-        else if (point == NSNotFound) { // handle multiple zeros after '.'
-            formattedAmount = numberString;
+        if (![number integerValue]) {formattedAmount = [formatter stringFromNumber:@0]; // if first char is '.', prepend a zero
+        formattedAmount = [formattedAmount stringByReplacingCharactersInRange:NSMakeRange(formattedAmount.length, 0) withString:formatter.currencyDecimalSeparator];
         }
+        self.amountFieldIsEmpty = FALSE;
     } else {
         self.amountFieldIsEmpty = FALSE;
     }
-
-    l = [formattedAmount rangeOfCharacterFromSet:self.charset options:NSBackwardsSearch].location;
-    l = (l < formattedAmount.length) ? l + 1 : formattedAmount.length;
-
-//    // don't allow values below TX_MIN_OUTPUT_AMOUNT
-//    if (!inputNumber.floatValue) {
-//        if (![number integerValue] && formattedAmount.length > maxDigits + point) {
-//            return;
-//        }
-//    } else {
-//        if (![number floatValue] && formattedAmount.length > maxDigits + point + 1) {
-//            return;
-//        }
-//    }
-    formatter.minimumFractionDigits = minDigits;
     
-    if (formattedAmount.length == 0 || self.amountFieldIsEmpty) {
+    if (formattedAmount.length == 0 || self.amountFieldIsEmpty) { // ""
         if (self.usingShapeshift) {
             amountLabel.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m bitcoinCurrencyStringForAmount:0]]:[m attributedDashStringForAmount:0 withTintColor:[UIColor colorWithRed:25.0f/255.0f green:96.0f/255.0f blue:165.0f/255.0f alpha:1.0f] dashSymbolSize:CGSizeMake(15, 16)];
         } else {
