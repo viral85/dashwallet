@@ -614,7 +614,6 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="pressSwapButton:" destination="4fz-p1-NND" eventType="touchDown" id="dcp-Dn-0hs"/>
                                     <action selector="releaseSwapButton:" destination="4fz-p1-NND" eventType="touchCancel" id="Zog-EN-RCG"/>
                                     <action selector="releaseSwapButton:" destination="4fz-p1-NND" eventType="touchUpOutside" id="xEh-Xl-7eU"/>
                                     <action selector="swapCurrency:" destination="4fz-p1-NND" eventType="touchUpInside" id="HPi-aA-2L9"/>

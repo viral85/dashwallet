@@ -252,7 +252,6 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                          withString:@"-#"];
     self.unknownFormat.maximumFractionDigits = 8;
     self.unknownFormat.minimumFractionDigits = 0; // iOS 8 bug, minimumFractionDigits now has to be set after currencySymbol
-    self.unknownFormat.maximum = @(MAX_MONEY/(int64_t)pow(10.0, self.unknownFormat.maximumFractionDigits));
     
     _localFormat = [NSNumberFormatter new];
     self.localFormat.lenient = YES;

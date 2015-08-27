@@ -105,6 +105,8 @@
         }];
     if (self.usingShapeshift) {
         [self swapCurrency:self];
+    } else {
+        self.shapeshiftLocalCurrencyLabel.text = @"";
     }
     self.shapeshiftLocalCurrencyLabel.hidden = !self.usingShapeshift;
     
@@ -337,7 +339,7 @@
         }
         [attributedString appendAttributedString:[[NSMutableAttributedString alloc] initWithString:@")"]];
         self.localCurrencyLabel.attributedText = attributedString;
-        self.amountField.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForDashAmount:amount]]:[m attributedDashStringForAmount:amount];
+        self.amountField.attributedText = (self.swapped) ? [[NSAttributedString alloc] initWithString:[m localCurrencyStringForDashAmount:amount]]:[m attributedDashStringForAmount:amount withTintColor:self.amountField.textColor dashSymbolSize:CGSizeMake(15, 16)];
     }
 
     [self.view layoutIfNeeded];
@@ -381,48 +383,6 @@
     if (self.usingShapeshift) {
         self.shapeshiftLocalCurrencyLabel.text = [NSString stringWithFormat:@"(%@)",[m localCurrencyStringForDashAmount:0]];
     }
-}
-
-- (IBAction)pressSwapButton:(id)sender
-{
-    if (self.tipView) {
-        [self.tipView popOut];
-        self.tipView = nil;
-    }
-    
-    if (self.swapLeftLabel.hidden) {
-        self.swapLeftLabel.text = self.localCurrencyLabel.text;
-        self.swapLeftLabel.frame = self.localCurrencyLabel.frame;
-        [self.localCurrencyLabel.superview addSubview:self.swapLeftLabel];
-        self.swapLeftLabel.hidden = NO;
-        self.localCurrencyLabel.hidden = YES;
-    }
-
-    self.swapLeftLabel.textColor = self.localCurrencyLabel.textColor;
-
-    if (self.swapRightLabel.hidden) {
-        self.swapRightLabel.attributedText = self.amountField.attributedText;
-        self.swapRightLabel.frame = self.amountField.frame;
-        [self.amountField.superview addSubview:self.swapRightLabel];
-        self.swapRightLabel.hidden = NO;
-        self.amountField.hidden = YES;
-    }
-
-    self.swapRightLabel.textColor = (self.amountField.text.length > 0) ? self.amountField.textColor :
-                                    [UIColor colorWithWhite:0.75 alpha:1.0];
-
-//    [UIView animateWithDuration:0.1 animations:^{
-//        //self.swapLeftLabel.transform = CGAffineTransformMakeScale(0.85, 0.85);
-//        self.swapLeftLabel.textColor = self.swapRightLabel.textColor;
-//        self.swapRightLabel.textColor = self.localCurrencyLabel.textColor;
-//        if (self.usingShapeshift) {
-//            self.swapLeftLabel.text = [[self.swapLeftLabel.text stringByReplacingOccurrencesOfString:@"(~" withString:@""]
-//                                   stringByReplacingOccurrencesOfString:@")" withString:@""];
-//        } else {
-//            self.swapLeftLabel.text = [[self.swapLeftLabel.text stringByReplacingOccurrencesOfString:@"(" withString:@""]
-//                                       stringByReplacingOccurrencesOfString:@")" withString:@""];
-//        }
-//    }];
 }
 
 - (IBAction)releaseSwapButton:(id)sender
@@ -528,6 +488,10 @@ replacementString:(NSString *)string
         self.amountFieldIsEmpty = FALSE;
     } else {
         self.amountFieldIsEmpty = FALSE;
+    }
+    
+    if (!self.amountFieldIsEmpty) {
+        if (![formatter numberFromString:formattedAmount]) return;
     }
     
     if (formattedAmount.length == 0 || self.amountFieldIsEmpty) { // ""
