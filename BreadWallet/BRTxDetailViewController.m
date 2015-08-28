@@ -373,7 +373,6 @@
             [self setBackgroundForCell:cell indexPath:indexPath];
             break;
     }
-    NSAssert(cell, @"there must be a cell");
     return cell;
 }
 

@@ -1344,7 +1344,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Quantum Explorer (7CAY8RCMVA)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Darkcoin Foundation Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1357,7 +1357,7 @@
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9764efc0-9b8d-446f-ba83-48f2621c3c26";
+				PROVISIONING_PROFILE = "602913eb-71c0-44f9-861d-b7215ae7c31d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = GCov_Build;
@@ -1470,7 +1470,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Quantum Explorer (7CAY8RCMVA)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Darkcoin Foundation Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1483,7 +1483,7 @@
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9764efc0-9b8d-446f-ba83-48f2621c3c26";
+				PROVISIONING_PROFILE = "602913eb-71c0-44f9-861d-b7215ae7c31d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1494,7 +1494,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Quantum Explorer (7CAY8RCMVA)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Darkcoin Foundation Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1507,7 +1507,7 @@
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9764efc0-9b8d-446f-ba83-48f2621c3c26";
+				PROVISIONING_PROFILE = "602913eb-71c0-44f9-861d-b7215ae7c31d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
