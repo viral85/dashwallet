@@ -30,8 +30,8 @@
 #import "BRTransaction.h"
 #import "BRMerkleBlock.h"
 #import "NSManagedObject+Sugar.h"
+#import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
-#import <CommonCrypto/CommonDigest.h>
 
 @implementation BRTransactionEntity
 
@@ -51,12 +51,13 @@
 
 - (instancetype)setAttributesFromTx:(BRTransaction *)tx
 {
-    [[self managedObjectContext] performBlockAndWait:^{
+    [self.managedObjectContext performBlockAndWait:^{
         NSMutableOrderedSet *inputs = [self mutableOrderedSetValueForKey:@"inputs"];
         NSMutableOrderedSet *outputs = [self mutableOrderedSetValueForKey:@"outputs"];
+        UInt256 txHash = tx.txHash;
         NSUInteger idx = 0;
         
-        self.txHash = tx.txHash;
+        self.txHash = [NSData dataWithBytes:&txHash length:sizeof(txHash)];
         self.blockHeight = tx.blockHeight;
         self.timestamp = tx.timestamp;
     
@@ -96,14 +97,19 @@
 {
     BRTransaction *tx = [BRTransaction new];
     
-    [[self managedObjectContext] performBlockAndWait:^{
-        tx.txHash = self.txHash;
+    [self.managedObjectContext performBlockAndWait:^{
+        NSData *txHash = self.txHash;
+        
+        if (txHash.length == sizeof(UInt256)) tx.txHash = *(const UInt256 *)txHash.bytes;
         tx.lockTime = self.lockTime;
         tx.blockHeight = self.blockHeight;
         tx.timestamp = self.timestamp;
     
         for (BRTxInputEntity *e in self.inputs) {
-            [tx addInputHash:e.txHash index:e.n script:nil signature:e.signature sequence:e.sequence];
+            txHash = e.txHash;
+            if (txHash.length != sizeof(UInt256)) continue;
+            [tx addInputHash:*(const UInt256 *)txHash.bytes index:e.n script:nil signature:e.signature
+             sequence:e.sequence];
         }
         
         for (BRTxOutputEntity *e in self.outputs) {

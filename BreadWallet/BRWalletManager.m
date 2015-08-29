@@ -41,21 +41,16 @@
 #define CIRCLE @"\xE2\x97\x8C" // dotted circle (utf-8)
 #define DOT    @"\xE2\x97\x8F" // black circle (utf-8)
 
-#define UNSPENT_URL @"https://api.chain.com/v2/%@/addresses/%@/unspents?api-key-id=eed0d7697a880144bb854676f88d123f"
-#define TICKER_URL  @"https://bitpay.com/rates"
+#define UNSPENT_URL    @"https://api.chain.com/v2/%@/addresses/%@/unspents?api-key-id=eed0d7697a880144bb854676f88d123f"
+#define TICKER_URL     @"https://bitpay.com/rates"
+#define FEE_PER_KB_URL @"https://api.breadwallet.com/v1/fee-per-kb"
 
 #define SEED_ENTROPY_LENGTH    (128/8)
 #define SEC_ATTR_SERVICE       @"org.voisine.breadwallet"
-#define DEFAULT_CURRENCY_PRICE 500.0
 #define DEFAULT_CURRENCY_CODE  @"USD"
 #define DEFAULT_SPENT_LIMIT    SATOSHIS
-
-#if TX_FEE_0_8_RULES
-#define DEFAULT_FEE_PER_KB 0 // use standard minimum fee instead
-#else
-#define DEFAULT_FEE_PER_KB (4096*1000/512) // fee required by eligius pool, which supports child-pays-for-parent
-#endif
-#define MAX_FEE_PER_KB     (10100*1000/247) // slightly higher than a 100bit fee on a typical 247byte transaction
+#define DEFAULT_FEE_PER_KB     (4096*1000/225) // fee required by eligius pool, which supports child-pays-for-parent
+#define MAX_FEE_PER_KB         (100100*1000/225) // slightly higher than a 1000bit fee on a typical 225byte transaction
 
 #define LOCAL_CURRENCY_CODE_KEY @"LOCAL_CURRENCY_CODE"
 #define CURRENCY_CODES_KEY      @"CURRENCY_CODES"
@@ -63,6 +58,7 @@
 #define CURRENCY_PRICES_KEY     @"CURRENCY_PRICES"
 #define SPEND_LIMIT_AMOUNT_KEY  @"SPEND_LIMIT_AMOUNT"
 #define SECURE_TIME_KEY         @"SECURE_TIME"
+#define FEE_PER_KB_KEY          @"FEE_PER_KB"
 
 #define MNEMONIC_KEY        @"mnemonic"
 #define CREATION_TIME_KEY   @"creationtime"
@@ -233,7 +229,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             [self protectedInit];
         }];
 
-    if ([[UIApplication sharedApplication] isProtectedDataAvailable]) [self protectedInit];
+    if ([UIApplication sharedApplication].protectedDataAvailable) [self protectedInit];
     return self;
 }
 
@@ -262,28 +258,37 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     if (_wallet) return _wallet;
 
     if (getKeychainData(SEED_KEY, nil)) { // upgrade from old keychain scheme
-        NSLog(@"upgrading to authenticated keychain scheme");
-        if (! setKeychainData([self.sequence masterPublicKeyFromSeed:self.seed], MASTER_PUBKEY_KEY, NO)) return _wallet;
-        if (setKeychainData(getKeychainData(MNEMONIC_KEY, nil), MNEMONIC_KEY, YES)) setKeychainData(nil, SEED_KEY, NO);
+        @autoreleasepool {
+            NSString *seedPhrase = getKeychainString(MNEMONIC_KEY, nil);
+
+            NSLog(@"upgrading to authenticated keychain scheme");
+            if (! setKeychainData([self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:seedPhrase
+                                   withPassphrase:nil]], MASTER_PUBKEY_KEY, NO)) return _wallet;
+            if (setKeychainString(seedPhrase, MNEMONIC_KEY, YES)) setKeychainData(nil, SEED_KEY, NO);
+        }
     }
     
-    if (! self.masterPublicKey) return _wallet;
+    uint64_t feePerKb = 0;
+    NSData *mpk = self.masterPublicKey;
+    
+    if (! mpk) return _wallet;
     
     @synchronized(self) {
         if (_wallet) return _wallet;
             
         _wallet =
             [[BRWallet alloc] initWithContext:[NSManagedObject context] sequence:self.sequence
-            masterPublicKey:self.masterPublicKey seed:^NSData *(NSString *authprompt, uint64_t amount) {
+            masterPublicKey:mpk seed:^NSData *(NSString *authprompt, uint64_t amount) {
                 return [self seedWithPrompt:authprompt forAmount:amount];
             }];
 
         _wallet.feePerKb = DEFAULT_FEE_PER_KB;
+        feePerKb = [[NSUserDefaults standardUserDefaults] doubleForKey:FEE_PER_KB_KEY];
+        if (feePerKb >= DEFAULT_FEE_PER_KB && feePerKb <= MAX_FEE_PER_KB) _wallet.feePerKb = feePerKb;
         
         // verify that keychain matches core data, with different access and backup policies it's possible to diverge
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            BRKey *k = [BRKey keyWithPublicKey:[self.sequence publicKey:0 internal:NO
-                                                masterPublicKey:self.masterPublicKey]];
+            BRKey *k = [BRKey keyWithPublicKey:[self.sequence publicKey:0 internal:NO masterPublicKey:mpk]];
                     
             if (_wallet.addresses.count > 0 && ! [_wallet containsAddress:k.address]) {
                 NSLog(@"wallet doesn't contain address: %@", k.address);
@@ -328,16 +333,6 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     return getKeychainData(MASTER_PUBKEY_KEY, nil);
 }
 
-- (NSData *)seed
-{
-    @autoreleasepool {
-        NSString *phrase = getKeychainString(MNEMONIC_KEY, nil);
-        
-        if (phrase.length == 0) return nil;
-        return [self.mnemonic deriveKeyFromPhrase:phrase withPassphrase:nil];
-    }
-}
-
 // requesting seedPhrase will trigger authentication
 - (NSString *)seedPhrase
 {
@@ -347,7 +342,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (void)setSeedPhrase:(NSString *)seedPhrase
 {
     @autoreleasepool { // @autoreleasepool ensures sensitive data will be dealocated immediately
-        if (seedPhrase) seedPhrase = [self.mnemonic encodePhrase:[self.mnemonic decodePhrase:seedPhrase]];
+        if (seedPhrase) seedPhrase = [self.mnemonic normalizePhrase:seedPhrase];
 
         [[NSManagedObject context] performBlockAndWait:^{
             [BRAddressEntity deleteObjects:[BRAddressEntity allObjects]];
@@ -383,6 +378,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletManagerSeedChangedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletBalanceChangedNotification object:nil];
     });
 }
 
@@ -411,21 +407,6 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     return (error && error.code == LAErrorPasscodeNotSet) ? NO : YES;
 }
 
-// set this to enable basic floating fee calculation
-- (void)setAverageBlockSize:(size_t)size
-{
-    _averageBlockSize = size;
-#if TX_FEE_0_8_RULES
-    return;
-#endif
-    
-    // if block size increases past 650kb, start increasing fee up to MAX_FEE_PER_KB when blocks hit 850kb
-    if (size > 650*1000 && size < 850*1000) {
-        self.wallet.feePerKb = DEFAULT_FEE_PER_KB + (MAX_FEE_PER_KB - DEFAULT_FEE_PER_KB)*(size - 650*1000)/(200*1000);
-    }
-    else self.wallet.feePerKb = (size <= 650*1000) ? DEFAULT_FEE_PER_KB : MAX_FEE_PER_KB;
-}
-
 // generates a random seed, saves to keychain and returns the associated seedPhrase
 - (NSString *)generateRandomSeed
 {
@@ -451,10 +432,9 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     BOOL touchid = (self.wallet.totalSent + amount < getKeychainInt(SPEND_LIMIT_KEY, nil)) ? YES : NO;
 
     if (! [self authenticateWithPrompt:authprompt andTouchId:touchid]) return nil;
-    
     // BUG: if user manually chooses to enter pin, spending limit is reset without including the tx being authorized
     if (! touchid) setKeychainInt(self.wallet.totalSent + amount + self.spendingLimit, SPEND_LIMIT_KEY, NO);
-    return self.seed;
+    return [self.mnemonic deriveKeyFromPhrase:getKeychainString(MNEMONIC_KEY, nil) withPassphrase:nil];
 }
 
 // authenticates user and returns seedPhrase
@@ -478,7 +458,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             context.localizedFallbackTitle = NSLocalizedString(@"passcode", nil);
             
             [context evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics
-             localizedReason:(authprompt ? authprompt : @" ") reply:^(BOOL success, NSError *error) {
+             localizedReason:(authprompt.length > 0 ? authprompt : @" ") reply:^(BOOL success, NSError *error) {
                 authcode = (success) ? 1 : error.code;
             }];
             
@@ -583,8 +563,11 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
         
-        if (! self.alertView.visible) break;
+        if (! self.alertView.visible) break; // user canceled
         
+        // count unique attempts before checking success
+        if (! [self.failedPins containsObject:self.pinField.text]) setKeychainInt(++failCount, PIN_FAIL_COUNT_KEY, NO);
+
         if ([self.pinField.text isEqual:pin]) { // successful pin attempt
             self.pinField.text = nil;
             [self.failedPins removeAllObjects];
@@ -599,24 +582,23 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             return YES;
         }
 
-        if (! [self.failedPins containsObject:self.pinField.text]) { // only count unique failed attempts
-            if (++failCount >= 8) { // wipe wallet after 8 failed pin attempts and 24+ hours of lockout
+        if (! [self.failedPins containsObject:self.pinField.text]) {
+            [self.failedPins addObject:self.pinField.text];
+        
+            if (failCount >= 8) { // wipe wallet after 8 failed pin attempts and 24+ hours of lockout
                 self.seedPhrase = nil;
                 
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_SEC/10), dispatch_get_main_queue(), ^{
                     abort();
                 });
-                
+            
                 return NO;
             }
-
-            setKeychainInt(failCount, PIN_FAIL_COUNT_KEY, NO);
-
+        
             if (self.secureTime + NSTimeIntervalSince1970 > getKeychainInt(PIN_FAIL_HEIGHT_KEY, nil)) {
                 setKeychainInt(self.secureTime + NSTimeIntervalSince1970, PIN_FAIL_HEIGHT_KEY, NO);
             }
 
-            [self.failedPins addObject:self.pinField.text];
             if (failCount >= 3) return [self authenticatePinWithTitle:title message:message]; // wallet disabled
         }
         
@@ -753,7 +735,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 // the keyboard can take a second or more to dismiss, this hides it quickly to improve perceived response time
 - (void)hideKeyboard
 {
-    for (UIWindow *w in [[UIApplication sharedApplication] windows]) {
+    for (UIWindow *w in [UIApplication sharedApplication].windows) {
         if (w.windowLevel == UIWindowLevelNormal || w.windowLevel == UIWindowLevelAlert ||
             w.windowLevel == UIWindowLevelStatusBar) continue;
         [UIView animateWithDuration:0.2 animations:^{ w.alpha = 0; }];
@@ -777,7 +759,12 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     
     if (i == NSNotFound) code = DEFAULT_CURRENCY_CODE, i = [_currencyCodes indexOfObject:DEFAULT_CURRENCY_CODE];
     _localCurrencyCode = [code copy];
-    self.localPrice = (i < _currencyPrices.count) ? _currencyPrices[i] : @(DEFAULT_CURRENCY_PRICE);
+
+    if (i < _currencyPrices.count && self.secureTime + 3*24*60*60 > [NSDate timeIntervalSinceReferenceDate]) {
+        self.localPrice = _currencyPrices[i]; // don't use exchange rate data more than 72hrs out of date
+    }
+    else self.localPrice = @(0);
+
     self.localFormat.currencyCode = _localCurrencyCode;
     self.localFormat.maximum =
         [[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
@@ -804,20 +791,19 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:TICKER_URL]
                          cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
 
-    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
-    completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        if (connectionError) {
-            NSLog(@"%@", connectionError);
+    [[[NSURLSession sharedSession] dataTaskWithRequest:req
+    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            NSLog(@"%@", error);
             return;
         }
 
         NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-        NSError *error = nil;
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         NSMutableArray *codes = [NSMutableArray array], *names = [NSMutableArray array], *rates =[NSMutableArray array];
         
         if ([response isKindOfClass:[NSHTTPURLResponse class]]) { // store server timestamp
-            NSString *date = [(NSHTTPURLResponse *)response allHeaderFields][@"Date"];
+            NSString *date = ((NSHTTPURLResponse *)response).allHeaderFields[@"Date"];
             NSTimeInterval now = [[[NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeDate error:nil]
                                    matchesInString:date options:0 range:NSMakeRange(0, date.length)].lastObject
                                   date].timeIntervalSinceReferenceDate;
@@ -855,7 +841,43 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         [defs synchronize];
         NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForAmount:SATOSHIS],
               [self stringForAmount:SATOSHIS]);
-    }];
+        
+        [self updateFeePerKb];
+    }] resume];
+}
+
+#pragma mark - floating fees
+
+- (void)updateFeePerKb
+{
+    if (self.reachability.currentReachabilityStatus == NotReachable) return;
+    
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:FEE_PER_KB_URL]
+                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10.0];
+    
+    [[[NSURLSession sharedSession] dataTaskWithRequest:req
+    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            NSLog(@"%@", error);
+            return;
+        }
+        
+        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        
+        if (error || ! [json isKindOfClass:[NSDictionary class]] ||
+            ! [json[@"fee_per_kb"] isKindOfClass:[NSNumber class]]) {
+            NSLog(@"unexpected response from %@:\n%@", req.URL.host,
+                  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+            return;
+        }
+        
+        uint64_t feePerKb = [json[@"fee_per_kb"] unsignedLongLongValue];
+
+        if (feePerKb >= DEFAULT_FEE_PER_KB && feePerKb <= MAX_FEE_PER_KB) {
+            _wallet.feePerKb = feePerKb;
+            [[NSUserDefaults standardUserDefaults] setDouble:feePerKb forKey:FEE_PER_KB_KEY];
+        }
+    }] resume];
 }
 
 #pragma mark - query unspent outputs
@@ -865,14 +887,14 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error))completion
 {
     NSURL *u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"bitcoin", address]];
-#ifdef BITCOIN_TESTNET
+#if BITCOIN_TESTNET
     u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"testnet3", address]];
 #endif
     NSURLRequest *req = [NSURLRequest requestWithURL:u cachePolicy:NSURLRequestReloadIgnoringCacheData
                          timeoutInterval:20.0];
     
-    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
-    completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    [[[NSURLSession sharedSession] dataTaskWithRequest:req
+    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             completion(nil, nil, nil, error);
             return;
@@ -881,8 +903,8 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         NSMutableArray *utxos = [NSMutableArray array], *amounts = [NSMutableArray array],
                        *scripts = [NSMutableArray array];
-        NSMutableData *o = nil;
-                               
+        BRUTXO o;
+        
         if (error) {
             completion(nil, nil, nil, error);
             return;
@@ -898,7 +920,7 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
         for (NSDictionary *utxo in json) {
             if (! [utxo isKindOfClass:[NSDictionary class]] ||
                 ! [utxo[@"transaction_hash"] isKindOfClass:[NSString class]] ||
-                [[utxo[@"transaction_hash"] hexToData] length] != CC_SHA256_DIGEST_LENGTH ||
+                [utxo[@"transaction_hash"] hexToData].length != sizeof(UInt256) ||
                 ! [utxo[@"output_index"] isKindOfClass:[NSNumber class]] ||
                 ! [utxo[@"script_hex"] isKindOfClass:[NSString class]] ||
                 ! [utxo[@"script_hex"] hexToData] ||
@@ -911,15 +933,15 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
             }
             
             if (! [utxo[@"script_type"] isEqual:@"pubkeyhash"] && ! [utxo[@"script_type"] isEqual:@"pubkey"]) continue;
-            o = [NSMutableData dataWithData:[[utxo[@"transaction_hash"] hexToData] reverse]];
-            [o appendUInt32:[utxo[@"output_index"] unsignedIntegerValue]];
-            [utxos addObject:o];
+            o.hash = *(const UInt256 *)[[utxo[@"transaction_hash"] hexToData] reverse].bytes;
+            o.n = [utxo[@"output_index"] unsignedIntValue];
+            [utxos addObject:brutxo_obj(o)];
             [amounts addObject:utxo[@"value"]];
             [scripts addObject:[utxo[@"script_hex"] hexToData]];
         }
         
         completion(utxos, amounts, scripts, nil);
-    }];
+    }] resume];
 }
 
 // given a private key, queries chain.com for unspent outputs and calls the completion block with a signed transaction
@@ -969,8 +991,11 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
         }
 
         //TODO: make sure not to create a transaction larger than TX_MAX_SIZE
-        for (NSData *o in utxos) {
-            [tx addInputHash:[o hashAtOffset:0] index:[o UInt32AtOffset:CC_SHA256_DIGEST_LENGTH] script:scripts[i]];
+        for (NSValue *output in utxos) {
+            BRUTXO o;
+            
+            [output getValue:&o];
+            [tx addInputHash:o.hash index:o.n script:scripts[i]];
             balance += [amounts[i++] unsignedLongLongValue];
         }
      
@@ -990,7 +1015,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
             return;
         }
      
-        [tx addOutputAddress:[self.wallet changeAddress] amount:balance - feeAmount];
+        [tx addOutputAddress:self.wallet.changeAddress amount:balance - feeAmount];
      
         if (! [tx signWithPrivateKeys:@[privKey]]) {
             completion(nil, 0, [NSError errorWithDomain:@"BreadWallet" code:401 userInfo:@{NSLocalizedDescriptionKey:
@@ -1007,8 +1032,8 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (int64_t)amountForString:(NSString *)string
 {
     if (! string.length) return 0;
-    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.format numberFromString:string] decimalValue]]
-             decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits] longLongValue];
+    return [[NSDecimalNumber decimalNumberWithDecimal:[self.format numberFromString:string].decimalValue]
+             decimalNumberByMultiplyingByPowerOf10:self.format.maximumFractionDigits].longLongValue;
 }
 
 - (NSString *)stringForAmount:(int64_t)amount
@@ -1024,10 +1049,10 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
     if ([string hasPrefix:@"<"]) string = [string substringFromIndex:1];
 
     NSNumber *n = [self.localFormat numberFromString:string];
-    int64_t price = [[[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
-                      decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits] longLongValue],
-            local = [[[NSDecimalNumber decimalNumberWithDecimal:n.decimalValue]
-                      decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits] longLongValue],
+    int64_t price = [[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
+                      decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits].longLongValue,
+            local = [[NSDecimalNumber decimalNumberWithDecimal:n.decimalValue]
+                      decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits].longLongValue,
             overflowbits = 0, p = 10, min, max, amount;
 
     if (local == 0 || price < 1) return 0;
@@ -1046,6 +1071,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (NSString *)localCurrencyStringForAmount:(int64_t)amount
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
+    if (self.localPrice.doubleValue <= DBL_EPSILON) return @""; // no exchange rate data
     
     NSDecimalNumber *n = [[[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
                            decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:llabs(amount)]]
@@ -1086,14 +1112,10 @@ replacementString:(NSString *)string
 {
     @autoreleasepool { // @autoreleasepool ensures sensitive data will be dealocated immediately
         if ([textView.text rangeOfString:@"\n"].location != NSNotFound) {
-            textView.text = [self.mnemonic normalizePhrase:textView.text];
+            NSString *phrase = [self.mnemonic normalizePhrase:textView.text];
             
-            if (! [self.mnemonic phraseIsValid:[self.mnemonic normalizePhrase:textView.text]]) {
-                self.alertView.title = NSLocalizedString(@"bad recovery phrase", nil);
-                [self.alertView performSelector:@selector(setTitle:)
-                 withObject:NSLocalizedString(@"recovery phrase", nil) afterDelay:3.0];
-            }
-            else if (! [[self.mnemonic normalizePhrase:textView.text] isEqual:getKeychainString(MNEMONIC_KEY, nil)]) {
+            if (! [[self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:phrase
+                                                           withPassphrase:nil]] isEqual:self.masterPublicKey]) {
                 self.alertView.title = NSLocalizedString(@"recovery phrase doesn't match", nil);
                 [self.alertView performSelector:@selector(setTitle:)
                  withObject:NSLocalizedString(@"recovery phrase", nil) afterDelay:3.0];
@@ -1139,7 +1161,7 @@ replacementString:(NSString *)string
         self.sweepCompletion = nil;
     }
     else if (self.sweepKey && self.sweepCompletion) {
-        NSString *passphrase = [[alertView textFieldAtIndex:0] text];
+        NSString *passphrase = [alertView textFieldAtIndex:0].text;
 
         dispatch_async(dispatch_get_main_queue(), ^{
             BRKey *key = [BRKey keyWithBIP38Key:self.sweepKey andPassphrase:passphrase];

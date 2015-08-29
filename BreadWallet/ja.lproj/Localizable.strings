@@ -5,7 +5,13 @@
 "%@ is not allowed to access the camera" = "%@ はカメラへのアクセスを拒否されています。";
 
 /* No comment provided by engineer. */
+"%@\n\nbalance: %@ (%@)" = "%1$@\n\n残高: %2$@ (%3$@)";
+
+/* No comment provided by engineer. */
 "%d confirmations" = "%d承認済み";
+
+/* No comment provided by engineer. */
+"0 confirmations" = "0承認済み";
 
 /* No comment provided by engineer. */
 "1 confirmation" = "1承認済み";
@@ -41,7 +47,16 @@
 "\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\n復元フレーズは絶対に\n誰にも見せないで下さい！\n復元フレーズを知っている人はあなたの\nビットコインを簡単に\n盗むことができます。\n\nパスワード管理アプリや、信用できない\n端末に復元フレーズは絶対に\n打ち込んだり写真撮ったりしないで\n下さい。ウィルスやマルウェアによって\n盗まれ兼ねません。\n";
 
 /* No comment provided by engineer. */
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "復元フレーズは絶対に\n誰にも見せないで下さい！\n復元フレーズを知っている人は\nあなたのビットコインを\n簡単に盗むことができます。";
+
+/* No comment provided by engineer. */
+"\nDO NOT take a screenshot.\nScreenshots are visible to other apps\nand devices.\n" = "\nスクリーンショットをご遠慮下さい。\n他のアプリや端末に復元フレーズが\n見えてしまう危険性があります。\n";
+
+/* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nネットワーク手数料 +%1$@ (%2$@)";
+
+/* No comment provided by engineer. */
+"\nNEVER type your recovery phrase into\npassword managers or elsewhere.\nOther devices may be infected.\n" = "パスワード管理アプリや、\n信用できない端末に復元フレーズは\n絶対に打ち込んだり\n写真を撮ったりしないで下さい。\nウィルスやマルウェアによって\n盗まれる可能性があります。";
 
 /* No comment provided by engineer. */
 "\ntry again in %d %@" = "\n%1$d %2$@ でもう一度お試しください。";
@@ -107,6 +122,9 @@
 "change payment amount?" = "送金額だけ変更しますか？";
 
 /* No comment provided by engineer. */
+"checking address balance..." = "アドレスの残高を確認しています…";
+
+/* No comment provided by engineer. */
 "checking private key balance..." = "秘密鍵の残高を確認中…";
 
 /* No comment provided by engineer. */
@@ -131,10 +149,19 @@
 "copied" = "コピーしました！";
 
 /* No comment provided by engineer. */
+"copy" = "コピー";
+
+/* No comment provided by engineer. */
 "copy address to clipboard" = "アドレスをクリップボードへコピー";
 
 /* No comment provided by engineer. */
 "copy request to clipboard" = "リクエストをクリップボードへコピー";
+
+/* No comment provided by engineer. */
+"copy wallet addresses to clipboard?" = "ウォレットアドレスをクリップボードへコピーしますか？";
+
+/* No comment provided by engineer. */
+"couldn't check address balance" = "アドレスの残高が確認できませんでした。";
 
 /* No comment provided by engineer. */
 "couldn't make payment" = "支払いを完了できませんでした";
@@ -153,9 +180,6 @@
 
 /* No comment provided by engineer. */
 "do it later" = "後でやります";
-
-/* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "復元フレーズは絶対に\n誰にも見せないで下さい！\n復元フレーズを知っている人は\nあなたのビットコインを\n簡単に盗むことができます。";
 
 /* No comment provided by engineer. */
 "done" = "完了";
@@ -224,13 +248,10 @@
 "moved" = "移動されました";
 
 /* No comment provided by engineer. */
-"\nNEVER type your recovery phrase into\npassword managers or elsewhere.\nOther devices may be infected.\n" = "パスワード管理アプリや、\n信用できない端末に復元フレーズは\n絶対に打ち込んだり\n写真を撮ったりしないで下さい。\nウィルスやマルウェアによって\n盗まれる可能性があります。";
-
-/* No comment provided by engineer. */
-"new phrase" = "新規フレーズ";
-
-/* No comment provided by engineer. */
 "next, write down your recovery phrase" = "復元フレーズを紙に書き留めて下さい！";
+
+/* No comment provided by engineer. */
+"no exchange rate data" = "為替レートのデータがありません";
 
 /* No comment provided by engineer. */
 "no peers found" = "通信相手が見つかりませんでした。";
@@ -264,6 +285,9 @@
 
 /* No comment provided by engineer. */
 "pay" = "送金";
+
+/* No comment provided by engineer. */
+"payee identity isn't certified" = "支払先の認証データが不正です";
 
 /* No comment provided by engineer. */
 "payment address" = "支払先アドレス";
@@ -477,4 +501,3 @@
 
 /* No comment provided by engineer. */
 "Your wallet may be out of sync.\nThis can often be fixed by rescanning the blockchain." = "あなたのウォレットが同期されていない可能性があります。\nブロックチェーンの再スキャンを行うと直ることが大半です。";
-

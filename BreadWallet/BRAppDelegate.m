@@ -31,6 +31,10 @@
 #pragma message "testnet build"
 #endif
 
+#if SNAPSHOT
+#pragma message "snapshot build"
+#endif
+
 @implementation BRAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -55,12 +59,10 @@
              userInfo:@{@"file":file}];
         }
     }
-
+    
     //TODO: bitcoin protocol/payment protocol over multipeer connectivity
 
     //TODO: accessibility for the visually impaired
-
-    //TODO: internationalization
 
     //TODO: fast wallet restore using webservice and/or utxo p2p message
 
@@ -69,6 +71,15 @@
     //TODO: figure out deterministic builds/removing app sigs: http://www.afp548.com/2012/06/05/re-signining-ios-apps/
 
     return YES;
+}
+
+// Applications may reject specific types of extensions based on the extension point identifier.
+// Constants representing common extension point identifiers are provided further down.
+// If unimplemented, the default behavior is to allow the extension point identifier.
+- (BOOL)application:(UIApplication *)application
+shouldAllowExtensionPointIdentifier:(NSString *)extensionPointIdentifier
+{
+    return NO; // disable extensions such as custom keyboards for security purposes
 }
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication
@@ -104,7 +115,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
         protectedObserver = balanceObserver = syncFinishedObserver = syncFailedObserver = nil;
     };
     
-    if ([[BRPeerManager sharedInstance] syncProgress] >= 1.0) {
+    if ([BRPeerManager sharedInstance].syncProgress >= 1.0) {
         NSLog(@"background fetch already synced");
         if (completion) completion(UIBackgroundFetchResultNoData);
         return;
@@ -113,8 +124,8 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     // timeout after 25 seconds
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 25*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         if (completion) {
-            NSLog(@"background fetch timeout with progress: %f", [[BRPeerManager sharedInstance] syncProgress]);
-            completion(([[BRPeerManager sharedInstance] syncProgress] > 0.1) ? UIBackgroundFetchResultNewData :
+            NSLog(@"background fetch timeout with progress: %f", [BRPeerManager sharedInstance].syncProgress);
+            completion(([BRPeerManager sharedInstance].syncProgress > 0.1) ? UIBackgroundFetchResultNewData :
                        UIBackgroundFetchResultFailed);
             cleanup();
         }
@@ -132,8 +143,8 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
         [[NSNotificationCenter defaultCenter] addObserverForName:BRWalletBalanceChangedNotification object:nil queue:nil
         usingBlock:^(NSNotification *note) {
             if (m.wallet.balance > balance) {
-                [[UIApplication sharedApplication]
-                 setApplicationIconBadgeNumber:[[UIApplication sharedApplication] applicationIconBadgeNumber] + 1];
+                [UIApplication sharedApplication].applicationIconBadgeNumber =
+                    [UIApplication sharedApplication].applicationIconBadgeNumber + 1;
                 [defs setDouble:[defs doubleForKey:SETTINGS_RECEIVED_AMOUNT_KEY] + (m.wallet.balance - balance)
                  forKey:SETTINGS_RECEIVED_AMOUNT_KEY]; // have to use setDouble here, setInteger isn't big enough
                 balance = m.wallet.balance;

@@ -61,7 +61,7 @@ static NSString *sanitizeString(NSString *s)
 @property (nonatomic, assign) BOOL clearClipboard, useClipboard, showTips, showBalance, canChangeAmount;
 @property (nonatomic, strong) BRTransaction *sweepTx;
 @property (nonatomic, strong) BRPaymentProtocolRequest *request;
-@property (nonatomic, strong) NSURL *url;
+@property (nonatomic, strong) NSURL *url, *callback;
 @property (nonatomic, assign) uint64_t amount;
 @property (nonatomic, strong) NSString *okAddress, *okIdentity;
 @property (nonatomic, strong) BRBubbleView *tipView;
@@ -136,7 +136,7 @@ static NSString *sanitizeString(NSString *s)
     BRWalletManager *m = [BRWalletManager sharedInstance];
     
     if ([url.scheme isEqual:@"bread"]) { // x-callback-url handling: http://x-callback-url.com/specifications/
-        NSString *xsource = nil, *xsuccess = nil, *xerror = nil;
+        NSString *xsource = nil, *xsuccess = nil, *xerror = nil, *uri = nil;
         NSURL *callback = nil;
 
         for (NSString *arg in [url.query componentsSeparatedByString:@"&"]) {
@@ -151,10 +151,11 @@ static NSString *sanitizeString(NSString *s)
             if ([pair[0] isEqual:@"x-source"]) xsource = value;
             else if ([pair[0] isEqual:@"x-success"]) xsuccess = value;
             else if ([pair[0] isEqual:@"x-error"]) xerror = value;
+            else if ([pair[0] isEqual:@"uri"]) uri = value;
         }
     
         if ([url.host isEqual:@"scanqr"] || [url.path isEqual:@"/scanqr"]) { // scan qr
-            [self scanQR:nil];
+            [self scanQR:self.scanButton];
         }
         else if ([url.host isEqual:@"addresslist"] || [url.path isEqual:@"/addresslist"]) { // copy wallet addresses
             if ((m.didAuthenticate || [m authenticateWithPrompt:nil andTouchId:YES]) && ! self.clearClipboard) {
@@ -165,10 +166,10 @@ static NSString *sanitizeString(NSString *s)
                       otherButtonTitles:NSLocalizedString(@"copy", nil), nil] show];
                 }
                 else {
-                    [[UIPasteboard generalPasteboard]
-                     setString:[[[m.wallet.addresses objectsPassingTest:^BOOL(id obj, BOOL *stop) {
-                        return [m.wallet addressIsUsed:obj];
-                    }] allObjects] componentsJoinedByString:@"\n"]];
+                    [UIPasteboard generalPasteboard].string =
+                        [[m.wallet.addresses objectsPassingTest:^BOOL(id obj, BOOL *stop) {
+                            return [m.wallet addressIsUsed:obj];
+                        }].allObjects componentsJoinedByString:@"\n"];
 
                     if (xsuccess) callback = [NSURL URLWithString:xsuccess];
                     self.url = nil;
@@ -176,14 +177,19 @@ static NSString *sanitizeString(NSString *s)
             }
             else if (xerror || xsuccess) {
                 callback = [NSURL URLWithString:(xerror) ? xerror : xsuccess];
-                [[UIPasteboard generalPasteboard] setString:@""];
+                [UIPasteboard generalPasteboard].string = @"";
                 [self cancel:nil];
             }
         }
         else if ([url.path isEqual:@"/address"] && xsuccess) { // get receive address
             callback = [NSURL URLWithString:[xsuccess stringByAppendingFormat:@"%@address=%@",
-                                             ([[[NSURL URLWithString:xsuccess] query] length] > 0) ? @"&" : @"?",
+                                             ([NSURL URLWithString:xsuccess].query.length > 0) ? @"&" : @"?",
                                              m.wallet.receiveAddress]];
+        }
+        else if (([url.host isEqual:@"bitcoin-uri"] || [url.path isEqual:@"/bitcoin-uri"]) && uri &&
+                 [[NSURL URLWithString:uri].scheme isEqual:@"bitcoin"]) {
+            if (xsuccess) self.callback = [NSURL URLWithString:xsuccess];
+            [self handleURL:[NSURL URLWithString:uri]];
         }
         
         if (callback && [[UIApplication sharedApplication] canOpenURL:callback]) {
@@ -278,7 +284,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
 
 - (void)confirmRequest:(BRPaymentRequest *)request
 {
-    if (! [request isValid]) {
+    if (! request.isValid) {
         if ([request.paymentAddress isValidBitcoinPrivateKey] || [request.paymentAddress isValidBitcoinBIP38Key]) {
             [self confirmSweep:request.paymentAddress];
         }
@@ -293,15 +299,17 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
         [(id)self.parentViewController.parentViewController startActivityWithTimeout:20.0];
 
         [BRPaymentRequest fetch:request.r timeout:20.0 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
-            [(id)self.parentViewController.parentViewController stopActivityWithSuccess:(! error)];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [(id)self.parentViewController.parentViewController stopActivityWithSuccess:(! error)];
 
-            if (error) {
-                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
-                  message:error.localizedDescription delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil)
-                  otherButtonTitles:nil] show];
-                [self cancel:nil];
-            }
-            else [self confirmProtocolRequest:req];
+                if (error && ! [request.paymentAddress isValidBitcoinAddress]) {
+                    [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
+                      message:error.localizedDescription delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                      otherButtonTitles:nil] show];
+                    [self cancel:nil];
+                }
+                else [self confirmProtocolRequest:(error) ? request.protocolRequest : req];
+            });
         }];
     }
     else [self confirmProtocolRequest:request.protocolRequest];
@@ -313,7 +321,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
     BRTransaction *tx = nil;
     uint64_t amount = 0, fee = 0;
     NSString *address = [NSString addressWithScriptPubKey:protoReq.details.outputScripts.firstObject];
-    BOOL valid = [protoReq isValid], outputTooSmall = NO;
+    BOOL valid = protoReq.isValid, outputTooSmall = NO;
 
     if (! valid && [protoReq.errorMessage isEqual:NSLocalizedString(@"request expired", nil)]) {
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"bad payment request", nil) message:protoReq.errorMessage
@@ -326,8 +334,8 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
 
     if (self.amount == 0) {
         for (NSNumber *n in protoReq.details.outputAmounts) {
-            if ([n unsignedLongLongValue] > 0 && [n unsignedLongLongValue] < TX_MIN_OUTPUT_AMOUNT) outputTooSmall = YES;
-            amount += [n unsignedLongLongValue];
+            if (n.unsignedLongLongValue > 0 && n.unsignedLongLongValue < TX_MIN_OUTPUT_AMOUNT) outputTooSmall = YES;
+            amount += n.unsignedLongLongValue;
         }
     }
     else amount = self.amount;
@@ -340,7 +348,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
         return;
     }
     else if (! [self.okAddress isEqual:address] && [m.wallet addressIsUsed:address] &&
-             [[[UIPasteboard generalPasteboard] string] isEqual:address]) {
+             [[UIPasteboard generalPasteboard].string isEqual:address]) {
         self.request = protoReq;
         self.okAddress = address;
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"WARNING", nil)
@@ -440,9 +448,12 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
 - (void)confirmTransaction:(BRTransaction *)tx withPrompt:(NSString *)prompt forAmount:(uint64_t)amount
 {
     BRWalletManager *m = [BRWalletManager sharedInstance];
+    BOOL auth = m.didAuthenticate;
 
     if (! tx) {
-        if (m.didAuthenticate || [m seedWithPrompt:prompt forAmount:amount]) {
+        if (! m.didAuthenticate) [m seedWithPrompt:prompt forAmount:amount];
+        
+        if (m.didAuthenticate) {
             // if user selected an amount equal to or below wallet balance, but the fee will bring the total above the
             // balance, offer to reduce the amount to available funds minus fee
             if ((self.amount <= [m amountForLocalCurrencyString:[m localCurrencyStringForAmount:m.wallet.balance]] ||
@@ -475,6 +486,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
         }
         else [self cancelOrChangeAmount];
 
+        if (! auth) m.didAuthenticate = NO;
         return;
     }
     
@@ -484,7 +496,9 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
           cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
     }
     
-    if (! [tx isSigned]) { // user canceled authentication
+    if (! auth) m.didAuthenticate = NO;
+
+    if (! tx.isSigned) { // user canceled authentication
         [self cancelOrChangeAmount];
         return;
     }
@@ -511,8 +525,17 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
             sent = YES;
             [self.view addSubview:[[[BRBubbleView viewWithText:NSLocalizedString(@"sent!", nil)
              center:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)] popIn]
-              popOutAfterDelay:2.0]];
+             popOutAfterDelay:2.0]];
             [(id)self.parentViewController.parentViewController stopActivityWithSuccess:YES];
+            [(id)self.parentViewController.parentViewController ping];
+
+            if (self.callback && [[UIApplication sharedApplication] canOpenURL:self.callback]) {
+                self.callback = [NSURL URLWithString:[self.callback.absoluteString stringByAppendingFormat:@"%@txid=%@",
+                                 (self.callback.query.length > 0) ? @"&" : @"?",
+                                 [NSString hexWithData:[NSData dataWithBytes:tx.txHash.u8 length:sizeof(UInt256)]]]];
+                [[UIApplication sharedApplication] openURL:self.callback];
+            }
+            
             [self reset:nil];
         }
         
@@ -526,7 +549,7 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
         // use the payment transaction's change address as the refund address, which prevents the same address being
         // used in other transactions in the event no refund is ever issued
         [refundScript appendScriptPubKeyForAddress:m.wallet.changeAddress];
-        for (NSNumber *amt in self.request.details.outputAmounts) refundAmount += [amt unsignedLongLongValue];
+        for (NSNumber *amt in self.request.details.outputAmounts) refundAmount += amt.unsignedLongLongValue;
 
         // TODO: keep track of commonName/memo to associate them with outputScripts
         BRPaymentProtocolPayment *payment =
@@ -537,30 +560,41 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
     
         [BRPaymentRequest postPayment:payment to:self.request.details.paymentURL timeout:20.0
         completion:^(BRPaymentProtocolACK *ack, NSError *error) {
-            [(id)self.parentViewController.parentViewController stopActivityWithSuccess:(! error)];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [(id)self.parentViewController.parentViewController stopActivityWithSuccess:(! error)];
     
-            if (error) {
-                if (! waiting && ! sent) {
-                    [[[UIAlertView alloc] initWithTitle:@"" message:error.localizedDescription delegate:nil
-                      cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
-                    [(id)self.parentViewController.parentViewController stopActivityWithSuccess:NO];
-                    [self cancel:nil];
+                if (error) {
+                    if (! waiting && ! sent) {
+                        [[[UIAlertView alloc] initWithTitle:@"" message:error.localizedDescription delegate:nil
+                          cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+                        [(id)self.parentViewController.parentViewController stopActivityWithSuccess:NO];
+                        [self cancel:nil];
+                    }
                 }
-            }
-            else if (! sent) {
-                sent = YES;
-                tx.timestamp = [NSDate timeIntervalSinceReferenceDate];
-                [m.wallet registerTransaction:tx];
-                [self.view
-                 addSubview:[[[BRBubbleView
-                               viewWithText:(ack.memo.length > 0 ? ack.memo : NSLocalizedString(@"sent!", nil))
-                               center:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)] popIn]
-                             popOutAfterDelay:(ack.memo.length > 0 ? 3.0 : 2.0)]];
-                [(id)self.parentViewController.parentViewController stopActivityWithSuccess:YES];
-                [self reset:nil];
-            }
+                else if (! sent) {
+                    sent = YES;
+                    tx.timestamp = [NSDate timeIntervalSinceReferenceDate];
+                    [m.wallet registerTransaction:tx];
+                    [self.view addSubview:[[[BRBubbleView
+                     viewWithText:(ack.memo.length > 0 ? ack.memo : NSLocalizedString(@"sent!", nil))
+                     center:CGPointMake(self.view.bounds.size.width/2, self.view.bounds.size.height/2)] popIn]
+                     popOutAfterDelay:(ack.memo.length > 0 ? 3.0 : 2.0)]];
+                    [(id)self.parentViewController.parentViewController stopActivityWithSuccess:YES];
+                    [(id)self.parentViewController.parentViewController ping];
 
-            waiting = NO;
+                    if (self.callback && [[UIApplication sharedApplication] canOpenURL:self.callback]) {
+                        self.callback =
+                            [NSURL URLWithString:[self.callback.absoluteString stringByAppendingFormat:@"%@txid=%@",
+                             (self.callback.query.length > 0) ? @"&" : @"?",
+                             [NSString hexWithData:[NSData dataWithBytes:tx.txHash.u8 length:sizeof(UInt256)]]]];
+                        [[UIApplication sharedApplication] openURL:self.callback];
+                    }
+                    
+                    [self reset:nil];
+                }
+
+                waiting = NO;
+            });
         }];
     }
     else waiting = NO;
@@ -580,28 +614,31 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
     [self.view addSubview:[v popIn]];
 
     [m sweepPrivateKey:privKey withFee:YES completion:^(BRTransaction *tx, uint64_t fee, NSError *error) {
-        [v popOut];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [v popOut];
 
-        if (error) {
-            [[[UIAlertView alloc] initWithTitle:@"" message:error.localizedDescription delegate:self
-              cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
-            [self cancel:nil];
-        }
-        else if (tx) {
-            uint64_t amount = fee;
+            if (error) {
+                [[[UIAlertView alloc] initWithTitle:@"" message:error.localizedDescription delegate:self
+                  cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+                [self cancel:nil];
+            }
+            else if (tx) {
+                uint64_t amount = fee;
 
-            for (NSNumber *amt in tx.outputAmounts) amount += amt.unsignedLongLongValue;
-            self.sweepTx = tx;
+                for (NSNumber *amt in tx.outputAmounts) amount += amt.unsignedLongLongValue;
+                self.sweepTx = tx;
 
-            [[[UIAlertView alloc] initWithTitle:@"" message:[NSString
-              stringWithFormat:NSLocalizedString(@"Send %@ (%@) from this private key into your wallet? "
-                                                 "The bitcoin network will receive a fee of %@ (%@).", nil),
-              [m stringForAmount:amount], [m localCurrencyStringForAmount:amount], [m stringForAmount:fee],
-              [m localCurrencyStringForAmount:fee]] delegate:self cancelButtonTitle:NSLocalizedString(@"cancel", nil)
-              otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:amount],
-                                 [m localCurrencyStringForAmount:amount]], nil] show];
-        }
-        else [self cancel:nil];
+                [[[UIAlertView alloc] initWithTitle:@"" message:[NSString
+                  stringWithFormat:NSLocalizedString(@"Send %@ (%@) from this private key into your wallet? "
+                                                     "The bitcoin network will receive a fee of %@ (%@).", nil),
+                  [m stringForAmount:amount], [m localCurrencyStringForAmount:amount], [m stringForAmount:fee],
+                  [m localCurrencyStringForAmount:fee]] delegate:self
+                  cancelButtonTitle:NSLocalizedString(@"cancel", nil)
+                  otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:amount],
+                                     [m localCurrencyStringForAmount:amount]], nil] show];
+            }
+            else [self cancel:nil];
+        });
     }];
 }
 
@@ -619,23 +656,25 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
     [self.view addSubview:[v popIn]];
 
     [m utxosForAddress:address completion:^(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error) {
-        [v popOut];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [v popOut];
         
-        if (error) {
-            [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't check address balance", nil)
-              message:error.localizedDescription delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil)
-              otherButtonTitles:nil] show];
-        }
-        else {
-            uint64_t balance = 0;
+            if (error) {
+                [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't check address balance", nil)
+                  message:error.localizedDescription delegate:nil cancelButtonTitle:NSLocalizedString(@"ok", nil)
+                  otherButtonTitles:nil] show];
+            }
+            else {
+                uint64_t balance = 0;
             
-            for (NSNumber *amt in amounts) balance += [amt unsignedLongLongValue];
+                for (NSNumber *amt in amounts) balance += amt.unsignedLongLongValue;
             
-            [[[UIAlertView alloc] initWithTitle:@""
-              message:[NSString stringWithFormat:NSLocalizedString(@"%@\n\nbalance: %@ (%@)", nil), address,
-                       [m stringForAmount:balance], [m localCurrencyStringForAmount:balance]] delegate:nil
-              cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
-        }
+                [[[UIAlertView alloc] initWithTitle:@""
+                  message:[NSString stringWithFormat:NSLocalizedString(@"%@\n\nbalance: %@ (%@)", nil), address,
+                           [m stringForAmount:balance], [m localCurrencyStringForAmount:balance]] delegate:nil
+                  cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+            }
+        });
     }];
 }
 
@@ -690,26 +729,35 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
 
 - (void)updateClipboardText
 {
-    BRWalletManager *m = [BRWalletManager sharedInstance];
-    NSString *p = [[[UIPasteboard generalPasteboard] string]
+    NSString *p = [[UIPasteboard generalPasteboard].string
                    stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    NSCharacterSet *c = [[NSCharacterSet alphanumericCharacterSet] invertedSet];
+    UIImage *img = [UIPasteboard generalPasteboard].image;
+    NSMutableArray *a = [NSMutableArray array];
+    NSCharacterSet *c = [NSCharacterSet alphanumericCharacterSet].invertedSet;
+    
+    if (p) {
+        [a addObject:p];
+        [a addObjectsFromArray:[p componentsSeparatedByCharactersInSet:c]];
+    }
+    
+    if (img && &CIDetectorTypeQRCode) {
+        for (CIQRCodeFeature *qr in [[CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:nil]
+                                     featuresInImage:[CIImage imageWithCGImage:img.CGImage]]) {
+            [a addObject:[qr.messageString
+                          stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+        }
+    }
 
-    if (! p) p = @"";
     self.clipboardText.text = @"";
     
-    for (NSString *s in [@[p] arrayByAddingObjectsFromArray:[p componentsSeparatedByCharactersInSet:c]]) {
+    for (NSString *s in a) {
         BRPaymentRequest *req = [BRPaymentRequest requestWithString:s];
-        NSData *d = s.hexToData.reverse;
-        
-        // if the clipboard contains a known txHash, we know it's not a hex encoded private key
-        if (d.length == 32 && [[m.wallet.recentTransactions valueForKey:@"txHash"] containsObject:d]) continue;
         
         if ([req.paymentAddress isValidBitcoinAddress]) {
             self.clipboardText.text = (req.label.length > 0) ? sanitizeString(req.label) : req.paymentAddress;
             break;
         }
-        else if ([req isValid] || [s isValidBitcoinPrivateKey] || [s isValidBitcoinBIP38Key]) {
+        else if ([s hasPrefix:@"bitcoin:"]) {
             self.clipboardText.text = sanitizeString(s);
             break;
         }
@@ -721,6 +769,51 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
     if (w > self.view.bounds.size.width - 16.0) w = self.view.bounds.size.width - 16.0;
     self.clipboardXLeft.constant = (self.view.bounds.size.width - w)/2.0;
     [self.clipboardText scrollRangeToVisible:NSMakeRange(0, 0)];
+}
+
+- (void)payFirstFromArray:(NSArray *)a
+{
+    BRWalletManager *m = [BRWalletManager sharedInstance];
+    NSUInteger i = 0;
+
+    for (NSString *s in a) {
+        BRPaymentRequest *req = [BRPaymentRequest requestWithString:s];
+        NSData *d = s.hexToData.reverse;
+        
+        i++;
+        
+        // if the clipboard contains a known txHash, we know it's not a hex encoded private key
+        if (d.length == sizeof(UInt256) &&
+            [[m.wallet.recentTransactions valueForKey:@"txHash"] containsObject:uint256_obj(*(UInt256 *)d.bytes)]) {
+            continue;
+        }
+        
+        if ([req.paymentAddress isValidBitcoinAddress] || [s isValidBitcoinPrivateKey] || [s isValidBitcoinBIP38Key] ||
+            (req.r.length > 0 && [s hasPrefix:@"bitcoin:"])) {
+            [self performSelector:@selector(confirmRequest:) withObject:req afterDelay:0.1];// delayed to show highlight
+            return;
+        }
+        else if (req.r.length > 0) {
+            [BRPaymentRequest fetch:req.r timeout:5.0 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (error) { // don't try any more BIP73 urls
+                        [self payFirstFromArray:[a objectsAtIndexes:[a
+                        indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
+                            return (idx >= i && ([obj hasPrefix:@"bitcoin:"] || ! [NSURL URLWithString:obj]));
+                        }]]];
+                    }
+                    else [self confirmProtocolRequest:req];
+                });
+            }];
+            
+            return;
+        }
+    }
+    
+    [[[UIAlertView alloc] initWithTitle:@""
+      message:NSLocalizedString(@"clipboard doesn't contain a valid bitcoin address", nil) delegate:nil
+      cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+    [self performSelector:@selector(cancel:) withObject:self afterDelay:0.1];
 }
 
 #pragma mark - IBAction
@@ -756,55 +849,28 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
 {
     if ([self nextTip]) return;
 
-    BRWalletManager *m = [BRWalletManager sharedInstance];
-    NSString *p = [[[UIPasteboard generalPasteboard] string]
+    NSString *p = [[UIPasteboard generalPasteboard].string
                    stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    UIImage *img = [[UIPasteboard generalPasteboard] image];
-    NSMutableArray *a = [NSMutableArray array];
-    NSCharacterSet *c = [[NSCharacterSet alphanumericCharacterSet] invertedSet];
+    UIImage *img = [UIPasteboard generalPasteboard].image;
+    NSMutableOrderedSet *s = [NSMutableOrderedSet orderedSet];
+    NSCharacterSet *c = [NSCharacterSet alphanumericCharacterSet].invertedSet;
 
     if (p) {
-        [a addObject:p];
-        [a addObjectsFromArray:[p componentsSeparatedByCharactersInSet:c]];
-
-        if ([NSURL URLWithString:p]) { //maybe BIP73 url: https://github.com/bitcoin/bips/blob/master/bip-0073.mediawiki
-            [a addObject:[NSString stringWithFormat:@"bitcoin:?r=%@",
-                          [p stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-        }
+        [s addObject:p];
+        [s addObjectsFromArray:[p componentsSeparatedByCharactersInSet:c]];
     }
     
-    if (img && CIDetectorTypeQRCode) {
+    if (img && &CIDetectorTypeQRCode) {
         for (CIQRCodeFeature *qr in [[CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:nil]
                                      featuresInImage:[CIImage imageWithCGImage:img.CGImage]]) {
-            [a addObject:qr.messageString];
-            
-            if ([NSURL URLWithString:qr.messageString]) {
-                [a addObject:[NSString stringWithFormat:@"bitcoin:?r=%@",
-                              [qr.messageString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-            }
+            [s addObject:[qr.messageString
+             stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
         }
     }
     
     [sender setEnabled:NO];
     self.clearClipboard = YES;
-
-    for (NSString *s in a) {
-        BRPaymentRequest *req = [BRPaymentRequest requestWithString:s];
-        NSData *d = s.hexToData.reverse;
-
-        // if the clipboard contains a known txHash, we know it's not a hex encoded private key
-        if (d.length == 32 && [[m.wallet.recentTransactions valueForKey:@"txHash"] containsObject:d]) continue;
-        
-        if ([req isValid] || [s isValidBitcoinPrivateKey] || [s isValidBitcoinBIP38Key]) {
-            [self performSelector:@selector(confirmRequest:) withObject:req afterDelay:0.1];// delayed to show highlight
-            return;
-        }
-    }
-    
-    [[[UIAlertView alloc] initWithTitle:@""
-      message:NSLocalizedString(@"clipboard doesn't contain a valid bitcoin address", nil) delegate:nil
-      cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
-    [self performSelector:@selector(cancel:) withObject:self afterDelay:0.1];
+    [self payFirstFromArray:s.array];
 }
 
 - (IBAction)reset:(id)sender
@@ -813,14 +879,14 @@ memo:(NSString *)memo isSecure:(BOOL)isSecure
         [self.navigationController popToRootViewControllerAnimated:YES];
     }
 
-    if (self.clearClipboard) [[UIPasteboard generalPasteboard] setString:@""];
+    if (self.clearClipboard) [UIPasteboard generalPasteboard].string = @"";
     self.request = nil;
     [self cancel:sender];
 }
 
 - (IBAction)cancel:(id)sender
 {
-    self.url = nil;
+    self.url = self.callback = nil;
     self.sweepTx = nil;
     self.amount = 0;
     self.okAddress = self.okIdentity = nil;
@@ -846,17 +912,20 @@ fromConnection:(AVCaptureConnection *)connection
     for (AVMetadataMachineReadableCodeObject *o in metadataObjects) {
         if (! [o.type isEqual:AVMetadataObjectTypeQRCode]) continue;
 
-        NSString *s = o.stringValue;
+        NSString *s = [o.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         BRPaymentRequest *request = [BRPaymentRequest requestWithString:s];
 
-        if (! [request isValid] && ! [s isValidBitcoinPrivateKey] && ! [s isValidBitcoinBIP38Key]) {
-            // check for BIP73 url: https://github.com/bitcoin/bips/blob/master/bip-0073.mediawiki
-            [BRPaymentRequest fetch:s timeout:5.0
+        if ((! request.isValid && ! [s isValidBitcoinPrivateKey] && ! [s isValidBitcoinBIP38Key]) ||
+            (request.r.length > 0 && ! [s hasPrefix:@"bitcoin:"])) {
+            [BRPaymentRequest fetch:request.r timeout:5.0
             completion:^(BRPaymentProtocolRequest *req, NSError *error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetQRGuide) object:nil];
                     
                     if (req) {
+                        self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-green"];
+                        [self.scanController stop];
+
                         [self.navigationController dismissViewControllerAnimated:YES completion:^{
                             [self resetQRGuide];
                         }];
@@ -866,8 +935,8 @@ fromConnection:(AVCaptureConnection *)connection
                     else {
                         self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-red"];
 
-                        if ([s hasPrefix:@"bitcoin:"] || [request.paymentAddress hasPrefix:@"1"] ||
-                            [request.paymentAddress hasPrefix:@"3"]) {
+                        if (([s hasPrefix:@"bitcoin:"] && request.paymentAddress.length > 1) ||
+                            [request.paymentAddress hasPrefix:@"1"] || [request.paymentAddress hasPrefix:@"3"]) {
                             self.scanController.message.text = [NSString stringWithFormat:@"%@\n%@",
                                                                 NSLocalizedString(@"not a valid bitcoin address", nil),
                                                                 request.paymentAddress];
@@ -886,16 +955,16 @@ fromConnection:(AVCaptureConnection *)connection
             if (request.r.length > 0) { // start fetching payment protocol request right away
                 [BRPaymentRequest fetch:request.r timeout:5.0
                 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
-                    if (error) request.r = nil;
-                    
-                    if (error && ! [request isValid]) {
-                        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
-                          message:error.localizedDescription delegate:nil
-                          cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
-                        [self cancel:nil];
-                    }
-
                     dispatch_async(dispatch_get_main_queue(), ^{
+                        if (error) request.r = nil;
+                    
+                        if (error && ! request.isValid) {
+                            [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
+                              message:error.localizedDescription delegate:nil
+                              cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+                            [self cancel:nil];
+                        }
+
                         [self.navigationController dismissViewControllerAnimated:YES completion:^{
                             [self resetQRGuide];
                         }];
@@ -913,7 +982,7 @@ fromConnection:(AVCaptureConnection *)connection
                     if (request.amount > 0) self.canChangeAmount = YES;
                 }];
                 
-                if (self.showBalance) {
+                if (request.isValid && self.showBalance) {
                     [self showBalance:request.paymentAddress];
                     [self cancel:nil];
                 }
@@ -976,7 +1045,7 @@ fromConnection:(AVCaptureConnection *)connection
 {
     //BUG: XXX this needs to take keyboard size into account
     self.useClipboard = NO;
-    self.clipboardText.text = [[UIPasteboard generalPasteboard] string];
+    self.clipboardText.text = [UIPasteboard generalPasteboard].string;
     [textView scrollRangeToVisible:textView.selectedRange];
     
     [UIView animateWithDuration:0.35 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
@@ -992,7 +1061,7 @@ fromConnection:(AVCaptureConnection *)connection
         self.sendLabel.alpha = 1.0;
     } completion:nil];
     
-    if (! self.useClipboard) [[UIPasteboard generalPasteboard] setString:textView.text];
+    if (! self.useClipboard) [UIPasteboard generalPasteboard].string = textView.text;
     [self updateClipboardText];
 }
 

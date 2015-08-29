@@ -33,16 +33,6 @@
 #import "NSMutableData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
 
-// serialized UTXO
-static NSData *txOutput(NSData *txHash, uint32_t n)
-{
-    NSMutableData *d = [NSMutableData dataWithCapacity:CC_SHA256_DIGEST_LENGTH + sizeof(uint32_t)];
-
-    [d appendData:txHash];
-    [d appendUInt32:n];
-    return d;
-}
-
 // chain position of first tx output address that appears in chain
 static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
     for (NSString *addr in tx.outputAddresses) {
@@ -59,7 +49,7 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 @property (nonatomic, strong) id<BRKeySequence> sequence;
 @property (nonatomic, strong) NSData *masterPublicKey;
 @property (nonatomic, strong) NSMutableArray *internalAddresses, *externalAddresses;
-@property (nonatomic, strong) NSMutableSet *allAddresses, *usedAddresses;
+@property (nonatomic, strong) NSMutableSet *allAddresses, *usedAddresses, *allTxHashes;
 @property (nonatomic, strong) NSSet *spentOutputs, *invalidTx;
 @property (nonatomic, strong) NSMutableOrderedSet *transactions;
 @property (nonatomic, strong) NSOrderedSet *utxos;
@@ -83,6 +73,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     self.seed = seed;
     self.allTx = [NSMutableDictionary dictionary];
     self.transactions = [NSMutableOrderedSet orderedSet];
+    self.allTxHashes = [NSMutableSet set];
     self.internalAddresses = [NSMutableArray array];
     self.externalAddresses = [NSMutableArray array];
     self.allAddresses = [NSMutableSet set];
@@ -96,14 +87,17 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
             NSMutableArray *a = (e.internal) ? self.internalAddresses : self.externalAddresses;
 
             while (e.index >= a.count) [a addObject:[NSNull null]];
-            [a replaceObjectAtIndex:e.index withObject:e.address];
+            a[e.index] = e.address;
             [self.allAddresses addObject:e.address];
         }
 
         for (BRTransactionEntity *e in [BRTransactionEntity allObjects]) {
             BRTransaction *tx = e.transaction;
+            NSValue *hash = (tx) ? uint256_obj(tx.txHash) : nil;
 
-            self.allTx[tx.txHash] = tx;
+            if (! tx) continue;
+            self.allTx[hash] = tx;
+            [self.allTxHashes addObject:hash];
             [self.transactions addObject:tx];
             [self.usedAddresses addObjectsFromArray:tx.inputAddresses];
             [self.usedAddresses addObjectsFromArray:tx.outputAddresses];
@@ -166,7 +160,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 
         while (a.count < gapLimit) { // generate new addresses up to gapLimit
             NSData *pubKey = [self.sequence publicKey:n internal:internal masterPublicKey:self.masterPublicKey];
-            NSString *addr = [[BRKey keyWithPublicKey:pubKey] address];
+            NSString *addr = [BRKey keyWithPublicKey:pubKey].address;
         
             if (! addr) {
                 NSLog(@"error generating keys");
@@ -200,10 +194,10 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         if (! tx1 || ! tx2) return NO;
         if (tx1.blockHeight > tx2.blockHeight) return YES;
         if (tx1.blockHeight < tx2.blockHeight) return NO;
-        if ([tx1.inputHashes containsObject:tx2.txHash]) return YES;
-        if ([tx2.inputHashes containsObject:tx1.txHash]) return NO;
+        if ([tx1.inputHashes containsObject:uint256_obj(tx2.txHash)]) return YES;
+        if ([tx2.inputHashes containsObject:uint256_obj(tx1.txHash)]) return NO;
         
-        for (NSData *hash in tx1.inputHashes) {
+        for (NSValue *hash in tx1.inputHashes) {
             if (_isAscending(self.allTx[hash], tx2)) return YES;
         }
                 
@@ -233,16 +227,20 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     for (BRTransaction *tx in [self.transactions reverseObjectEnumerator]) {
         NSMutableSet *spent = [NSMutableSet set];
         uint32_t i = 0, n = 0;
+        BRTransaction *transaction;
+        UInt256 h;
+        BRUTXO o;
 
-        for (NSData *hash in tx.inputHashes) {
+        for (NSValue *hash in tx.inputHashes) {
             n = [tx.inputIndexes[i++] unsignedIntValue];
-            [spent addObject:txOutput(hash, n)];
+            [hash getValue:&h];
+            [spent addObject:brutxo_obj(((BRUTXO) { h, n }))];
         }
 
         // check if any inputs are invalid or already spent
         if (tx.blockHeight == TX_UNCONFIRMED &&
             ([spent intersectsSet:spentOutputs] || [[NSSet setWithArray:tx.inputHashes] intersectsSet:invalidTx])) {
-            [invalidTx addObject:tx.txHash];
+            [invalidTx addObject:uint256_obj(tx.txHash)];
             continue;
         }
 
@@ -254,22 +252,22 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         //NOTE: balance/UTXOs will then need to be recalculated when last block changes
         for (NSString *address in tx.outputAddresses) { // add outputs to UTXO set
             if ([self containsAddress:address]) {
-                [utxos addObject:txOutput(tx.txHash, n)];
+                [utxos addObject:brutxo_obj(((BRUTXO) { tx.txHash, n }))];
                 balance += [tx.outputAmounts[n] unsignedLongLongValue];
             }
+            
             n++;
         }
 
         // transaction ordering is not guaranteed, so check the entire UTXO set against the entire spent output set
-        [spent setSet:[utxos set]];
+        [spent setSet:utxos.set];
         [spent intersectSet:spentOutputs];
         
-        for (NSData *o in spent) { // remove any spent outputs from UTXO set
-            BRTransaction *transaction = self.allTx[[o hashAtOffset:0]];
-            uint32_t n = [o UInt32AtOffset:CC_SHA256_DIGEST_LENGTH];
-            
-            [utxos removeObject:o];
-            balance -= [transaction.outputAmounts[n] unsignedLongLongValue];
+        for (NSValue *output in spent) { // remove any spent outputs from UTXO set
+            [output getValue:&o];
+            transaction = self.allTx[uint256_obj(o.hash)];
+            [utxos removeObject:output];
+            balance -= [transaction.outputAmounts[o.n] unsignedLongLongValue];
         }
         
         if (prevBalance < balance) totalReceived += balance - prevBalance;
@@ -319,14 +317,20 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 // NSData objects containing serialized UTXOs
 - (NSArray *)unspentOutputs
 {
-    return [self.utxos array];
+    return self.utxos.array;
 }
 
 // BRTransaction objects sorted by date, most recent first
 - (NSArray *)recentTransactions
 {
     //TODO: don't include receive transactions that don't have at least one wallet output >= TX_MIN_OUTPUT_AMOUNT
-    return [self.transactions array];
+    return self.transactions.array;
+}
+
+// hashes of all wallet transactions
+- (NSSet *)txHashes
+{
+    return self.allTxHashes;
 }
 
 // true if the address is controlled by the wallet
@@ -357,8 +361,9 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 - (BRTransaction *)transactionForAmounts:(NSArray *)amounts toOutputScripts:(NSArray *)scripts withFee:(BOOL)fee;
 {
     uint64_t amount = 0, balance = 0, feeAmount = 0;
-    BRTransaction *transaction = [BRTransaction new];
+    BRTransaction *transaction = [BRTransaction new], *tx;
     NSUInteger i = 0, cpfpSize = 0;
+    BRUTXO o;
 
     for (NSData *script in scripts) {
         if (! script.length) return nil;
@@ -370,13 +375,12 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     //TODO: use up all UTXOs for all used addresses to avoid leaving funds in addresses whose public key is revealed
     //TODO: avoid combining addresses in a single transaction when possible to reduce information leakage
     //TODO: use any UTXOs received from output addresses to mitigate an attacker double spending and requesting a refund
-    for (NSData *o in self.utxos) {
-        BRTransaction *tx = self.allTx[[o hashAtOffset:0]];
-        uint32_t n = [o UInt32AtOffset:CC_SHA256_DIGEST_LENGTH];
-
+    for (NSValue *output in self.utxos) {
+        [output getValue:&o];
+        tx = self.allTx[uint256_obj(o.hash)];
         if (! tx) continue;
-        [transaction addInputHash:tx.txHash index:n script:tx.outputScripts[n]];
-        balance += [tx.outputAmounts[n] unsignedLongLongValue];
+        [transaction addInputHash:tx.txHash index:o.n script:tx.outputScripts[o.n]];
+        balance += [tx.outputAmounts[o.n] unsignedLongLongValue];
         
         // add up size of unconfirmed, non-change inputs for child-pays-for-parent fee calculation
         if (tx.blockHeight == TX_UNCONFIRMED && [self amountSentByTransaction:tx] == 0) cpfpSize += tx.size;
@@ -418,8 +422,8 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         NSData *seed = self.seed(authprompt, (amount > 0) ? amount : 0);
 
         if (! seed) return YES; // user canceled authentication
-        [privkeys addObjectsFromArray:[self.sequence privateKeys:[externalIndexes array] internal:NO fromSeed:seed]];
-        [privkeys addObjectsFromArray:[self.sequence privateKeys:[internalIndexes array] internal:YES fromSeed:seed]];
+        [privkeys addObjectsFromArray:[self.sequence privateKeys:externalIndexes.array internal:NO fromSeed:seed]];
+        [privkeys addObjectsFromArray:[self.sequence privateKeys:internalIndexes.array internal:YES fromSeed:seed]];
         
         return [transaction signWithPrivateKeys:privkeys];
     }
@@ -432,7 +436,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     
     NSInteger i = 0;
     
-    for (NSData *txHash in transaction.inputHashes) {
+    for (NSValue *txHash in transaction.inputHashes) {
         BRTransaction *tx = self.allTx[txHash];
         uint32_t n = [transaction.inputIndexes[i++] unsignedIntValue];
 
@@ -445,14 +449,18 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 // records the transaction in the wallet, or returns false if it isn't associated with the wallet
 - (BOOL)registerTransaction:(BRTransaction *)transaction
 {
-    if (transaction.txHash == nil) return NO;
-    if (self.allTx[transaction.txHash] != nil) return YES;
+    UInt256 txHash = transaction.txHash;
+    NSValue *hash = uint256_obj(txHash);
+    
+    if (uint256_is_zero(txHash)) return NO;
+    if (self.allTx[hash] != nil) return YES;
     if (! [self containsTransaction:transaction]) return NO;
 
     //TODO: verify signatures when possible
-    //TODO: XXX handle tx replacement with input sequence numbers (now replacements appear invalid until confirmation)
+    //TODO: handle tx replacement with input sequence numbers (now replacements appear invalid until confirmation)
     
-    self.allTx[transaction.txHash] = transaction;
+    self.allTx[hash] = transaction;
+    [self.allTxHashes addObject:hash];
     [self.transactions insertObject:transaction atIndex:0];
     [self.usedAddresses addObjectsFromArray:transaction.inputAddresses];
     [self.usedAddresses addObjectsFromArray:transaction.outputAddresses];
@@ -463,7 +471,8 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     [self addressesWithGapLimit:SEQUENCE_GAP_LIMIT_INTERNAL internal:YES];
 
     [self.moc performBlock:^{ // add the transaction to core data
-        if ([BRTransactionEntity countObjectsMatching:@"txHash == %@", transaction.txHash] == 0) {
+        if ([BRTransactionEntity countObjectsMatching:@"txHash == %@",
+             [NSData dataWithBytes:&txHash length:sizeof(txHash)]] == 0) {
             [[BRTransactionEntity managedObject] setAttributesFromTx:transaction];
         }
     }];
@@ -472,33 +481,41 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 }
 
 // removes a transaction from the wallet along with any transactions that depend on its outputs
-- (void)removeTransaction:(NSData *)txHash
+- (void)removeTransaction:(UInt256)txHash
 {
-    BRTransaction *transaction = self.allTx[txHash];
+    BRTransaction *transaction = self.allTx[uint256_obj(txHash)];
     NSMutableSet *hashes = [NSMutableSet set];
 
     for (BRTransaction *tx in self.transactions) { // remove dependent transactions
         if (tx.blockHeight < transaction.blockHeight) break;
-        if (! [txHash isEqual:tx.txHash] && [tx.inputHashes containsObject:txHash]) [hashes addObject:tx.txHash];
+
+        if (! uint256_eq(txHash, tx.txHash) && [tx.inputHashes containsObject:uint256_obj(txHash)]) {
+            [hashes addObject:uint256_obj(tx.txHash)];
+        }
     }
 
-    for (NSData *hash in hashes) {
-        [self removeTransaction:hash];
+    for (NSValue *hash in hashes) {
+        UInt256 h;
+
+        [hash getValue:&h];
+        [self removeTransaction:h];
     }
 
-    [self.allTx removeObjectForKey:txHash];
+    [self.allTx removeObjectForKey:uint256_obj(txHash)];
+    [self.allTxHashes removeObject:uint256_obj(txHash)];
     if (transaction) [self.transactions removeObject:transaction];
     [self updateBalance];
 
     [self.moc performBlock:^{ // remove transaction from core data
-        [BRTransactionEntity deleteObjects:[BRTransactionEntity objectsMatching:@"txHash == %@", txHash]];
+        [BRTransactionEntity deleteObjects:[BRTransactionEntity objectsMatching:@"txHash == %@",
+                                            [NSData dataWithBytes:&txHash length:sizeof(txHash)]]];
     }];
 }
 
-// true if the given transaction has been added to the wallet
-- (BRTransaction *)transactionForHash:(NSData *)txHash
+// returns the transaction with the given hash if it's been registered in the wallet
+- (BRTransaction *)transactionForHash:(UInt256)txHash
 {
-    return self.allTx[txHash];
+    return self.allTx[uint256_obj(txHash)];
 }
 
 // true if no previous wallet transactions spend any of the given transaction's inputs, and no input tx is invalid
@@ -507,15 +524,21 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     //TODO: XXX attempted double spends should cause conflicted tx to remain unverified until they're confirmed
     //TODO: XXX conflicted tx with the same wallet outputs should be presented as the same tx to the user
     if (transaction.blockHeight != TX_UNCONFIRMED) return YES;
-    if (self.allTx[transaction.txHash] != nil) return ([self.invalidTx containsObject:transaction.txHash]) ? NO : YES;
+
+    if (self.allTx[uint256_obj(transaction.txHash)] != nil) {
+        return ([self.invalidTx containsObject:uint256_obj(transaction.txHash)]) ? NO : YES;
+    }
 
     uint32_t i = 0;
 
-    for (NSData *hash in transaction.inputHashes) {
+    for (NSValue *hash in transaction.inputHashes) {
         BRTransaction *tx = self.allTx[hash];
         uint32_t n = [transaction.inputIndexes[i++] unsignedIntValue];
+        UInt256 h;
 
-        if ((tx && ! [self transactionIsValid:tx]) || [self.spentOutputs containsObject:txOutput(hash, n)]) return NO;
+        [hash getValue:&h];
+        if ((tx && ! [self transactionIsValid:tx]) ||
+            [self.spentOutputs containsObject:brutxo_obj(((BRUTXO) { h, n }))]) return NO;
     }
 
     return YES;
@@ -528,7 +551,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 
     // TODO: XXX consider marking any unconfirmed transaction with a non-final sequence number as postdated
     // TODO: XXX notify that transactions with dust outputs are unlikely to confirm
-    for (NSData *txHash in transaction.inputHashes) { // check if any inputs are known to be postdated
+    for (NSValue *txHash in transaction.inputHashes) { // check if any inputs are known to be postdated
         if ([self transactionIsPostdated:self.allTx[txHash] atBlockHeight:blockHeight]) return YES;
     }
 
@@ -547,23 +570,25 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
 // set the block heights and timestamps for the given transactions
 - (void)setBlockHeight:(int32_t)height andTimestamp:(NSTimeInterval)timestamp forTxHashes:(NSArray *)txHashes
 {
-    BOOL set = NO;
+    NSMutableArray *hashes = [NSMutableArray array];
 
-    for (NSData *hash in txHashes) {
+    for (NSValue *hash in txHashes) {
         BRTransaction *tx = self.allTx[hash];
+        UInt256 h;
 
         if (! tx || (tx.blockHeight == height && tx.timestamp == timestamp)) continue;
         tx.blockHeight = height;
         tx.timestamp = timestamp;
-        set = YES;
+        [hash getValue:&h];
+        [hashes addObject:[NSData dataWithBytes:&h length:sizeof(h)]];
     }
 
-    if (set) {
+    if (hashes.count > 0) {
         [self sortTransactions];
         [self updateBalance];
 
         [self.moc performBlock:^{
-            for (BRTransactionEntity *e in [BRTransactionEntity objectsMatching:@"txHash in %@", txHashes]) {
+            for (BRTransactionEntity *e in [BRTransactionEntity objectsMatching:@"txHash in %@", hashes]) {
                 e.blockHeight = height;
                 e.timestamp = timestamp;
             }
@@ -592,7 +617,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     uint64_t amount = 0;
     NSUInteger i = 0;
 
-    for (NSData *hash in transaction.inputHashes) {
+    for (NSValue *hash in transaction.inputHashes) {
         BRTransaction *tx = self.allTx[hash];
         uint32_t n = [transaction.inputIndexes[i++] intValue];
 
@@ -610,7 +635,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     uint64_t amount = 0;
     NSUInteger i = 0;
 
-    for (NSData *hash in transaction.inputHashes) {
+    for (NSValue *hash in transaction.inputHashes) {
         BRTransaction *tx = self.allTx[hash];
         uint32_t n = [transaction.inputIndexes[i++] intValue];
 
@@ -642,7 +667,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
     NSMutableArray *amounts = [NSMutableArray array], *heights = [NSMutableArray array];
     NSUInteger i = 0;
 
-    for (NSData *hash in transaction.inputHashes) { // get the amounts and block heights of all the transaction inputs
+    for (NSValue *hash in transaction.inputHashes) { // get the amounts and block heights of all the transaction inputs
         BRTransaction *tx = self.allTx[hash];
         uint32_t n = [transaction.inputIndexes[i++] unsignedIntValue];
 

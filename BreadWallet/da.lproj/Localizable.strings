@@ -5,7 +5,13 @@
 "%@ is not allowed to access the camera" = "%@ har ikke tilladelse til at bruge kameraet";
 
 /* No comment provided by engineer. */
+"%@\n\nbalance: %@ (%@)" = "%1$@\n\nindestående: %2$@ (%3$@)";
+
+/* No comment provided by engineer. */
 "%d confirmations" = "%d bekræftelser";
+
+/* No comment provided by engineer. */
+"0 confirmations" = "0 bekræftelser";
 
 /* No comment provided by engineer. */
 "1 confirmation" = "1 bekræftelse";
@@ -41,7 +47,16 @@
 "\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nLAD IKKE nogen se din genskabelsessætning, eller de kan bruge dine bitcoin.\n\nindtast ALDRIG din genskabelsessætning ind i adgangskodehuskere eller andre steder. Andre enheder kan være inficerede.\n";
 
 /* No comment provided by engineer. */
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nLAD IKKE nogen se din\ngendannelsessætning, eller\nde kan bruge dine bitcoin.";
+
+/* No comment provided by engineer. */
+"\nDO NOT take a screenshot.\nScreenshots are visible to other apps\nand devices.\n" = "\nTAG IKKE et screenshot.\nScreenshots er synlige for andre apps\nog enheder.\n";
+
+/* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nnetværksgebyr +%1$@ (%2$@)";
+
+/* No comment provided by engineer. */
+"\nNEVER type your recovery phrase into\npassword managers or elsewhere.\nOther devices may be infected.\n" = "\nSkriv ALDRIG din gendannelsessætning\ni kodeords-programmer eller lignende.\nAndre enheder kan være inficeret.\n";
 
 /* No comment provided by engineer. */
 "\ntry again in %d %@" = "\nprøv igen om %1$d %2$@";
@@ -107,6 +122,9 @@
 "change payment amount?" = "ændr betalingsbeløb?";
 
 /* No comment provided by engineer. */
+"checking address balance..." = "tjekker adressens indestående...";
+
+/* No comment provided by engineer. */
 "checking private key balance..." = "tjekker saldo for privat nøgle …";
 
 /* No comment provided by engineer. */
@@ -131,10 +149,19 @@
 "copied" = "kopieret";
 
 /* No comment provided by engineer. */
+"copy" = "kopiér";
+
+/* No comment provided by engineer. */
 "copy address to clipboard" = "kopiér adresse til udklipsholder";
 
 /* No comment provided by engineer. */
 "copy request to clipboard" = "kopiér anmodning til udklipsholder";
+
+/* No comment provided by engineer. */
+"copy wallet addresses to clipboard?" = "kopiér tegnebogs-adresser til udklipsholder?";
+
+/* No comment provided by engineer. */
+"couldn't check address balance" = "kunne ikke tjekke adressens indestående";
 
 /* No comment provided by engineer. */
 "couldn't make payment" = "kunne ikke foretage betaling";
@@ -153,9 +180,6 @@
 
 /* No comment provided by engineer. */
 "do it later" = "gør det senere";
-
-/* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nLAD IKKE nogen se din\ngendannelsessætning, eller\nde kan bruge dine bitcoin.";
 
 /* No comment provided by engineer. */
 "done" = "færdig";
@@ -224,13 +248,10 @@
 "moved" = "flyttet";
 
 /* No comment provided by engineer. */
-"\nNEVER type your recovery phrase into\npassword managers or elsewhere.\nOther devices may be infected.\n" = "\nSkriv ALDRIG din gendannelsessætning\ni kodeords-programmer eller lignende.\nAndre enheder kan være inficeret.\n";
-
-/* No comment provided by engineer. */
-"new phrase" = "ny sætning";
-
-/* No comment provided by engineer. */
 "next, write down your recovery phrase" = "skriv nu din gendannelsessætning ned";
+
+/* No comment provided by engineer. */
+"no exchange rate data" = "ingen valutakursdata";
 
 /* No comment provided by engineer. */
 "no peers found" = "ingen peers fundet";
@@ -264,6 +285,9 @@
 
 /* No comment provided by engineer. */
 "pay" = "betal";
+
+/* No comment provided by engineer. */
+"payee identity isn't certified" = "betalingsmodtagerens identitet er ikke certificeret";
 
 /* No comment provided by engineer. */
 "payment address" = "betalingsadresse";
@@ -477,4 +501,3 @@
 
 /* No comment provided by engineer. */
 "Your wallet may be out of sync.\nThis can often be fixed by rescanning the blockchain." = "Din tegnebog kan være ude af sync.\nDette kan ofte løses ved at scanne blokkæden igen.";
-

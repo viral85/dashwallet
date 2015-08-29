@@ -51,7 +51,7 @@
 
 - (instancetype)initWithString:(NSString *)string
 {
-    if (! (self = [self init])) return nil;
+    if (! (self = [super init])) return nil;
     
     self.string = string;
     return self;
@@ -88,30 +88,33 @@
         url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@", url.scheme, url.resourceSpecifier]];
     }
     
-    self.paymentAddress = url.host;
+    if ([url.scheme isEqual:@"bitcoin"]) {
+        self.paymentAddress = url.host;
     
-    //TODO: correctly handle unknown but required url arguments (by reporting the request invalid)
-    for (NSString *arg in [url.query componentsSeparatedByString:@"&"]) {
-        NSArray *pair = [arg componentsSeparatedByString:@"="]; // if more than one '=', then pair[1] != value
+        //TODO: correctly handle unknown but required url arguments (by reporting the request invalid)
+        for (NSString *arg in [url.query componentsSeparatedByString:@"&"]) {
+            NSArray *pair = [arg componentsSeparatedByString:@"="]; // if more than one '=', then pair[1] != value
 
-        if (pair.count < 2) continue;
+            if (pair.count < 2) continue;
         
-        NSString *value = [[[arg substringFromIndex:[pair[0] length] + 1]
-                            stringByReplacingOccurrencesOfString:@"+" withString:@" "]
-                           stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSString *value = [[[arg substringFromIndex:[pair[0] length] + 1]
+                                stringByReplacingOccurrencesOfString:@"+" withString:@" "]
+                               stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 
-        if ([pair[0] isEqual:@"amount"]) {
-            self.amount = [[[NSDecimalNumber decimalNumberWithString:value] decimalNumberByMultiplyingByPowerOf10:8]
-                           unsignedLongLongValue];
+            if ([pair[0] isEqual:@"amount"]) {
+                self.amount = [[NSDecimalNumber decimalNumberWithString:value]
+                               decimalNumberByMultiplyingByPowerOf10:8].unsignedLongLongValue;
+            }
+            else if ([pair[0] isEqual:@"label"]) {
+                self.label = value;
+            }
+            else if ([pair[0] isEqual:@"message"]) {
+                self.message = value;
+            }
+            else if ([pair[0] isEqual:@"r"]) self.r = value;
         }
-        else if ([pair[0] isEqual:@"label"]) {
-            self.label = value;
-        }
-        else if ([pair[0] isEqual:@"message"]) {
-            self.message = value;
-        }
-        else if ([pair[0] isEqual:@"r"]) self.r = value;
     }
+    else if (url) self.r = s; // BIP73 url: https://github.com/bitcoin/bips/blob/master/bip-0073.mediawiki
 }
 
 - (NSString *)string
@@ -122,8 +125,8 @@
     NSMutableArray *q = [NSMutableArray array];
     
     if (self.amount > 0) {
-        [q addObject:[@"amount=" stringByAppendingString:[[(id)[NSDecimalNumber numberWithUnsignedLongLong:self.amount]
-                                                           decimalNumberByMultiplyingByPowerOf10:-8] stringValue]]];
+        [q addObject:[@"amount=" stringByAppendingString:[(id)[NSDecimalNumber numberWithUnsignedLongLong:self.amount]
+                                                           decimalNumberByMultiplyingByPowerOf10:-8].stringValue]];
     }
 
     if (self.label.length > 0) {
@@ -174,9 +177,7 @@
 
 - (BOOL)isValid
 {
-    if (! [self.paymentAddress isValidBitcoinAddress] && (! self.r || ! [NSURL URLWithString:self.r])) return NO;
-
-    return YES;
+    return ([self.paymentAddress isValidBitcoinAddress] || (self.r && [NSURL URLWithString:self.r])) ? YES : NO;
 }
 
 // receiver converted to BIP70 request object
@@ -212,27 +213,27 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
     NSMutableURLRequest *req = (u) ? [NSMutableURLRequest requestWithURL:u
                                       cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:timeout] : nil;
 
-    [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
+    [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"]; // BIP74 user-agent (bitpay, unpublished)
     [req setValue:@"application/bitcoin-paymentrequest" forHTTPHeaderField:@"Accept"];
 //  [req addValue:@"text/uri-list" forHTTPHeaderField:@"Accept"]; // breaks some BIP72 implementations, notably bitpay's
 
-    if (! req || ! [NSURLConnection canHandleRequest:req]) {
+    if (! req) {
         completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417
                          userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"bad payment request URL", nil)}]);
         return;
     }
 
-    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
-    completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        if (connectionError) {
-            completion(nil, connectionError);
+    [[[NSURLSession sharedSession] dataTaskWithRequest:req
+    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            completion(nil, error);
             return;
         }
     
         BRPaymentProtocolRequest *req = nil;
         NSString *network = @"main";
         
-#ifdef BITCOIN_TESTNET
+#if BITCOIN_TESTNET
         network = @"test";
 #endif
         
@@ -243,7 +244,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
             for (NSString *url in [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]
                                    componentsSeparatedByString:@"\n"]) {
                 if ([url hasPrefix:@"#"]) continue; // skip comments
-                req = [[BRPaymentRequest requestWithString:url] protocolRequest]; // use first url and ignore the rest
+                req = [BRPaymentRequest requestWithString:url].protocolRequest; // use first url and ignore the rest
                 break;
             }
         }
@@ -261,7 +262,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
                                                                           nil), req.details.network, network]}]);
         }
         else completion(req, nil);
-    }];
+    }] resume];
 }
 
 + (void)postPayment:(BRPaymentProtocolPayment *)payment to:(NSString *)paymentURL timeout:(NSTimeInterval)timeout
@@ -270,8 +271,11 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
     NSURL *u = [NSURL URLWithString:paymentURL];
 
     if (! u) {
-        completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417
-                         userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"bad payment URL", nil)}]);
+        if (completion) {
+            completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417
+                             userInfo:@{NSLocalizedDescriptionKey:NSLocalizedString(@"bad payment URL", nil)}]);
+        }
+        
         return;
     }
 
@@ -281,13 +285,13 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
     [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
     [req setValue:@"application/bitcoin-payment" forHTTPHeaderField:@"Content-Type"];
     [req addValue:@"application/bitcoin-paymentack" forHTTPHeaderField:@"Accept"];
-    [req setHTTPMethod:@"POST"];
-    [req setHTTPBody:payment.data];
+    req.HTTPMethod = @"POST";
+    req.HTTPBody = payment.data;
 
-    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
-    completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-        if (connectionError) {
-            completion(nil, connectionError);
+    [[[NSURLSession sharedSession] dataTaskWithRequest:req
+    completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            if (completion) completion(nil, error);
             return;
         }
         
@@ -300,12 +304,14 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
         if (! ack) {
             NSLog(@"unexpected response from %@:\n%@", u.host,
                   [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-            completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
-                             [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil), u.host]
-                            }]);
+            if (completion) {
+                completion(nil, [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
+                                 [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil),
+                                  u.host]}]);
+            }
         }
-        else completion(ack, nil);
-     }];
+        else if (completion) completion(ack, nil);
+     }] resume];
 }
 
 @end

@@ -27,6 +27,7 @@
 #import "BRTransactionEntity.h"
 #import "BRTransaction.h"
 #import "BRTxOutputEntity.h"
+#import "NSData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
 
 @implementation BRTxInputEntity
@@ -39,8 +40,11 @@
 
 - (instancetype)setAttributesFromTx:(BRTransaction *)tx inputIndex:(NSUInteger)index
 {
-    [[self managedObjectContext] performBlockAndWait:^{
-        self.txHash = tx.inputHashes[index];
+    [self.managedObjectContext performBlockAndWait:^{
+        UInt256 hash = UINT256_ZERO;
+        
+        [tx.inputHashes[index] getValue:&hash];
+        self.txHash = [NSData dataWithBytes:&hash length:sizeof(hash)];
         self.n = [tx.inputIndexes[index] intValue];
         self.signature = (tx.inputSignatures[index] != [NSNull null]) ? tx.inputSignatures[index] : nil;
         self.sequence = [tx.inputSequences[index] intValue];

@@ -139,12 +139,12 @@
 
 @end
 
-typedef enum {
+typedef enum : NSUInteger {
     output_amount = 1,
     output_script = 2
-} output_key_t;
+} output_key;
 
-typedef enum {
+typedef enum : NSUInteger {
     details_network = 1,
     details_outputs = 2,
     details_time = 3,
@@ -152,31 +152,31 @@ typedef enum {
     details_memo = 5,
     details_payment_url = 6,
     details_merchant_data = 7
-} details_key_t;
+} details_key;
 
-typedef enum {
+typedef enum : NSUInteger {
     request_version = 1,
     request_pki_type = 2,
     request_pki_data = 3,
     request_details = 4,
     request_signature = 5
-} request_key_t;
+} request_key;
 
-typedef enum {
+typedef enum : NSUInteger {
     certificates_cert = 1
-} certificates_key_t;
+} certificates_key;
 
-typedef enum {
+typedef enum : NSUInteger {
     payment_merchant_data = 1,
     payment_transactions = 2,
     payment_refund_to = 3,
     payment_memo = 4
-} payment_key_t;
+} payment_key;
 
-typedef enum {
+typedef enum : NSUInteger {
     ack_payment = 1,
     ack_memo = 2
-} ack_key_t;
+} ack_key;
 
 @interface BRPaymentProtocolDetails ()
 
@@ -253,7 +253,7 @@ merchantData:(NSData *)data
     NSMutableArray *amounts = [NSMutableArray arrayWithArray:_outputAmounts];
     
     while ([amounts containsObject:@(UINT64_MAX)]) {
-        [amounts replaceObjectAtIndex:[amounts indexOfObject:@(UINT64_MAX)] withObject:@(0)];
+        amounts[[amounts indexOfObject:@(UINT64_MAX)]] = @(0);
     }
     
     return amounts;
@@ -407,7 +407,7 @@ details:(BRPaymentProtocolDetails *)details signature:(NSData *)sig
                             NSLocalizedString(@"missing certificate", nil);
 
             for (NSDictionary *property in CFBridgingRelease(SecTrustCopyProperties(trust))) {
-                if (property[@"type"] != kSecPropertyTypeError) continue;
+                if (! [property[@"type"] isEqual:(__bridge id)kSecPropertyTypeError]) continue;
                 _errorMessage = [_errorMessage stringByAppendingFormat:@" - %@", property[@"value"]];
                 break;
             }
@@ -416,22 +416,26 @@ details:(BRPaymentProtocolDetails *)details signature:(NSData *)sig
         }
 
         SecKeyRef pubKey = SecTrustCopyPublicKey(trust);
-        SecPadding padding = kSecPaddingPKCS1;
-        NSData *sig = _signature, *d = nil;
+        OSStatus status = errSecUnimplemented;
+        NSData *sig = _signature;
 
         _signature = [NSData data]; // set signature to 0 bytes, a signature can't sign itself
-        if ([self.pkiType isEqual:@"x509+sha256"]) d = self.data.SHA256, padding = kSecPaddingPKCS1SHA256;
-        if ([self.pkiType isEqual:@"x509+sha1"]) d = self.data.SHA1, padding = kSecPaddingPKCS1SHA1;
+
+        if ([self.pkiType isEqual:@"x509+sha256"]) {
+            status = SecKeyRawVerify(pubKey, kSecPaddingPKCS1SHA256, self.data.SHA256.u8, sizeof(UInt256), sig.bytes,
+                                     sig.length);
+        }
+        else if ([self.pkiType isEqual:@"x509+sha1"]) {
+            status = SecKeyRawVerify(pubKey, kSecPaddingPKCS1SHA1, self.data.SHA1.u8, sizeof(UInt160), sig.bytes,
+                                     sig.length);
+        }
+        
         _signature = sig;
-
-        // verify request signature
-        OSStatus status = SecKeyRawVerify(pubKey, padding, d.bytes, d.length, _signature.bytes, _signature.length);
-
         CFRelease(pubKey);
 
         if (status != errSecSuccess) {
-            _errorMessage = (d) ? NSLocalizedString(@"bad signature", nil) :
-                            NSLocalizedString(@"unsupported signature type", nil);
+            _errorMessage = (status == errSecUnimplemented) ? NSLocalizedString(@"unsupported signature type", nil) :
+                            NSLocalizedString(@"bad signature", nil);
             return NO;
         }
     }
@@ -514,7 +518,7 @@ refundToAmounts:(NSArray *)amounts refundToScripts:(NSArray *)scripts memo:(NSSt
     NSMutableArray *amounts = [NSMutableArray arrayWithArray:_refundToAmounts];
     
     while ([amounts containsObject:@(UINT64_MAX)]) {
-        [amounts replaceObjectAtIndex:[amounts indexOfObject:@(UINT64_MAX)] withObject:@(0)];
+        amounts[[amounts indexOfObject:@(UINT64_MAX)]] = @(0);
     }
     
     return amounts;

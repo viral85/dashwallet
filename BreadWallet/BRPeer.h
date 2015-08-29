@@ -63,6 +63,9 @@
 #define MSG_ALERT       @"alert"
 #define MSG_REJECT      @"reject" // described in BIP61: https://github.com/bitcoin/bips/blob/master/bip-0061.mediawiki
 
+typedef union _UInt256 UInt256;
+typedef union _UInt128 UInt128;
+
 @class BRPeer, BRTransaction, BRMerkleBlock;
 
 @protocol BRPeerDelegate<NSObject>
@@ -72,17 +75,17 @@
 - (void)peer:(BRPeer *)peer disconnectedWithError:(NSError *)error;
 - (void)peer:(BRPeer *)peer relayedPeers:(NSArray *)peers;
 - (void)peer:(BRPeer *)peer relayedTransaction:(BRTransaction *)transaction;
-- (void)peer:(BRPeer *)peer hasTransaction:(NSData *)txHash;
-- (void)peer:(BRPeer *)peer rejectedTransaction:(NSData *)txHash withCode:(uint8_t)code;
+- (void)peer:(BRPeer *)peer hasTransaction:(UInt256)txHash;
+- (void)peer:(BRPeer *)peer rejectedTransaction:(UInt256)txHash withCode:(uint8_t)code;
 
 // called when the peer relays either a merkleblock or a block header, headers will have 0 totalTransactions
 - (void)peer:(BRPeer *)peer relayedBlock:(BRMerkleBlock *)block;
 
-- (BRTransaction *)peer:(BRPeer *)peer requestedTransaction:(NSData *)txHash;
+- (BRTransaction *)peer:(BRPeer *)peer requestedTransaction:(UInt256)txHash;
 
 @end
 
-typedef enum {
+typedef enum : NSInteger {
     BRPeerStatusDisconnected = 0,
     BRPeerStatusConnecting,
     BRPeerStatusConnected
@@ -98,7 +101,7 @@ typedef enum {
 
 @property (nonatomic, readonly) BRPeerStatus status;
 @property (nonatomic, readonly) NSString *host;
-@property (nonatomic, readonly) uint32_t address;
+@property (nonatomic, readonly) UInt128 address;
 @property (nonatomic, readonly) uint16_t port;
 @property (nonatomic, readonly) uint64_t services;
 @property (nonatomic, readonly) uint32_t version;
@@ -113,10 +116,10 @@ typedef enum {
 @property (nonatomic, assign) uint32_t currentBlockHeight; // set this to local block height (helps detect tarpit nodes)
 @property (nonatomic, assign) BOOL synced; // use this to keep track of peer state
 
-+ (instancetype)peerWithAddress:(uint32_t)address andPort:(uint16_t)port;
++ (instancetype)peerWithAddress:(UInt128)address andPort:(uint16_t)port;
 
-- (instancetype)initWithAddress:(uint32_t)address andPort:(uint16_t)port;
-- (instancetype)initWithAddress:(uint32_t)address port:(uint16_t)port timestamp:(NSTimeInterval)timestamp
+- (instancetype)initWithAddress:(UInt128)address andPort:(uint16_t)port;
+- (instancetype)initWithAddress:(UInt128)address port:(uint16_t)port timestamp:(NSTimeInterval)timestamp
 services:(uint64_t)services;
 - (void)setDelegate:(id<BRPeerDelegate>)delegate queue:(dispatch_queue_t)delegateQueue;
 - (void)connect;
@@ -124,12 +127,12 @@ services:(uint64_t)services;
 - (void)sendMessage:(NSData *)message type:(NSString *)type;
 - (void)sendFilterloadMessage:(NSData *)filter;
 - (void)sendMempoolMessage;
-- (void)sendGetheadersMessageWithLocators:(NSArray *)locators andHashStop:(NSData *)hashStop;
-- (void)sendGetblocksMessageWithLocators:(NSArray *)locators andHashStop:(NSData *)hashStop;
+- (void)sendGetheadersMessageWithLocators:(NSArray *)locators andHashStop:(UInt256)hashStop;
+- (void)sendGetblocksMessageWithLocators:(NSArray *)locators andHashStop:(UInt256)hashStop;
 - (void)sendInvMessageWithTxHashes:(NSArray *)txHashes;
 - (void)sendGetdataMessageWithTxHashes:(NSArray *)txHashes andBlockHashes:(NSArray *)blockHashes;
 - (void)sendGetaddrMessage;
 - (void)sendPingMessageWithPongHandler:(void (^)(BOOL success))pongHandler;
-- (void)rerequestBlocksFrom:(NSData *)blockHash; // useful to get additional transactions after a bloom filter update
+- (void)rerequestBlocksFrom:(UInt256)blockHash; // useful to get additional transactions after a bloom filter update
 
 @end

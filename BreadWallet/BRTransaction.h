@@ -25,18 +25,15 @@
 
 #import <Foundation/Foundation.h>
 
-#if TX_FEE_0_8_RULES
-#define TX_FEE_PER_KB        10000ULL    // standard tx fee per kb of tx size, rounded up to nearest kb (0.8 rules)
-#else
 #define TX_FEE_PER_KB        1000ULL     // standard tx fee per kb of tx size, rounded up to nearest kb
-#endif
 #define TX_MIN_OUTPUT_AMOUNT (TX_FEE_PER_KB*3*(34 + 148)/1000) // no txout can be below this amount (or it won't relay)
 #define TX_MAX_SIZE          100000      // no tx can be larger than this size in bytes
 #define TX_FREE_MAX_SIZE     1000        // tx must not be larger than this size in bytes without a fee
 #define TX_FREE_MIN_PRIORITY 57600000ULL // tx must not have a priority below this value without a fee
 #define TX_UNCONFIRMED       INT32_MAX   // block height indicating transaction is unconfirmed
 #define TX_MAX_LOCK_HEIGHT   500000000u  // a lockTime below this value is a block height, otherwise a timestamp
-#define TX_AVERAGE_SIZE      550         // average transaction size in bytes as of november 2014 (relatively stable)
+
+typedef union _UInt256 UInt256;
 
 @interface BRTransaction : NSObject
 
@@ -50,7 +47,7 @@
 @property (nonatomic, readonly) NSArray *outputAddresses;
 @property (nonatomic, readonly) NSArray *outputScripts;
 
-@property (nonatomic, strong) NSData *txHash;
+@property (nonatomic, assign) UInt256 txHash;
 @property (nonatomic, assign) uint32_t version;
 @property (nonatomic, assign) uint32_t lockTime;
 @property (nonatomic, assign) uint32_t blockHeight;
@@ -66,8 +63,8 @@
 - (instancetype)initWithInputHashes:(NSArray *)hashes inputIndexes:(NSArray *)indexes inputScripts:(NSArray *)scripts
 outputAddresses:(NSArray *)addresses outputAmounts:(NSArray *)amounts;
 
-- (void)addInputHash:(NSData *)hash index:(NSUInteger)index script:(NSData *)script;
-- (void)addInputHash:(NSData *)hash index:(NSUInteger)index script:(NSData *)script signature:(NSData *)signature
+- (void)addInputHash:(UInt256)hash index:(NSUInteger)index script:(NSData *)script;
+- (void)addInputHash:(UInt256)hash index:(NSUInteger)index script:(NSData *)script signature:(NSData *)signature
 sequence:(uint32_t)sequence;
 - (void)addOutputAddress:(NSString *)address amount:(uint64_t)amount;
 - (void)addOutputScript:(NSData *)script amount:(uint64_t)amount;

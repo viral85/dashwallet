@@ -29,6 +29,8 @@
 #import "BRWalletManager.h"
 #import "BRTransaction.h"
 #import "BRBubbleView.h"
+#import "BRAppGroupConstants.h"
+#import "UIImage+Utility.h"
 #import <MobileCoreServices/UTCoreTypes.h>
 
 #define QR_TIP      NSLocalizedString(@"Let others scan this QR code to get your bitcoin address. Anyone can send "\
@@ -67,36 +69,29 @@
 
 - (void)updateAddress
 {
+    static NSUserDefaults *groupDefs = nil;
     BRWalletManager *m = [BRWalletManager sharedInstance];
     BRPaymentRequest *req = self.paymentRequest;
 
-    if (! req.isValid || [self.paymentAddress isEqual:self.addressButton.currentTitle]) return;
-
-    CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
-
-    [filter setValue:req.data forKey:@"inputMessage"];
-    [filter setValue:@"L" forKey:@"inputCorrectionLevel"];
-    UIGraphicsBeginImageContext(self.qrView.bounds.size);
-
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGImageRef img = [[CIContext contextWithOptions:nil] createCGImage:filter.outputImage
-                      fromRect:filter.outputImage.extent];
-
-    if (context) {
-        CGContextSetInterpolationQuality(context, kCGInterpolationNone);
-        CGContextRotateCTM(context, M_PI); // flip
-        CGContextScaleCTM(context, -1.0, 1.0); // mirror
-        CGContextDrawImage(context, CGContextGetClipBoundingBox(context), img);
-        self.qrView.image = UIGraphicsGetImageFromCurrentImageContext();
-        [self.addressButton setTitle:self.paymentAddress forState:UIControlStateNormal];
-    }
-
-    UIGraphicsEndImageContext();
-    CGImageRelease(img);
+    if ([self.paymentAddress isEqual:self.addressButton.currentTitle]) return;
+    self.qrView.image = [UIImage imageWithQRCodeData:req.data size:self.qrView.bounds.size
+                         color:[CIColor colorWithRed:0.0 green:0.0 blue:0.0]];
+    [self.addressButton setTitle:self.paymentAddress forState:UIControlStateNormal];
+    if (! groupDefs) groupDefs = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
     
     if (req.amount > 0) {
         self.label.text = [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:req.amount],
                            [m localCurrencyStringForAmount:req.amount]];
+    }
+    else if (req.isValid) {
+        [groupDefs setObject:req.data forKey:APP_GROUP_REQUEST_DATA_KEY];
+        [groupDefs setObject:self.paymentAddress forKey:APP_GROUP_RECEIVE_ADDRESS_KEY];
+        [groupDefs synchronize];
+    }
+    else {
+        [groupDefs removeObjectForKey:APP_GROUP_REQUEST_DATA_KEY];
+        [groupDefs removeObjectForKey:APP_GROUP_RECEIVE_ADDRESS_KEY];
+        [groupDefs synchronize];
     }
 }
 
@@ -109,7 +104,7 @@
 - (NSString *)paymentAddress
 {
     if (_paymentRequest) return _paymentRequest.paymentAddress;
-    return [[[BRWalletManager sharedInstance] wallet] receiveAddress];
+    return [BRWalletManager sharedInstance].wallet.receiveAddress;
 }
 
 - (BOOL)nextTip
@@ -197,7 +192,7 @@
     [a addButtonWithTitle:NSLocalizedString(@"cancel", nil)];
     a.cancelButtonIndex = a.numberOfButtons - 1;
     
-    [a showInView:[[UIApplication sharedApplication] keyWindow]];
+    [a showInView:[UIApplication sharedApplication].keyWindow];
 }
 
 #pragma mark - UIActionSheetDelegate
@@ -207,21 +202,18 @@
     NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
 
     //TODO: allow user to create a payment protocol request object, and use merge avoidance techniques:
-    //      https://medium.com/@octskyward/merge-avoidance-7f95a386692f
+    // https://medium.com/@octskyward/merge-avoidance-7f95a386692f
     if ([title isEqual:NSLocalizedString(@"copy address to clipboard", nil)] ||
         [title isEqual:NSLocalizedString(@"copy request to clipboard", nil)]) {
-        [[UIPasteboard generalPasteboard]
-         setString:(self.paymentRequest.amount > 0) ? self.paymentRequest.string : self.paymentAddress];
+        [UIPasteboard generalPasteboard].string =
+            (self.paymentRequest.amount > 0) ? self.paymentRequest.string : self.paymentAddress;
 
-        [self.view
-         addSubview:[[[BRBubbleView viewWithText:NSLocalizedString(@"copied", nil)
-                       center:CGPointMake(self.view.bounds.size.width/2.0, self.view.bounds.size.height/2.0 - 130.0)]
-                      popIn] popOutAfterDelay:2.0]];
+        [self.view addSubview:[[[BRBubbleView viewWithText:NSLocalizedString(@"copied", nil)
+         center:CGPointMake(self.view.bounds.size.width/2.0, self.view.bounds.size.height/2.0 - 130.0)] popIn]
+         popOutAfterDelay:2.0]];
     }
     else if ([title isEqual:NSLocalizedString(@"send address as email", nil)] ||
              [title isEqual:NSLocalizedString(@"send request as email", nil)]) {
-        //TODO: add qr image to email
-        
         //TODO: implement BIP71 payment protocol mime attachement
         // https://github.com/bitcoin/bips/blob/master/bip-0071.mediawiki
         
@@ -265,7 +257,7 @@
     else if ([title isEqual:NSLocalizedString(@"request an amount", nil)]) {
         UINavigationController *c = [self.storyboard instantiateViewControllerWithIdentifier:@"AmountNav"];
         
-        [(BRAmountViewController *)c.topViewController setDelegate:self];
+        ((BRAmountViewController *)c.topViewController).delegate = self;
         [self.navigationController presentViewController:c animated:YES completion:nil];
     }
 }
@@ -304,7 +296,7 @@ error:(NSError *)error
     
     c.paymentRequest = self.paymentRequest;
     c.paymentRequest.amount = amount;
-    [(UINavigationController *)self.navigationController.presentedViewController setDelegate:c];
+    ((UINavigationController *)self.navigationController.presentedViewController).delegate = c;
     [(UINavigationController *)self.navigationController.presentedViewController pushViewController:c animated:YES];
 }
 

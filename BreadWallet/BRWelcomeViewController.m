@@ -62,16 +62,14 @@
     self.foregroundObserver =
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationWillEnterForegroundNotification object:nil
         queue:nil usingBlock:^(NSNotification *note) {
-            if (! [[BRWalletManager sharedInstance] noWallet]) { // sanity check
-                [self.navigationController.presentingViewController dismissViewControllerAnimated:NO completion:nil];
-            }
-            else [self animateWallpaper];
+            [self animateWallpaper];
         }];
     
     self.backgroundObserver =
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidEnterBackgroundNotification object:nil
         queue:nil usingBlock:^(NSNotification *note) {
-            self.wallpaper.center = CGPointMake(self.wallpaper.frame.size.width/2, self.wallpaper.center.y);
+            self.wallpaperXLeft.constant = 0;
+            [self.wallpaper.superview layoutIfNeeded];
         }];
 }
 
@@ -103,14 +101,32 @@
     [super viewDidAppear:animated];
 
     dispatch_async(dispatch_get_main_queue(), ^{ // animation sometimes doesn't work if run directly in viewDidAppear
-        if (! [[BRWalletManager sharedInstance] noWallet]) { // sanity check
+#if SNAPSHOT
+        [[UIApplication sharedApplication] setStatusBarHidden:NO];
+        self.navigationItem.titleView.hidden = NO;
+        self.navigationItem.titleView.alpha = 1.0;
+        self.logoXCenter.constant = self.view.frame.size.width;
+        self.walletXCenter.constant = self.restoreXCenter.constant = 0.0;
+        self.paralaxXLeft.constant = self.view.frame.size.width*PARALAX_RATIO;
+        return;
+#endif
+
+        if (! [BRWalletManager sharedInstance].noWallet) { // sanity check
             [self.navigationController.presentingViewController dismissViewControllerAnimated:NO completion:nil];
         }
         
-        [self animateWallpaper];
-        
         if (! self.hasAppeared) {
             self.hasAppeared = YES;
+            self.paralaxXLeft = [NSLayoutConstraint constraintWithItem:self.view.superview
+                                 attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.paralax
+                                 attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0];
+            [self.view.superview insertSubview:self.paralax belowSubview:self.view];
+            [self.view.superview addConstraint:self.paralaxXLeft];
+            [self.view.superview addConstraint:[NSLayoutConstraint constraintWithItem:self.view.superview
+             attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self.paralax
+             attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0.0]];
+            [self.view.superview insertSubview:self.paralax belowSubview:self.view];
+            [self.view.superview layoutIfNeeded];
             self.logoXCenter.constant = self.view.frame.size.width;
             self.walletXCenter.constant = 0.0;
             self.restoreXCenter.constant = 0.0;
@@ -125,6 +141,8 @@
                 [self.view.superview layoutIfNeeded];
             } completion:nil];
         }
+        
+        [self animateWallpaper];
     });
 }
 
@@ -179,21 +197,6 @@
 {
     if (self.animating) return;
     self.animating = YES;
-    
-    if (self.paralax.superview != self.view.superview) {
-        NSLayoutConstraint *c = self.paralaxXLeft;
-        UIView *v = self.view.superview;
-    
-        self.paralaxXLeft = [NSLayoutConstraint constraintWithItem:(c.firstItem == self.paralax ? c.firstItem : v)
-                             attribute:c.firstAttribute relatedBy:c.relation
-                             toItem:(c.secondItem == self.paralax ? c.secondItem : v) attribute:c.secondAttribute
-                             multiplier:c.multiplier constant:c.constant];
-        [v insertSubview:self.paralax belowSubview:self.view];
-        [v addConstraint:self.paralaxXLeft];
-        [v layoutIfNeeded];
-        self.paralax.center = CGPointMake(self.paralax.center.x, v.bounds.size.height/2.0);
-    }
-
     self.wallpaperXLeft.constant = -240.0;
 
     [UIView animateWithDuration:30.0 delay:0.0
@@ -209,7 +212,7 @@
 
 - (IBAction)generate:(id)sender
 {
-    if (! [[BRWalletManager sharedInstance] isPasscodeEnabled]) {
+    if (! [BRWalletManager sharedInstance].passcodeEnabled) {
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"turn device passcode on", nil)
           message:NSLocalizedString(@"\nA device passcode is needed to safeguard your wallet. Go to settings and turn "
                                     "passcode on to continue.", nil)
@@ -217,14 +220,9 @@
         return;
     }
 
-    if (self.foregroundObserver) [[NSNotificationCenter defaultCenter] removeObserver:self.foregroundObserver];
-    self.foregroundObserver = nil;
-
     [self.navigationController.navigationBar.topItem setHidesBackButton:YES animated:YES];
     [sender setEnabled:NO];
-
     self.seedNav = [self.storyboard instantiateViewControllerWithIdentifier:@"SeedNav"];
-    
     self.warningLabel.hidden = self.showButton.hidden = NO;
     self.warningLabel.alpha = self.showButton.alpha = 0.0;
         
@@ -238,7 +236,14 @@
 
 - (IBAction)show:(id)sender
 {
-    [self.navigationController presentViewController:self.seedNav animated:YES completion:nil];
+    [self.navigationController presentViewController:self.seedNav animated:YES completion:^{
+        self.warningLabel.hidden = self.showButton.hidden = YES;
+        self.navigationController.navigationBar.topItem.titleView.alpha = 1.0;
+        self.startLabel.alpha = self.recoverLabel.alpha = 1.0;
+        self.generateButton.alpha = 1.0;
+        self.generateButton.enabled = YES;
+        self.navigationController.navigationBar.topItem.hidesBackButton = NO;
+    }];
 }
 
 #pragma mark UIViewControllerAnimatedTransitioning

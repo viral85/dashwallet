@@ -26,7 +26,6 @@
 #import "NSString+Bitcoin.h"
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
-#import "ccMemory.h"
 
 static const UniChar base58chars[] = {
     '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P',
@@ -46,7 +45,7 @@ static const UniChar base58chars[] = {
     
     uint8_t buf[(d.length - z)*138/100 + 1]; // log(256)/log(58), rounded up
 
-    CC_XZEROMEM(buf, sizeof(buf));
+    memset(buf, 0, sizeof(buf));
 
     for (i = z; i < d.length; i++) {
         uint32_t carry = ((const uint8_t *)d.bytes)[i];
@@ -57,7 +56,7 @@ static const UniChar base58chars[] = {
             carry /= 58;
         }
         
-        CC_XZEROMEM(&carry, sizeof(carry));
+        memset(&carry, 0, sizeof(carry));
     }
 
     i = 0;
@@ -67,7 +66,7 @@ static const UniChar base58chars[] = {
     
     while (z-- > 0) CFStringAppendCharacters(s, &base58chars[0], 1);
     while (i < sizeof(buf)) CFStringAppendCharacters(s, &base58chars[buf[i++]], 1);
-    CC_XZEROMEM(buf, sizeof(buf));
+    memset(buf, 0, sizeof(buf));
     return CFBridgingRelease(s);
 }
 
@@ -77,7 +76,7 @@ static const UniChar base58chars[] = {
     
     NSMutableData *data = [NSMutableData secureDataWithData:d];
 
-    [data appendBytes:d.SHA256_2.bytes length:4];
+    [data appendBytes:d.SHA256_2.u32 length:4];
     return [self base58WithData:data];
 }
 
@@ -130,7 +129,7 @@ static const UniChar base58chars[] = {
     else if (l == 2 && ([elem[0] intValue] == 65 || [elem[0] intValue] == 33) && [elem[1] intValue] == OP_CHECKSIG) {
         // pay-to-pubkey scriptPubKey
         [d appendBytes:&v length:1];
-        [d appendData:[elem[0] hash160]];
+        [d appendBytes:[elem[0] hash160].u8 length:sizeof(UInt160)];
     }
     else return nil; // unknown script type
 
@@ -153,7 +152,7 @@ static const UniChar base58chars[] = {
     if (l >= 2 && [elem[l - 2] intValue] <= OP_PUSHDATA4 && [elem[l - 2] intValue] > 0 &&
         ([elem[l - 1] intValue] == 65 || [elem[l - 1] intValue] == 33)) { // pay-to-pubkey-hash scriptSig
         [d appendBytes:&v length:1];
-        [d appendData:[elem[l - 1] hash160]];
+        [d appendBytes:[elem[l - 1] hash160].u8 length:sizeof(UInt160)];
     }
     else if (l >= 2 && [elem[l - 2] intValue] <= OP_PUSHDATA4 && [elem[l - 2] intValue] > 0 &&
              [elem[l - 1] intValue] <= OP_PUSHDATA4 && [elem[l - 1] intValue] > 0) { // pay-to-script-hash scriptSig
@@ -162,7 +161,7 @@ static const UniChar base58chars[] = {
         v = BITCOIN_SCRIPT_ADDRESS_TEST;
 #endif
         [d appendBytes:&v length:1];
-        [d appendData:[elem[l - 1] hash160]];
+        [d appendBytes:[elem[l - 1] hash160].u8 length:sizeof(UInt160)];
     }
     else if (l >= 1 && [elem[l - 1] intValue] <= OP_PUSHDATA4 && [elem[l - 1] intValue] > 0) {// pay-to-pubkey scriptSig
         //TODO: implement Peter Wullie's pubKey recovery from signature
@@ -181,7 +180,7 @@ static const UniChar base58chars[] = {
     
     uint8_t buf[(self.length - z)*733/1000 + 1]; // log(58)/log(256), rounded up
     
-    CC_XZEROMEM(buf, sizeof(buf));
+    memset(buf, 0, sizeof(buf));
     
     for (i = z; i < self.length; i++) {
         uint32_t carry = [self characterAtIndex:i];
@@ -226,7 +225,7 @@ static const UniChar base58chars[] = {
             carry >>= 8;
         }
         
-        CC_XZEROMEM(&carry, sizeof(carry));
+        memset(&carry, 0, sizeof(carry));
     }
     
     i = 0;
@@ -236,7 +235,7 @@ static const UniChar base58chars[] = {
 
     d.length = z;
     [d appendBytes:&buf[i] length:sizeof(buf) - i];
-    CC_XZEROMEM(buf, sizeof(buf));
+    memset(buf, 0, sizeof(buf));
     return d;
 }
 
@@ -249,7 +248,7 @@ static const UniChar base58chars[] = {
     NSData *data = CFBridgingRelease(CFDataCreate(SecureAllocator(), d.bytes, d.length - 4));
 
     // verify checksum
-    if (*(uint32_t *)((const uint8_t *)d.bytes + d.length - 4) != *(uint32_t *)data.SHA256_2.bytes) return nil;
+    if (*(uint32_t *)((const uint8_t *)d.bytes + d.length - 4) != data.SHA256_2.u32[0]) return nil;
     return data;
 }
 
@@ -280,11 +279,11 @@ static const UniChar base58chars[] = {
                 return d;
         }
         
-        CC_XZEROMEM(&c, sizeof(c));
+        memset(&c, 0, sizeof(c));
         
         if (i % 2) {
             [d appendBytes:&b length:1];
-            CC_XZEROMEM(&b, sizeof(b));
+            memset(&b, 0, sizeof(b));
         }
         else b *= 16;
     }
@@ -319,7 +318,7 @@ static const UniChar base58chars[] = {
     NSData *d = self.base58checkToData;
     
     if (d.length == 33 || d.length == 34) { // wallet import format: https://en.bitcoin.it/wiki/Wallet_import_format
-#if BITCOIN_TESNET
+#if BITCOIN_TESTNET
         return (*(const uint8_t *)d.bytes == BITCOIN_PRIVKEY_TEST) ? YES : NO;
 #else
         return (*(const uint8_t *)d.bytes == BITCOIN_PRIVKEY) ? YES : NO;
@@ -332,7 +331,7 @@ static const UniChar base58chars[] = {
         [self getBytes:d.mutableBytes maxLength:d.length usedLength:NULL encoding:NSUTF8StringEncoding options:0
          range:NSMakeRange(0, self.length) remainingRange:NULL];
         [d appendBytes:"?" length:1];
-        return (*(const uint8_t *)d.SHA256.bytes == 0) ? YES : NO;
+        return (d.SHA256.u8[0] == 0) ? YES : NO;
     }
     else return (self.hexToData.length == 32) ? YES : NO; // hex encoded key
 }

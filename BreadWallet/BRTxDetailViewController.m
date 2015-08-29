@@ -124,22 +124,8 @@
 }
 
 - (void)setBackgroundForCell:(UITableViewCell *)cell indexPath:(NSIndexPath *)path
-{
-    if (! cell.backgroundView) {
-        UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, cell.frame.size.width, 0.5)];
-        
-        v.tag = 100;
-        cell.backgroundView = [[UIView alloc] initWithFrame:cell.frame];
-        cell.backgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.67];
-        v.backgroundColor = self.tableView.separatorColor;
-        [cell.backgroundView addSubview:v];
-        v = [[UIView alloc] initWithFrame:CGRectMake(0, cell.frame.size.height - 0.5, cell.frame.size.width, 0.5)];
-        v.tag = 101;
-        v.backgroundColor = self.tableView.separatorColor;
-        [cell.backgroundView addSubview:v];
-    }
-    
-    [cell viewWithTag:100].frame = CGRectMake((path.row == 0 ? 0 : 15), 0, cell.frame.size.width, 0.5);
+{    
+    [cell viewWithTag:100].hidden = (path.row > 0);
     [cell viewWithTag:101].hidden = (path.row + 1 < [self tableView:self.tableView numberOfRowsInSection:path.section]);
 }
 
@@ -169,7 +155,7 @@
     BRCopyLabel *detailLabel;
     UILabel *textLabel, *subtitleLabel, *amountLabel, *localCurrencyLabel;
     BRWalletManager *m = [BRWalletManager sharedInstance];
-    NSUInteger peerCount = [[BRPeerManager sharedInstance] peerCount],
+    NSUInteger peerCount = [BRPeerManager sharedInstance].peerCount,
                relayCount = [[BRPeerManager sharedInstance] relayCountForTransaction:self.transaction.txHash];
     
     // Configure the cell...
@@ -184,7 +170,8 @@
                     subtitleLabel = (id)[cell viewWithTag:3];
                     [self setBackgroundForCell:cell indexPath:indexPath];
                     textLabel.text = NSLocalizedString(@"id:", nil);
-                    detailLabel.text = [NSString hexWithData:self.transaction.txHash.reverse];
+                    detailLabel.text = [NSString hexWithData:[NSData dataWithBytes:self.transaction.txHash.u8
+                                                              length:sizeof(UInt256)].reverse];
                     subtitleLabel.text = nil;
                     break;
                     
@@ -207,7 +194,7 @@
                         detailLabel.text = NSLocalizedString(@"double spend", nil);
                     }
                     else if ([m.wallet transactionIsPostdated:self.transaction
-                              atBlockHeight:[[BRPeerManager sharedInstance] lastBlockHeight]]) {
+                              atBlockHeight:[BRPeerManager sharedInstance].lastBlockHeight]) {
                         detailLabel.text = NSLocalizedString(@"transaction is post-dated", nil);
                     }
                     else if (peerCount == 0 || relayCount < peerCount) {
@@ -361,7 +348,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSUInteger i = [[self.tableView indexPathsForVisibleRows] indexOfObject:indexPath];
+    NSUInteger i = [self.tableView.indexPathsForVisibleRows indexOfObject:indexPath];
     UITableViewCell *cell = (i < self.tableView.visibleCells.count) ? self.tableView.visibleCells[i] : nil;
     BRCopyLabel *l = (id)[cell viewWithTag:2];
     

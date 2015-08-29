@@ -31,6 +31,8 @@
 #import "BRWalletManager.h"
 #import "BRPeerManager.h"
 #import "BRTransaction.h"
+#import "NSString+Bitcoin.h"
+#import "NSData+Bitcoin.h"
 
 #define TRANSACTION_CELL_HEIGHT 75
 
@@ -89,6 +91,26 @@ static NSString *dateFormat(NSString *template)
     
     if (m.didAuthenticate) [self unlock:nil];
     self.transactions = m.wallet.recentTransactions;
+    
+#if SNAPSHOT
+    BRTransaction *tx = [[BRTransaction alloc] initWithInputHashes:@[uint256_obj(UINT256_ZERO)] inputIndexes:@[@(0)]
+                         inputScripts:@[[NSData data]] outputAddresses:@[@""] outputAmounts:@[@(0)]];
+    
+    m.localCurrencyCode = [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
+    self.tableView.showsVerticalScrollIndicator = NO;
+    self.moreTx = YES;
+    m.didAuthenticate = YES;
+    [self unlock:nil];
+    tx.txHash = UINT256_ZERO;
+    self.transactions = @[tx, tx, tx, tx, tx, tx];
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.5*NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        self.navigationItem.title = [NSString stringWithFormat:@"%@ (%@)", [m stringForAmount:42980000],
+                                     [m localCurrencyStringForAmount:42980000]];
+    });
+
+    return;
+#endif
 
     if (! self.backgroundObserver) {
         self.backgroundObserver =
@@ -138,7 +160,7 @@ static NSString *dateFormat(NSString *template)
             [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncStartedNotification object:nil
             queue:nil usingBlock:^(NSNotification *note) {
                 if ([[BRPeerManager sharedInstance]
-                     timestampForBlockHeight:[[BRPeerManager sharedInstance] lastBlockHeight]] + 60*60*24*7 <
+                     timestampForBlockHeight:[BRPeerManager sharedInstance].lastBlockHeight] + 60*60*24*7 <
                     [NSDate timeIntervalSinceReferenceDate] &&
                     m.seedCreationTime + 60*60*24 < [NSDate timeIntervalSinceReferenceDate]) {
                     self.navigationItem.titleView = nil;
@@ -212,7 +234,7 @@ static NSString *dateFormat(NSString *template)
 - (uint32_t)blockHeight
 {
     static uint32_t height = 0;
-    uint32_t h = [[BRPeerManager sharedInstance] lastBlockHeight];
+    uint32_t h = [BRPeerManager sharedInstance].lastBlockHeight;
     
     if (h > height) height = h;
     return height;
@@ -224,40 +246,32 @@ static NSString *dateFormat(NSString *template)
 
     if (transactions.count <= 5) self.moreTx = NO;
     _transactions = [transactions subarrayWithRange:NSMakeRange(0, (self.moreTx) ? 5 : transactions.count)];
-    if ([[BRWalletManager sharedInstance] didAuthenticate]) return;
-    
-    for (BRTransaction *tx in _transactions) {
-        if (tx.blockHeight == TX_UNCONFIRMED || (tx.blockHeight > height - 5 && tx.blockHeight <= height)) continue;
-        _transactions = [transactions subarrayWithRange:NSMakeRange(0, [transactions indexOfObject:tx])];
-        self.moreTx = YES;
-        break;
+    if ([BRWalletManager sharedInstance].didAuthenticate) return;
+
+    if ([self.navigationItem.title isEqual:NSLocalizedString(@"syncing...", nil)]) {
+        _transactions = @[];
+        if (transactions.count > 0) self.moreTx = YES;
+    }
+    else {
+        for (BRTransaction *tx in _transactions) {
+            if (tx.blockHeight == TX_UNCONFIRMED || (tx.blockHeight > height - 5 && tx.blockHeight <= height)) continue;
+            _transactions = [transactions subarrayWithRange:NSMakeRange(0, [transactions indexOfObject:tx])];
+            self.moreTx = YES;
+            break;
+        }
     }
 }
 
 - (void)setBackgroundForCell:(UITableViewCell *)cell tableView:(UITableView *)tableView indexPath:(NSIndexPath *)path
-{
-    if (! cell.backgroundView) {
-        UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, cell.frame.size.width, 0.5)];
-        
-        v.tag = 100;
-        cell.backgroundView = [[UIView alloc] initWithFrame:cell.frame];
-        cell.backgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.67];
-        v.backgroundColor = tableView.separatorColor;
-        [cell.backgroundView addSubview:v];
-        v = [[UIView alloc] initWithFrame:CGRectMake(0, cell.frame.size.height - 0.5, cell.frame.size.width, 0.5)];
-        v.tag = 101;
-        v.backgroundColor = tableView.separatorColor;
-        [cell.backgroundView addSubview:v];
-    }
-    
-    [cell viewWithTag:100].frame = CGRectMake((path.row == 0 ? 0 : 15), 0, cell.frame.size.width, 0.5);
+{    
+    [cell viewWithTag:100].hidden = (path.row > 0);
     [cell viewWithTag:101].hidden = (path.row + 1 < [self tableView:tableView numberOfRowsInSection:path.section]);
 }
 
 - (NSString *)dateForTx:(BRTransaction *)tx
 {
     static NSDateFormatter *f1 = nil, *f2 = nil, *f3 = nil, *f4 = nil;
-    NSString *date = self.txDates[tx.txHash];
+    NSString *date = self.txDates[uint256_obj(tx.txHash)];
     NSTimeInterval now = [[BRPeerManager sharedInstance] timestampForBlockHeight:TX_UNCONFIRMED],
                    week = now - 6*24*60*60, year = now - 364*24*60*60;
 
@@ -280,10 +294,10 @@ static NSString *dateFormat(NSString *template)
     
     if (tx.timestamp <= 1 && t <= week) f = (t > year) ? f3 : f4;
 
-    date = [[[[f stringFromDate:[NSDate dateWithTimeIntervalSinceReferenceDate:t]] lowercaseString]
+    date = [[[f stringFromDate:[NSDate dateWithTimeIntervalSinceReferenceDate:t]].lowercaseString
              stringByReplacingOccurrencesOfString:@"am" withString:@"a"]
             stringByReplacingOccurrencesOfString:@"pm" withString:@"p"];
-    if (tx.blockHeight != TX_UNCONFIRMED) self.txDates[tx.txHash] = date;
+    if (tx.blockHeight != TX_UNCONFIRMED) self.txDates[uint256_obj(tx.txHash)] = date;
     return date;
 }
 
@@ -319,7 +333,7 @@ static NSString *dateFormat(NSString *template)
     nav.view.alpha = 0.0;
 
     [nav dismissViewControllerAnimated:NO completion:^{
-        [(id)[nav.viewControllers.firstObject sendViewController] scanQR:nil];
+        [(id)((BRRootViewController *)nav.viewControllers.firstObject).sendViewController scanQR:nil];
         [UIView animateWithDuration:0.1 delay:1.5 options:0 animations:^{ nav.view.alpha = 1.0; } completion:nil];
     }];
 }
@@ -412,6 +426,16 @@ static NSString *dateFormat(NSString *template)
                          sent = [m.wallet amountSentByTransaction:tx],
                          balance = [m.wallet balanceAfterTransaction:tx];
                 uint32_t h = self.blockHeight, confirms = (tx.blockHeight > h) ? 0 : (h - tx.blockHeight) + 1;
+
+#if SNAPSHOT
+                received = [@[@(0), @(0), @(54000000), @(0), @(0), @(93000000)][indexPath.row] longLongValue];
+                sent = [@[@(1010000), @(10010000), @(0), @(82990000), @(10010000), @(0)][indexPath.row] longLongValue];
+                balance = [@[@(42980000), @(43990000), @(54000000), @(0), @(82990000), @(93000000)][indexPath.row]
+                           longLongValue];
+                [self.txDates removeAllObjects];
+                tx.timestamp = [NSDate timeIntervalSinceReferenceDate] - indexPath.row*100000;
+                confirms = 6;
+#endif
 
                 sentLabel.hidden = YES;
                 unconfirmedLabel.hidden = NO;
@@ -628,7 +652,7 @@ static NSString *dateFormat(NSString *template)
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == alertView.cancelButtonIndex) {
-        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+        [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
         return;
     }
 
@@ -637,7 +661,7 @@ static NSString *dateFormat(NSString *template)
     if (c.authSuccess) {
         [self.navigationController pushViewController:c animated:YES];
     }
-    else [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    else [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
 }
 
 #pragma mark - UIViewControllerAnimatedTransitioning

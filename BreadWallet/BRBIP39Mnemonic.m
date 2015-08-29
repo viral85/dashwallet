@@ -26,10 +26,8 @@
 #import "BRBIP39Mnemonic.h"
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
-#import "ccMemory.h"
-#import <CommonCrypto/CommonKeyDerivation.h>
 
-#define WORDS @"BIP39EnglishWords"
+#define WORDS @"BIP39Words"
 
 // BIP39 is method for generating a deterministic wallet seed from a mnemonic phrase
 // https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
@@ -45,15 +43,16 @@
     NSMutableArray *a =
         CFBridgingRelease(CFArrayCreateMutable(SecureAllocator(), data.length*3/4, &kCFTypeArrayCallBacks));
     NSMutableData *d = [NSMutableData secureDataWithData:data];
+    UInt256 sha256 = data.SHA256;
 
-    [d appendData:data.SHA256]; // append SHA256 checksum
+    [d appendBytes:&sha256 length:sizeof(sha256)]; // append SHA256 checksum
 
     for (int i = 0; i < data.length*3/4; i++) {
         x = CFSwapInt32BigToHost(*(const uint32_t *)((const uint8_t *)d.bytes + i*11/8));
         [a addObject:words[(x >> (sizeof(x)*8 - (11 + ((i*11) % 8)))) % n]];
     }
 
-    CC_XZEROMEM(&x, sizeof(x));
+    memset(&x, 0, sizeof(x));
     return CFBridgingRelease(CFStringCreateByCombiningStrings(SecureAllocator(), (CFArrayRef)a, CFSTR(" ")));
 }
 
@@ -87,14 +86,14 @@
     b = *((const uint8_t *)d.bytes + a.count*4/3) >> (8 - a.count/3);
     d.length = a.count*4/3;
 
-    if (b != (*(const uint8_t *)d.SHA256.bytes >> (8 - a.count/3))) {
+    if (b != (d.SHA256.u8[0] >> (8 - a.count/3))) {
         NSLog(@"incorrect phrase, bad checksum");
         return nil;
     }
 
-    CC_XZEROMEM(&x, sizeof(x));
-    CC_XZEROMEM(&y, sizeof(y));
-    CC_XZEROMEM(&b, sizeof(b));
+    memset(&x, 0, sizeof(x));
+    memset(&y, 0, sizeof(y));
+    memset(&b, 0, sizeof(b));
     return d;
 }
 
@@ -105,28 +104,36 @@
 
 - (NSString *)normalizePhrase:(NSString *)phrase
 {
+    if (! phrase) return nil;
+
     NSMutableString *s = CFBridgingRelease(CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)phrase));
-    
+    NSMutableCharacterSet *ws = [NSMutableCharacterSet whitespaceAndNewlineCharacterSet];
+    CFRange r;
+
     CFStringNormalize((CFMutableStringRef)s, kCFStringNormalizationFormKD);
-    [s replaceOccurrencesOfString:@"." withString:@" " options:0 range:NSMakeRange(0, s.length)];
-    [s replaceOccurrencesOfString:@"," withString:@" " options:0 range:NSMakeRange(0, s.length)];
-    [s replaceOccurrencesOfString:@"\n" withString:@" " options:0 range:NSMakeRange(0, s.length)];
-    CFStringTrimWhitespace((CFMutableStringRef)s);
     CFStringLowercase((CFMutableStringRef)s, CFLocaleGetSystem());
+    CFStringTrimWhitespace((CFMutableStringRef)s);
+    [ws removeCharactersInString:@" "];
+    
+    while (CFStringFindCharacterFromSet((CFStringRef)s, (CFCharacterSetRef)ws, CFRangeMake(0, s.length), 0, &r)) {
+        [s replaceCharactersInRange:NSMakeRange(r.location, r.length) withString:@" "];
+    }
     
     while ([s rangeOfString:@"  "].location != NSNotFound) {
         [s replaceOccurrencesOfString:@"  " withString:@" " options:0 range:NSMakeRange(0, s.length)];
     }
-    
+        
     return s;
 }
 
 - (NSData *)deriveKeyFromPhrase:(NSString *)phrase withPassphrase:(NSString *)passphrase
 {
-    NSMutableData *key = [NSMutableData secureDataWithLength:CC_SHA512_DIGEST_LENGTH];
+    if (! phrase) return nil;
+    
+    NSMutableData *key = [NSMutableData secureDataWithLength:sizeof(UInt512)];
     NSData *password, *salt;
-    CFMutableStringRef pw = CFStringCreateMutableCopy(SecureAllocator(), phrase.length, (CFStringRef)phrase);
-    CFMutableStringRef s = CFStringCreateMutableCopy(SecureAllocator(), 8 + passphrase.length, CFSTR("mnemonic"));
+    CFMutableStringRef pw = CFStringCreateMutableCopy(SecureAllocator(), 0, (CFStringRef)phrase);
+    CFMutableStringRef s = CFStringCreateMutableCopy(SecureAllocator(), 0, CFSTR("mnemonic"));
 
     if (passphrase) CFStringAppend(s, (CFStringRef)passphrase);
     CFStringNormalize(pw, kCFStringNormalizationFormKD);
@@ -136,8 +143,7 @@
     CFRelease(pw);
     CFRelease(s);
 
-    CCKeyDerivationPBKDF(kCCPBKDF2, password.bytes, password.length, salt.bytes, salt.length, kCCPRFHmacAlgSHA512, 2048,
-                         key.mutableBytes, key.length);
+    PBKDF2(SHA512, 64, password.bytes, password.length, salt.bytes, salt.length, 2048, key.mutableBytes, key.length);
     return key;
 }
 

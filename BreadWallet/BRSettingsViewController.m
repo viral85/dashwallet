@@ -26,13 +26,15 @@
 #import "BRSettingsViewController.h"
 #import "BRSeedViewController.h"
 #import "BRWalletManager.h"
+#import "BRBubbleView.h"
+#include <asl.h>
 
 @interface BRSettingsViewController ()
 
 @property (nonatomic, assign) BOOL touchId;
 @property (nonatomic, strong) UITableViewController *selectorController;
 @property (nonatomic, strong) NSArray *selectorOptions;
-@property (nonatomic, strong) NSString *selectedOption;
+@property (nonatomic, strong) NSString *selectedOption, *noOptionsText;
 @property (nonatomic, assign) NSUInteger selectorType;
 @property (nonatomic, strong) UISwipeGestureRecognizer *navBarSwipe;
 @property (nonatomic, strong) id balanceObserver;
@@ -93,27 +95,12 @@
     _selectorController.tableView.dataSource = self;
     _selectorController.tableView.delegate = self;
     _selectorController.tableView.backgroundColor = [UIColor clearColor];
-    _selectorController.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     return _selectorController;
 }
 
 - (void)setBackgroundForCell:(UITableViewCell *)cell tableView:(UITableView *)tableView indexPath:(NSIndexPath *)path
-{
-    if (! cell.backgroundView) {
-        UIView *v = [[UIView alloc] initWithFrame:CGRectMake(0, 0, cell.frame.size.width, 0.5)];
-        
-        v.tag = 100;
-        cell.backgroundView = [[UIView alloc] initWithFrame:cell.frame];
-        cell.backgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.67];
-        v.backgroundColor = tableView.separatorColor;
-        [cell.backgroundView addSubview:v];
-        v = [[UIView alloc] initWithFrame:CGRectMake(0, cell.frame.size.height - 0.5, cell.frame.size.width, 0.5)];
-        v.tag = 101;
-        v.backgroundColor = tableView.separatorColor;
-        [cell.backgroundView addSubview:v];
-    }
-    
-    [cell viewWithTag:100].frame = CGRectMake((path.row == 0 ? 0 : 15), 0, cell.frame.size.width, 0.5);
+{    
+    [cell viewWithTag:100].hidden = (path.row > 0);
     [cell viewWithTag:101].hidden = (path.row + 1 < [self tableView:tableView numberOfRowsInSection:path.section]);
 }
 
@@ -123,6 +110,32 @@
 {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://breadwallet.com"]];
 }
+
+#if DEBUG
+- (IBAction)copyLogs:(id)sender
+{
+    aslmsg q = asl_new(ASL_TYPE_QUERY), m;
+    aslresponse r = asl_search(NULL, q);
+    NSMutableString *s = [NSMutableString string];
+    time_t t;
+    struct tm tm;
+
+    while ((m = asl_next(r))) {
+        t = strtol(asl_get(m, ASL_KEY_TIME), NULL, 10);
+        localtime_r(&t, &tm);
+        [s appendFormat:@"%d-%02d-%02d %02d:%02d:%02d %s: %s\n", tm.tm_year + 1900, tm.tm_mon, tm.tm_mday, tm.tm_hour,
+         tm.tm_min, tm.tm_sec, asl_get(m, ASL_KEY_SENDER), asl_get(m, ASL_KEY_MSG)];
+    }
+
+    asl_free(r);
+    [UIPasteboard generalPasteboard].string = (s.length < 8000000) ? s : [s substringFromIndex:s.length - 8000000];
+    
+    [self.navigationController.topViewController.view
+     addSubview:[[[BRBubbleView viewWithText:NSLocalizedString(@"copied", nil)
+     center:CGPointMake(self.view.bounds.size.width/2.0, self.view.bounds.size.height/2.0)] popIn]
+     popOutAfterDelay:2.0]];
+}
+#endif
 
 - (IBAction)touchIdLimit:(id)sender
 {
@@ -141,11 +154,12 @@
         if (m.spendingLimit > SATOSHIS*10) m.spendingLimit = SATOSHIS*10;
         self.selectedOption = self.selectorOptions[(log10(m.spendingLimit) < 6) ? 0 :
                                                    (NSUInteger)log10(m.spendingLimit) - 6];
+        self.noOptionsText = nil;
         self.selectorController.title = NSLocalizedString(@"touch id spending limit", nil);
         [self.navigationController pushViewController:self.selectorController animated:YES];
         [self.selectorController.tableView reloadData];
     }
-    else [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    else [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
 }
 
 - (IBAction)navBarSwipe:(id)sender
@@ -258,6 +272,12 @@
     return cell;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    if (tableView == self.selectorController.tableView && self.selectorOptions.count == 0) return self.noOptionsText;
+    return nil;
+}
+
 #pragma mark - UITableViewDelegate
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
@@ -309,12 +329,13 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     //TODO: include an option to generate a new wallet and sweep old balance if backup may have been compromized
+    BRWalletManager *m = [BRWalletManager sharedInstance];
     UIViewController *c = nil;
     UILabel *l = nil;
     NSMutableAttributedString *s = nil;
     NSMutableArray *options;
     NSUInteger i = 0;
-    BRWalletManager *m = [BRWalletManager sharedInstance];
+    double localPrice = m.localCurrencyPrice;
     
     if (tableView == self.selectorController.tableView) {
         i = [self.selectorOptions indexOfObject:self.selectedOption];
@@ -351,7 +372,15 @@
                     [s replaceCharactersInRange:[s.string rangeOfString:@"%net%"] withString:@""];
                     l.attributedText = s;
                     [l.superview.gestureRecognizers.firstObject addTarget:self action:@selector(about:)];
+#if DEBUG
+                {
+                    UIButton *b = nil;
                     
+                    b = (id)[c.view viewWithTag:413];
+                    [b addTarget:self action:@selector(copyLogs:) forControlEvents:UIControlEventTouchUpInside];
+                    b.hidden = NO;
+                }
+#endif
                     [self.navigationController pushViewController:c animated:YES];
                     break;
                     
@@ -389,13 +418,15 @@
                     self.selectorOptions = options;
                     i = [m.currencyCodes indexOfObject:m.localCurrencyCode];
                     if (i < options.count) self.selectedOption = options[i];
-                    self.selectorController.title = [NSString stringWithFormat:@"%@ = %@",
-                                                     [m localCurrencyStringForAmount:SATOSHIS/m.localCurrencyPrice],
-                                                     [m stringForAmount:SATOSHIS/m.localCurrencyPrice]];
+                    self.noOptionsText = NSLocalizedString(@"no exchange rate data", nil);
+                    self.selectorController.title =
+                        [NSString stringWithFormat:@"%@ = %@",
+                         [m localCurrencyStringForAmount:(localPrice > DBL_EPSILON) ? SATOSHIS/localPrice : 0],
+                         [m stringForAmount:(localPrice > DBL_EPSILON) ? SATOSHIS/localPrice : 0]];
                     [self.navigationController pushViewController:self.selectorController animated:YES];
                     [self.selectorController.tableView reloadData];
                     
-                    if (i != NSNotFound) {
+                    if (i < options.count) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [self.selectorController.tableView
                              scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]
@@ -442,7 +473,7 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == alertView.cancelButtonIndex) {
-        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+        [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
         return;
     }
     
@@ -451,7 +482,7 @@
     if (c.authSuccess) {
         [self.navigationController pushViewController:c animated:YES];
     }
-    else [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    else [self.tableView deselectRowAtIndexPath:self.tableView.indexPathForSelectedRow animated:YES];
 }
 
 @end
