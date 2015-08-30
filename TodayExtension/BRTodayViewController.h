@@ -1,9 +1,9 @@
 //
-//  UIImage+Blur.h
-//  DashWallet
+//  TodayViewController.h
+//  TodayWidget
 //
-//  Created by Aaron Voisine on 11/8/14.
-//  Copyright (c) 2014 Aaron Voisine <voisine@gmail.com>
+//  Created by Henry on 6/14/15.
+//  Copyright (c) 2015 Aaron Voisine <voisine@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIImage (Blur)
-
-- (UIImage *)blurWithRadius:(CGFloat)radius;
+@interface BRTodayViewController : UIViewController
 
 @end

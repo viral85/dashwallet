@@ -1601,16 +1601,16 @@
                             <imageView userInteractionEnabled="NO" contentMode="center" fixedFrame="YES" image="wallpaper-default" translatesAutoresizingMaskIntoConstraints="NO" id="N12-14-Jsp">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" misplaced="YES" text="Enter this wallet's recovery phrase to wipe it and start/recover another. Your current balance remains on this phrase." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="289" translatesAutoresizingMaskIntoConstraints="NO" id="YC6-rN-4P5">
-                                <rect key="frame" x="16" y="64" width="289" height="62"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Enter this wallet's recovery phrase to wipe it and start/recover another. Your current balance remains on this phrase." lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="289" translatesAutoresizingMaskIntoConstraints="NO" id="YC6-rN-4P5">
+                                <rect key="frame" x="16" y="70" width="289" height="61"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                                 <color key="shadowColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <size key="shadowOffset" width="0.0" height="0.0"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3D6-D7-2JP">
-                                <rect key="frame" x="12" y="138" width="296" height="200"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3D6-D7-2JP">
+                                <rect key="frame" x="12" y="143" width="296" height="195"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.67000000000000004" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="yes" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
@@ -1625,7 +1625,7 @@
                             <constraint firstItem="3D6-D7-2JP" firstAttribute="leading" secondItem="u2L-lU-MXZ" secondAttribute="leading" constant="12" id="H1q-RD-UrJ"/>
                             <constraint firstItem="3D6-D7-2JP" firstAttribute="top" secondItem="YC6-rN-4P5" secondAttribute="bottom" constant="12" id="Hzn-9K-qd0"/>
                             <constraint firstAttribute="trailing" secondItem="3D6-D7-2JP" secondAttribute="trailing" constant="12" id="NtE-Jt-OpD"/>
-                            <constraint firstItem="YC6-rN-4P5" firstAttribute="top" secondItem="you-3b-Ulg" secondAttribute="bottom" id="bmC-9u-liL"/>
+                            <constraint firstItem="YC6-rN-4P5" firstAttribute="top" secondItem="you-3b-Ulg" secondAttribute="bottom" constant="6" id="bmC-9u-liL"/>
                             <constraint firstAttribute="centerX" secondItem="YC6-rN-4P5" secondAttribute="centerX" id="nLu-eA-b0A"/>
                         </constraints>
                     </view>
@@ -2310,41 +2310,21 @@ Other devices may be infected.
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZPH-1d-tW9">
                                 <rect key="frame" x="0.0" y="264" width="320" height="105"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LK7-eX-ZgB">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="1"/>
-                                        <color key="backgroundColor" white="0.67000000000000004" alpha="1" colorSpace="calibratedWhite"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="0.5" id="l2b-EL-NOY"/>
-                                        </constraints>
-                                    </view>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" tag="-411" contentMode="left" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="dz8-9E-hrc" customClass="BRCopyLabel">
                                         <rect key="frame" x="15" y="0.0" width="290" height="105"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mcG-j3-eTm">
-                                        <rect key="frame" x="0.0" y="104" width="320" height="1"/>
-                                        <color key="backgroundColor" white="0.67000000000000004" alpha="1" colorSpace="calibratedWhite"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="0.5" id="B43-b5-4Rt"/>
-                                        </constraints>
-                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="0.67000000000000004" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                 <gestureRecognizers/>
                                 <constraints>
-                                    <constraint firstAttribute="centerX" secondItem="dz8-9E-hrc" secondAttribute="centerX" id="8Le-xq-Vck"/>
-                                    <constraint firstItem="mcG-j3-eTm" firstAttribute="leading" secondItem="ZPH-1d-tW9" secondAttribute="leading" id="9pA-Sp-DBl"/>
                                     <constraint firstItem="dz8-9E-hrc" firstAttribute="width" secondItem="ZPH-1d-tW9" secondAttribute="width" constant="-30" id="EFb-Ob-S3f"/>
-                                    <constraint firstItem="LK7-eX-ZgB" firstAttribute="leading" secondItem="ZPH-1d-tW9" secondAttribute="leading" id="ELg-7b-hdf"/>
                                     <constraint firstItem="dz8-9E-hrc" firstAttribute="height" secondItem="ZPH-1d-tW9" secondAttribute="height" id="Enr-e9-KXu"/>
                                     <constraint firstAttribute="height" constant="105" id="Gfe-SM-JDn"/>
-                                    <constraint firstItem="LK7-eX-ZgB" firstAttribute="top" secondItem="ZPH-1d-tW9" secondAttribute="top" id="JiJ-0L-w7U"/>
-                                    <constraint firstAttribute="trailing" secondItem="LK7-eX-ZgB" secondAttribute="trailing" id="cd1-Z4-TGT"/>
-                                    <constraint firstAttribute="trailing" secondItem="mcG-j3-eTm" secondAttribute="trailing" id="ejg-TN-bTL"/>
-                                    <constraint firstAttribute="bottom" secondItem="mcG-j3-eTm" secondAttribute="bottom" id="qyN-ab-YLO"/>
-                                    <constraint firstAttribute="centerY" secondItem="dz8-9E-hrc" secondAttribute="centerY" id="tjh-cL-7bM"/>
+                                    <constraint firstAttribute="centerX" secondItem="dz8-9E-hrc" secondAttribute="centerX" id="OgS-lk-F18"/>
+                                    <constraint firstAttribute="centerY" secondItem="dz8-9E-hrc" secondAttribute="centerY" id="U9B-MF-9vj"/>
                                 </constraints>
                             </view>
                             <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="I wrote it down:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" useAutomaticPreferredMaxLayoutWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cyp-mV-Bhd">

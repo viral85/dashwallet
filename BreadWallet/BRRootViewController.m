@@ -33,7 +33,7 @@
 #import "BRBouncyBurgerButton.h"
 #import "BRPeerManager.h"
 #import "BRWalletManager.h"
-#import "UIImage+Blur.h"
+#import "UIImage+Utility.h"
 #import "NSString+Dash.h"
 #import "Reachability.h"
 #import <LocalAuthentication/LocalAuthentication.h>

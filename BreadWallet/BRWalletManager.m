@@ -53,11 +53,7 @@
 #define DEFAULT_CURRENCY_CODE  @"USD"
 #define DEFAULT_SPENT_LIMIT    DUFFS
 
-#if TX_FEE_0_8_RULES
-#define DEFAULT_FEE_PER_KB 0 // use standard minimum fee instead
-#else
-#define DEFAULT_FEE_PER_KB (4096*1000/512) // fee required by eligius pool, which supports child-pays-for-parent
-#endif
+#define DEFAULT_FEE_PER_KB (4096*1000/512)
 #define MAX_FEE_PER_KB     (10100*1000/247) // slightly higher than a 100bit fee on a typical 247byte transaction
 
 #define LOCAL_CURRENCY_CODE_KEY     @"LOCAL_CURRENCY_CODE"
@@ -70,6 +66,7 @@
 #define CRYPTSY_DASH_BTC_UPDATE_TIME_KEY  @"CRYPTSY_DASH_BTC_UPDATE_TIME"
 #define SPEND_LIMIT_AMOUNT_KEY      @"SPEND_LIMIT_AMOUNT"
 #define SECURE_TIME_KEY             @"SECURE_TIME"
+#define FEE_PER_KB_KEY              @"FEE_PER_KB"
 
 #define MNEMONIC_KEY        @"mnemonic"
 #define CREATION_TIME_KEY   @"creationtime"
@@ -295,29 +292,38 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     if (_wallet) return _wallet;
 
     if (getKeychainData(SEED_KEY, nil)) { // upgrade from old keychain scheme
-        NSLog(@"upgrading to authenticated keychain scheme");
-        if (! setKeychainData([self.sequence masterPublicKeyFromSeed:self.seed], MASTER_PUBKEY_KEY, NO)) return _wallet;
-        if (setKeychainData(getKeychainData(MNEMONIC_KEY, nil), MNEMONIC_KEY, YES)) setKeychainData(nil, SEED_KEY, NO);
+        @autoreleasepool {
+            NSString *seedPhrase = getKeychainString(MNEMONIC_KEY, nil);
+            
+            NSLog(@"upgrading to authenticated keychain scheme");
+            if (! setKeychainData([self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:seedPhrase
+                                                                                             withPassphrase:nil]], MASTER_PUBKEY_KEY, NO)) return _wallet;
+            if (setKeychainString(seedPhrase, MNEMONIC_KEY, YES)) setKeychainData(nil, SEED_KEY, NO);
+        }
     }
     
-    if (! self.masterPublicKey) return _wallet;
+    uint64_t feePerKb = 0;
+    NSData *mpk = self.masterPublicKey;
+    
+    if (! mpk) return _wallet;
     
     @synchronized(self) {
         if (_wallet) return _wallet;
-            
+        
         _wallet =
-            [[BRWallet alloc] initWithContext:[NSManagedObject context] sequence:self.sequence
-            masterPublicKey:self.masterPublicKey seed:^NSData *(NSString *authprompt, uint64_t amount) {
-                return [self seedWithPrompt:authprompt forAmount:amount];
-            }];
-
+        [[BRWallet alloc] initWithContext:[NSManagedObject context] sequence:self.sequence
+                          masterPublicKey:mpk seed:^NSData *(NSString *authprompt, uint64_t amount) {
+                              return [self seedWithPrompt:authprompt forAmount:amount];
+                          }];
+        
         _wallet.feePerKb = DEFAULT_FEE_PER_KB;
+        feePerKb = [[NSUserDefaults standardUserDefaults] doubleForKey:FEE_PER_KB_KEY];
+        if (feePerKb >= DEFAULT_FEE_PER_KB && feePerKb <= MAX_FEE_PER_KB) _wallet.feePerKb = feePerKb;
         
         // verify that keychain matches core data, with different access and backup policies it's possible to diverge
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            BRKey *k = [BRKey keyWithPublicKey:[self.sequence publicKey:0 internal:NO
-                                                masterPublicKey:self.masterPublicKey]];
-                    
+            BRKey *k = [BRKey keyWithPublicKey:[self.sequence publicKey:0 internal:NO masterPublicKey:mpk]];
+            
             if (_wallet.addresses.count > 0 && ! [_wallet containsAddress:k.address]) {
                 NSLog(@"wallet doesn't contain address: %@", k.address);
 #if DEBUG
@@ -330,12 +336,12 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                 }];
                 
                 _wallet = nil;
-                    
+                
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletManagerSeedChangedNotification
-                     object:nil];
+                                                                        object:nil];
                     [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletBalanceChangedNotification
-                     object:nil];
+                                                                        object:nil];
                 });
             }
         });

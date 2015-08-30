@@ -1,9 +1,9 @@
 //
-//  UIImage+Color.h
-//  DashWallet
+//  UIImage+Utility.h
+//  BreadWallet
 //
-//  Created by Quantum Explorer on 8/13/15.
-//  Copyright (c) 2015 Aaron Voisine. All rights reserved.
+//  Created by Aaron Voisine on 11/8/14.
+//  Copyright (c) 2014 Aaron Voisine <voisine@gmail.com>
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface UIImage (Color)
+@interface UIImage (Utility)
+
++ (instancetype)imageWithQRCodeData:(NSData *)data size:(CGSize)size color:(CIColor *)color;
+
+- (UIImage *)blurWithRadius:(CGFloat)radius;
 
 - (UIImage *)imageWithTintColor:(UIColor *)tintColor;
 
