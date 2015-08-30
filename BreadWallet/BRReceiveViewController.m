@@ -26,10 +26,12 @@
 #import "BRReceiveViewController.h"
 #import "BRRootViewController.h"
 #import "BRPaymentRequest.h"
+#import "BRAppGroupConstants.h"
 #import "BRWalletManager.h"
 #import "BRTransaction.h"
 #import "BRBubbleView.h"
 #import <MobileCoreServices/UTCoreTypes.h>
+#import "UIImage+Utility.h"
 
 #define QR_TIP      NSLocalizedString(@"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send "\
                     "dash to your wallet by transferring them to your address.", nil)
@@ -67,37 +69,31 @@
 
 - (void)updateAddress
 {
+    static NSUserDefaults *groupDefs = nil;
     BRWalletManager *m = [BRWalletManager sharedInstance];
     BRPaymentRequest *req = self.paymentRequest;
+    
+    if ([self.paymentAddress isEqual:self.addressButton.currentTitle]) return;
+    self.qrView.image = [UIImage imageWithQRCodeData:req.data size:self.qrView.bounds.size
+                                               color:[CIColor colorWithRed:0.0 green:0.0 blue:0.0]];
 
-    if (! req.isValid || [self.paymentAddress isEqual:self.addressButton.currentTitle]) return;
-
-    CIFilter *filter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
-
-    [filter setValue:req.data forKey:@"inputMessage"];
-    [filter setValue:@"L" forKey:@"inputCorrectionLevel"];
-    UIGraphicsBeginImageContext(self.qrView.bounds.size);
-
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGImageRef img = [[CIContext contextWithOptions:nil] createCGImage:filter.outputImage
-                      fromRect:filter.outputImage.extent];
-
-    if (context) {
-        CGContextSetInterpolationQuality(context, kCGInterpolationNone);
-        CGContextRotateCTM(context, M_PI); // flip
-        CGContextScaleCTM(context, -1.0, 1.0); // mirror
-        CGContextDrawImage(context, CGContextGetClipBoundingBox(context), img);
-        self.qrView.image = UIGraphicsGetImageFromCurrentImageContext();
-        [self.addressButton setTitle:self.paymentAddress forState:UIControlStateNormal];
-    }
-
-    UIGraphicsEndImageContext();
-    CGImageRelease(img);
+    [self.addressButton setTitle:self.paymentAddress forState:UIControlStateNormal];
+    if (! groupDefs) groupDefs = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
     
     if (req.amount > 0) {
         NSMutableAttributedString * attributedString = [[m attributedDashStringForAmount:req.amount] mutableCopy];
         [attributedString appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)",[m localCurrencyStringForDashAmount:req.amount]]]];
         self.label.attributedText = attributedString;
+    }
+    else if (req.isValid) {
+        [groupDefs setObject:req.data forKey:APP_GROUP_REQUEST_DATA_KEY];
+        [groupDefs setObject:self.paymentAddress forKey:APP_GROUP_RECEIVE_ADDRESS_KEY];
+        [groupDefs synchronize];
+    }
+    else {
+        [groupDefs removeObjectForKey:APP_GROUP_REQUEST_DATA_KEY];
+        [groupDefs removeObjectForKey:APP_GROUP_RECEIVE_ADDRESS_KEY];
+        [groupDefs synchronize];
     }
 }
 
