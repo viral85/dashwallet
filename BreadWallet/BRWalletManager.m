@@ -307,7 +307,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     
     if (! mpk) return _wallet;
     
-    @synchronized(self) {
+    if ([NSThread isMainThread]) {
         if (_wallet) return _wallet;
         
         _wallet =
@@ -345,9 +345,12 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                 });
             }
         });
-        
-        return _wallet;
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self wallet];
+        });
     }
+    return _wallet;
 }
 
 // true if keychain is available and we know that no wallet exists on it
