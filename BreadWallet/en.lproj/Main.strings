@@ -216,7 +216,7 @@
 "ue1-2S-fEr.text" = "ƀ 1,000,000";
 
 /* Class = "UILabel"; text = "dashwallet v%ver%%net%\ncopyright © 2015 Aaron Voisine\n\nthis app is open source"; ObjectID = "uvz-hk-Nr4"; */
-"uvz-hk-Nr4.text" = "dashwallet v%ver%%net%\ncopyright © 2015 Aaron Voisine\n\nthis app is open source";
+"uvz-hk-Nr4.text" = "dashwallet v%ver%%net%\ncopyright © 2015 Darkcoin Foundation\n\nBased on breadwallet\ncopyright © 2015 Aaron Voisine\n\nthis app is open source";
 
 /* Class = "UILabel"; text = "start a new wallet by generating a wallet recovery phrase"; ObjectID = "wDZ-DN-szv"; */
 "wDZ-DN-szv.text" = "start a new wallet by generating a wallet recovery phrase";

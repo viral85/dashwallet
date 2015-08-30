@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\npermettre l'accès à la caméra dans\nRéglages->Confidentialité->Appareil photo->%@";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nNE LAISSEZ PERSONNE voir votre phrase de récupération sinon n'importe qui pourra dépenser vos bitcoins.\n\nNe tapez JAMAIS votre phrase de récupération dans un gestionnaire de mot de passe où ailleurs. D'autres dispositifs peuvent être infectés.\n";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nNE LAISSEZ PERSONNE voir votre phrase de récupération sinon n'importe qui pourra dépenser vos dash.\n\nNe tapez JAMAIS votre phrase de récupération dans un gestionnaire de mot de passe où ailleurs. D'autres dispositifs peuvent être infectés.\n";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nfrais de réseau +%1$@ (%2$@)";
@@ -65,7 +65,7 @@
 "bad payment request URL" = "mauvaise URL de demande de paiement";
 
 /* No comment provided by engineer. */
-"bad payment URL" = "mauvaise addresse URL de paiement";
+"bad payment URL" = "mauvaise adresse URL de paiement";
 
 /* No comment provided by engineer. */
 "bad recovery phrase" = "mauvaise phrase de récupération";
@@ -80,8 +80,7 @@
 "Dash address" = "Adresse Dash";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. "\
-"A dash address always starts with 'X' or 'Y'." = "Les adresses dash peuvent aussi être copiées dans le presse-papier. Une adresse dash commence toujours par 'X' ou 'Y'.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Les adresses dash peuvent aussi être copiées dans le presse-papier. Une adresse dash commence toujours par 'X' ou 'Y'.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "frais de réseau dash";
@@ -126,7 +125,7 @@
 "CONFIRM WIPE" = "CONFIRMER EFFACEMENT";
 
 /* No comment provided by engineer. */
-"confirmed in block #%d" = "confirmée en bloc #%d";
+"confirmed in block #%d" = "confirmée par le bloc #%d";
 
 /* No comment provided by engineer. */
 "connect timeout" = "connect timeout";
@@ -159,7 +158,7 @@
 "do it later" = "le faire plus tard";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nNE LAISSEZ PERSONNE voir votre phrase\nde récupération sinon n'importe qui\npourra dépenser vos bitcoins.";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = "\nNE LAISSEZ PERSONNE voir votre phrase\nde récupération sinon n'importe qui\npourra dépenser vos dash.";
 
 /* No comment provided by engineer. */
 "done" = "terminé";
@@ -180,7 +179,7 @@
 "error signing transaction" = "erreur de signature de la transaction";
 
 /* No comment provided by engineer. */
-"from:" = "de :";
+"from:" = "depuis :";
 
 /* No comment provided by engineer. */
 "hour" = "heure";
@@ -210,7 +209,7 @@
 "INVALID" = "INVALIDE";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "Laissez les autres numériser ce code QR pour obtenir votre adresse bitcoin. N'importe qui peut envoyer des bitcoins à votre portefeuille en les transférant à votre adresse.";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "Vos amis peuvent numériser ce code QR pour obtenir votre adresse dash. N'importe qui peut envoyer du dash à votre portefeuille en le transférant vers cette adresse.";
 
 /* No comment provided by engineer. */
 "minute" = "minute";
@@ -402,10 +401,10 @@
 "this private key is empty" = "cette clé privée est vide";
 
 /* No comment provided by engineer. */
-"to:" = "à :";
+"to:" = "envers :";
 
 /* No comment provided by engineer. */
-"to: %@" = "à : %@";
+"to: %@" = "envers : %@";
 
 /* No comment provided by engineer. */
 "touch id limit" = "limite de touch id";
@@ -420,7 +419,7 @@
 "transaction fees would cost more than the funds available on this private key (due to tiny \"dust\" deposits)" = "les frais de transaction coûteraient plus que les fonds disponibles sur cette clé privée (à cause de minuscules dépôts \"dust\")";
 
 /* No comment provided by engineer. */
-"transaction history" = "historique de transaction";
+"transaction history" = "historique des transactions";
 
 /* No comment provided by engineer. */
 "transaction is post-dated" = "la transaction est postdatée";
@@ -462,7 +461,7 @@
 "verify passcode" = "vérifiez le code d'accès";
 
 /* No comment provided by engineer. */
-"wallet address" = "adresse de portefeuille";
+"wallet address" = "adresse portefeuille";
 
 /* No comment provided by engineer. */
 "wallet disabled" = "portefeuille désactivé";

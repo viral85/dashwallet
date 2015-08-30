@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\nAyarlar->Gizlilik->Kamera->%@ \nkısmından kamera erişimine izin verin";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nKimsenin kurtarma cümlenizi görmesine veya bitcoinlerinizi harcamasına İZİN VERMEYİN.\n\nASLA kurtarma cümlenizi şifre yöneticilerine veya başka yerlere yazmayın. Başka cihazlar güvenli olmayabilir.\n";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nKimsenin kurtarma cümlenizi görmesine veya dashlerinizi harcamasına İZİN VERMEYİN.\n\nASLA kurtarma cümlenizi şifre yöneticilerine veya başka yerlere yazmayın. Başka cihazlar güvenli olmayabilir.\n";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nağ ücreti +%1$@ (%2$@)";
@@ -80,8 +80,7 @@
 "Dash address" = "Dash adresi";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. "\
-"A dash address always starts with 'X' or 'Y'." = "Dash adresleri ayrıca panoya kopyalanabilir. Dash adresi her zaman 'X' veya 'Y' ile başlar.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Dash adresleri ayrıca panoya kopyalanabilir. Dash adresi her zaman 'X' veya 'Y' ile başlar.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "bitcoin ağ ücreti";
@@ -159,7 +158,7 @@
 "do it later" = "daha sonra yap";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nkimsenin kurtarma cümlenizi görmesine İZİN VERMEYİN\n      çünkü bitcoinlerinizi harcayabilirler.\n";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = "\nkimsenin kurtarma cümlenizi görmesine İZİN VERMEYİN\n      çünkü dashlerinizi harcayabilirler.\n";
 
 /* No comment provided by engineer. */
 "done" = "bitti";
@@ -210,7 +209,7 @@
 "INVALID" = "GEÇERSİZ";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "Bitcoin adresinizi edinmek için diğer QR kodlarını tarayın. Başkaları bitcoinleri adresinize transfer yoluyla cüzdanınıza gönderebilir.";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "Dash adresinizi edinmek için diğer QR kodlarını tarayın. Başkaları bitcoinleri adresinize transfer yoluyla cüzdanınıza gönderebilir.";
 
 /* No comment provided by engineer. */
 "minute" = "dakika";

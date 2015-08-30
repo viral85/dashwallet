@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\npermitir el acceso a la cámara en\nConfiguración->Privacidad->Cámara->%@";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nNO permitas que nadie vea tu frase de recuperación, podrían usar tus bitcoin.\n\nNUNCA introduzcas tu frase de recuperación en gestores de contraseñas u otros servicios. Los otros dispositivos pueden estar infectados.\n";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nNO permitas que nadie vea tu frase de recuperación, podrían usar tus dash.\n\nNUNCA introduzcas tu frase de recuperación en gestores de contraseñas u otros servicios. Los otros dispositivos pueden estar infectados.\n";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\ncuota de red +%1$@ (%2$@)";
@@ -80,8 +80,7 @@
 "Dash address" = "Dirección de dash";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. "\
-"A dash address always starts with 'X' or 'Y'." = "Las direcciones de dash también pueden copiarse en el portapapeles. Una dirección de dash siempre comienza por \"X\" o \"Y\".";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Las direcciones de dash también pueden copiarse en el portapapeles. Una dirección de dash siempre comienza por \"X\" o \"Y\".";
 
 /* No comment provided by engineer. */
 "dash network fee" = "cuota de red de dash";
@@ -159,7 +158,7 @@
 "do it later" = "hazlo más tarde";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nNO permitas que nadie vea tu frase de\nrecuperación, podrían usar tus bitcoin.\n";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = "\nNO permitas que nadie vea tu frase de\nrecuperación, podrían usar tus dash.\n";
 
 /* No comment provided by engineer. */
 "done" = "hecho";
@@ -210,7 +209,7 @@
 "INVALID" = "NO VÁLIDO";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "Permite a otros escanear este código QR para obtener tu dirección bitcoin. Cualquiera puede enviar bitcoin a tu cartera transfiriéndolos a tu dirección.";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "Permite a otros escanear este código QR para obtener tu dirección dash. Cualquiera puede enviar dash a tu cartera transfiriéndolos a tu dirección.";
 
 /* No comment provided by engineer. */
 "minute" = "minuto";

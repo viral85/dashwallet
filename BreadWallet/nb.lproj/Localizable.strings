@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\ntillat kameratilgang i\nInnstillinger->Personvern->Kamera->%@";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nIKKE la noen se din gjennopprettingsfrase; de kan sende dine bitcoin\n\nSKRIV ALDRI opp din gjenopprettingsfrase i en passordbehandler eller andre steder. Andre enheter kan være kompromittert.\n";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nIKKE la noen se din gjennopprettingsfrase; de kan sende dine dash\n\nSKRIV ALDRI opp din gjenopprettingsfrase i en passordbehandler eller andre steder. Andre enheter kan være kompromittert.\n";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nnettverksavgift +%1$@ (%2$@)";
@@ -80,8 +80,7 @@
 "Dash address" = "Dash-adresse";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. "\
-"A dash address always starts with 'X' or 'Y'." = "Dash-adresser kan også kopieres til utklippstavlen. En Dash-adresse starter alltid med 'X' eller 'Y'.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Dash-adresser kan også kopieres til utklippstavlen. En Dash-adresse starter alltid med 'X' eller 'Y'.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "dash nettverksavgift";
@@ -159,7 +158,7 @@
 "do it later" = "gjør det senere";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nIKKE la noen se din gjennopprettingsfrase;\nde kan sende dine bitcoin.\n";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = "\nIKKE la noen se din gjennopprettingsfrase;\nde kan sende dine dash.\n";
 
 /* No comment provided by engineer. */
 "done" = "utført";
@@ -210,7 +209,7 @@
 "INVALID" = "UGYLDIG";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "La andre skanne QR koden for å få din bitcoin adresse. Alle kan sende deg bitcoin ved å bruke din adresse.";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "La andre skanne QR koden for å få din dash adresse. Alle kan sende deg dash ved å bruke din adresse.";
 
 /* No comment provided by engineer. */
 "minute" = "minutt";

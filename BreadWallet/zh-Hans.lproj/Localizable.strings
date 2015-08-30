@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\n允许摄像机访问\n设置->隐私->摄像机->%@";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\n不要让任何人看到你的恢复密语，否则他们就可以使用您的比特币。\n\n切勿将您的恢复密语输入到密码管理器或其他地方。因为其它装置有被病毒感染的可能性。\n";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\n不要让任何人看到你的恢复密语，否则他们就可以使用您的比特币。\n\n切勿将您的恢复密语输入到密码管理器或其他地方。因为其它装置有被病毒感染的可能性。\n";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\n网络费用+%1$@ (%2$@)";
@@ -80,8 +80,7 @@
 "Dash address" = "比特币地址";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. "\
-"A dash address always starts with 'X' or 'Y'." = "比特币地址也可以复制到剪贴板。一个比特币地址总是开始于'X'或'Y'";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "比特币地址也可以复制到剪贴板。一个比特币地址总是开始于'X'或'Y'";
 
 /* No comment provided by engineer. */
 "dash network fee" = "比特币网络费";
@@ -159,7 +158,7 @@
 "do it later" = "以后再做";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\n不要让任何人看到你的恢复密语，\n否则他们就可以使用您的比特币。\n";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = "\n不要让任何人看到你的恢复密语，\n否则他们就可以使用您的比特币。\n";
 
 /* No comment provided by engineer. */
 "done" = "完成";
@@ -210,7 +209,7 @@
 "INVALID" = "无效";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "让别人扫描此二维码，以获得您的比特币地址。任何人都可以通过这个地址将比特币转移到您的钱包";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "让别人扫描此二维码，以获得您的比特币地址。任何人都可以通过这个地址将比特币转移到您的钱包";
 
 /* No comment provided by engineer. */
 "minute" = "分钟";

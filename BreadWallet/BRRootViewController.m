@@ -464,7 +464,7 @@
     
     if (sender == self) { // show recovery phrase
         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"WARNING", nil)
-          message:NSLocalizedString(@"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\n"
+          message:NSLocalizedString(@"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\n"
                                     "NEVER type your recovery phrase into password managers or elsewhere. Other "
                                     "devices may be infected.\n", nil)
           delegate:[[(id)segue.destinationViewController viewControllers] firstObject]

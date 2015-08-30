@@ -60,9 +60,7 @@
 #define CURRENCY_CODES_KEY          @"CURRENCY_CODES"
 #define CURRENCY_NAMES_KEY          @"CURRENCY_NAMES"
 #define CURRENCY_PRICES_KEY         @"CURRENCY_PRICES"
-#define BITFINEX_DASH_BTC_PRICE_KEY @"BITFINEX_DASH_BTC_PRICE"
 #define CRYPTSY_DASH_BTC_PRICE_KEY  @"CRYPTSY_DASH_BTC_PRICE"
-#define BITFINEX_DASH_BTC_UPDATE_TIME_KEY @"BITFINEX_DASH_BTC_UPDATE_TIME"
 #define CRYPTSY_DASH_BTC_UPDATE_TIME_KEY  @"CRYPTSY_DASH_BTC_UPDATE_TIME"
 #define SPEND_LIMIT_AMOUNT_KEY      @"SPEND_LIMIT_AMOUNT"
 #define SECURE_TIME_KEY             @"SECURE_TIME"
@@ -839,47 +837,18 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 -(double)bitcoinDashPrice {
     if (_bitcoinDashPrice == 0) {
         NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-        NSDate * cryptsyUpdateTime = [defs objectForKey:CRYPTSY_DASH_BTC_UPDATE_TIME_KEY];
-        NSDate * bitfinexUpdateTime = [defs objectForKey:BITFINEX_DASH_BTC_UPDATE_TIME_KEY];
-        if (cryptsyUpdateTime && [cryptsyUpdateTime timeIntervalSinceNow] > -30 && bitfinexUpdateTime && [bitfinexUpdateTime timeIntervalSinceNow] > -30) {
-            //they are both recent
-            double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
-            double bitfinexPrice = [[defs objectForKey:BITFINEX_DASH_BTC_PRICE_KEY] doubleValue];
-            _bitcoinDashPrice = (cryptsyPrice + bitfinexPrice)/2.0f;
-        } else if (cryptsyUpdateTime && ([cryptsyUpdateTime timeIntervalSinceNow] > -30 || !bitfinexUpdateTime)) {
-            double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
-            _bitcoinDashPrice = cryptsyPrice;
-        } else if (bitfinexUpdateTime && ([bitfinexUpdateTime timeIntervalSinceNow] > -30 || !cryptsyUpdateTime)) {
-            double bitfinexPrice = [[defs objectForKey:BITFINEX_DASH_BTC_PRICE_KEY] doubleValue];
-            _bitcoinDashPrice = bitfinexPrice;
-        } else if ([cryptsyUpdateTime timeIntervalSinceDate:bitfinexUpdateTime] > 0) {
-            double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
-            _bitcoinDashPrice = cryptsyPrice;
-        } else if (bitfinexUpdateTime) {
-            double bitfinexPrice = [[defs objectForKey:BITFINEX_DASH_BTC_PRICE_KEY] doubleValue];
-            _bitcoinDashPrice = bitfinexPrice;
-        }
+        
+        double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
+        _bitcoinDashPrice = cryptsyPrice;
+        
     }
     return _bitcoinDashPrice;
 }
 
 - (void)refreshBitcoinDashPrice{
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-    NSDate * cryptsyUpdateTime = [defs objectForKey:CRYPTSY_DASH_BTC_UPDATE_TIME_KEY];
-    NSDate * bitfinexUpdateTime = [defs objectForKey:BITFINEX_DASH_BTC_UPDATE_TIME_KEY];
-    if (cryptsyUpdateTime && [cryptsyUpdateTime timeIntervalSinceNow] > -30 && bitfinexUpdateTime && [bitfinexUpdateTime timeIntervalSinceNow] > -30) {
-        //they are both recent
-        double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
-        double bitfinexPrice = [[defs objectForKey:BITFINEX_DASH_BTC_PRICE_KEY] doubleValue];
-        _bitcoinDashPrice = (cryptsyPrice + bitfinexPrice)/2.0f;
-    } else if (cryptsyUpdateTime && [cryptsyUpdateTime timeIntervalSinceNow] > -30) {
-        double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
-        _bitcoinDashPrice = cryptsyPrice;
-    } else if (bitfinexUpdateTime && [bitfinexUpdateTime timeIntervalSinceNow] > -30) {
-        double bitfinexPrice = [[defs objectForKey:BITFINEX_DASH_BTC_PRICE_KEY] doubleValue];
-        _bitcoinDashPrice = bitfinexPrice;
-    }
-    
+    double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
+    _bitcoinDashPrice = cryptsyPrice;
     if (! _wallet) return;
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -909,6 +878,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                NSString * lastTradePriceString = [[[[json objectForKey:@"return"] objectForKey:@"markets"] objectForKey:@"DRK"] objectForKey:@"lasttradeprice"];
                                if (lastTradePriceString) {
                                    NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+                                   NSLocale *usa = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+                                   numberFormatter.locale = usa;
                                    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
                                    NSNumber *lastTradePriceNumber = [numberFormatter numberFromString:lastTradePriceString];
                                    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
@@ -917,34 +888,34 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                    [defs synchronize];
                                    [self refreshBitcoinDashPrice];
                                }
-                               NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
+                               NSLog(@"cryptsy exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
                                      [self dashStringForAmount:DUFFS]);
                            }
      ];
-    NSURLRequest *reqBitfinex = [NSURLRequest requestWithURL:[NSURL URLWithString:BITFINEX_TICKER_URL]
-                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
-    
-    [NSURLConnection sendAsynchronousRequest:reqBitfinex queue:[NSOperationQueue currentQueue]
-                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
-                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
-                                   NSLog(@"%@", connectionError);
-                                   return;
-                               }
-                               NSError *error = nil;
-                               NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-                               if (![json objectForKey:@"ask"] || ![json objectForKey:@"bid"]) return;
-                               double askPrice = [[json objectForKey:@"ask"] doubleValue];
-                               double bidPrice = [[json objectForKey:@"bid"] doubleValue];
-                               double midValue = (askPrice + bidPrice)/2;
-                               NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-                               [defs setObject:@(midValue) forKey:BITFINEX_DASH_BTC_PRICE_KEY];
-                               [defs setObject:[NSDate date] forKey:BITFINEX_DASH_BTC_UPDATE_TIME_KEY];
-                               [defs synchronize];
-                               [self refreshBitcoinDashPrice];
-                               NSLog(@"bitfinex exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
-                                     [self dashStringForAmount:DUFFS]);
-                           }
-    ];
+//    NSURLRequest *reqBitfinex = [NSURLRequest requestWithURL:[NSURL URLWithString:BITFINEX_TICKER_URL]
+//                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+//    
+//    [NSURLConnection sendAsynchronousRequest:reqBitfinex queue:[NSOperationQueue currentQueue]
+//                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+//                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+//                                   NSLog(@"%@", connectionError);
+//                                   return;
+//                               }
+//                               NSError *error = nil;
+//                               NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+//                               if (![json objectForKey:@"ask"] || ![json objectForKey:@"bid"]) return;
+//                               double askPrice = [[json objectForKey:@"ask"] doubleValue];
+//                               double bidPrice = [[json objectForKey:@"bid"] doubleValue];
+//                               double midValue = (askPrice + bidPrice)/2;
+//                               NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+//                               [defs setObject:@(midValue) forKey:BITFINEX_DASH_BTC_PRICE_KEY];
+//                               [defs setObject:[NSDate date] forKey:BITFINEX_DASH_BTC_UPDATE_TIME_KEY];
+//                               [defs synchronize];
+//                               [self refreshBitcoinDashPrice];
+//                               NSLog(@"bitfinex exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
+//                                     [self dashStringForAmount:DUFFS]);
+//                           }
+//    ];
 
 }
 

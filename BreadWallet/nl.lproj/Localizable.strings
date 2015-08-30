@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\ngeef toegang tot de camera in\nInstellingen->Privacy->Camera->%@";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nLaat je herstel zin aan NIEMAND zien, anders hebben zij de mogelijkheid om jouw bitcoins uit te geven.\n\nType je herstel zin NOOIT in bij wachtwoord beheer programma's of ergens anders. Andere apparaten kunnen geïnfecteerd zijn.\n";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nLaat je herstel zin aan NIEMAND zien, anders hebben zij de mogelijkheid om jouw dash uit te geven.\n\nType je herstel zin NOOIT in bij wachtwoord beheer programma's of ergens anders. Andere apparaten kunnen geïnfecteerd zijn.\n";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nnetwerkvergoeding +%1$@ (%2$@)";
@@ -80,8 +80,7 @@
 "Dash address" = "Dash adres";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. "\
-"A dash address always starts with 'X' or 'Y'." = "Dash adressen kunnen ook naar het klipbord gekopieerd worden. Een dash adres begint altijd met een 'X' of een 'Y'.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Dash adressen kunnen ook naar het klipbord gekopieerd worden. Een dash adres begint altijd met een 'X' of een 'Y'.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "dash netwerk vergoeding";
@@ -159,7 +158,7 @@
 "do it later" = "probeer later nogmaals";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nLaat je herstel zin aan NIEMAND zien,\nanders hebben zij de mogelijkheid om\njouw bitcoins uit te geven.";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = "\nLaat je herstel zin aan NIEMAND zien,\nanders hebben zij de mogelijkheid om\njouw dash uit te geven.";
 
 /* No comment provided by engineer. */
 "done" = "gereed";
@@ -210,7 +209,7 @@
 "INVALID" = "ONGELDIG";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "Laat anderen deze QR code scannen om jouw bitcoin adres te verkrijgen. Iedereen kan bitcoins naar jouw portemonnee verzenden door deze te sturen naar jouw adres.";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "Laat anderen deze QR code scannen om jouw dash adres te verkrijgen. Iedereen kan dash naar jouw portemonnee verzenden door deze te sturen naar jouw adres.";
 
 /* No comment provided by engineer. */
 "minute" = "minuut";

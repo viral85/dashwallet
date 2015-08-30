@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\nengedélyezd a kamera használatát a\nBeállítások->Adatvédelem->Kamera->%@ menüpontban";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nNE engedd, hogy más lássa a helyreállítási kódmondatodat, különben elköltheti a bitcoinjaidat.\n\nSOHA ne gépeld be a helyreállítási kódmondatodat jelszókezelő alkalmazásokba vagy máshová, hiszen fertőzöttek lehetnek.\n";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\nNE engedd, hogy más lássa a helyreállítási kódmondatodat, különben elköltheti a bitcoinjaidat.\n\nSOHA ne gépeld be a helyreállítási kódmondatodat jelszókezelő alkalmazásokba vagy máshová, hiszen fertőzöttek lehetnek.\n";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nhálózati díj +%1$@ (%2$@)";
@@ -155,7 +155,7 @@
 "do it later" = "később leírom";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "\nNE engedd, hogy más lássa a helyreállítási\nkódmondatodat, különben elköltheti a\nbitcoinjaidat.";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = "\nNE engedd, hogy más lássa a helyreállítási\nkódmondatodat, különben elköltheti a\ndashjaidat.";
 
 /* No comment provided by engineer. */
 "done" = "kész";
@@ -206,7 +206,7 @@
 "INVALID" = "ÉRVÉNYTELEN";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "Engedd hogy ezt a QR kódot beolvassa aki bitcoint akar neked küldeni.\nA címedet használva bárki tud bitcoint küldeni a tárcádba.";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "Engedd hogy ezt a QR kódot beolvassa aki dash akar neked küldeni.\nA címedet használva bárki tud dash küldeni a tárcádba.";
 
 /* No comment provided by engineer. */
 "minute" = "perc";

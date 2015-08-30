@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = " разрешить доступ к камере в \nнастройки-> конфиденциальность-> камера->%@";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = " НЕ позволяйте никому видеть вашу фразу восстановления или они могут потратить ваши bitcoins.  \n\nНикогда не вводите фразу восстановления в менеджеры паролей или других местах. Другие устройства могут быть инфицированы. ";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = " НЕ позволяйте никому видеть вашу фразу восстановления или они могут потратить ваши dash.  \n\nНикогда не вводите фразу восстановления в менеджеры паролей или других местах. Другие устройства могут быть инфицированы. ";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nсетевой платеж +%1$@ (%2$@)";
@@ -80,8 +80,7 @@
 "Dash address" = "Dash адрес";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. "\
-"A dash address always starts with 'X' or 'Y'." = "Dash адреса также могут быть скопированы в буфер обмена. Dash адрес всегда начинается с «X» или «Y».";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Dash адреса также могут быть скопированы в буфер обмена. Dash адрес всегда начинается с «X» или «Y».";
 
 /* No comment provided by engineer. */
 "dash network fee" = "сетевая плата dash";
@@ -210,7 +209,7 @@
 "INVALID" = "НЕВЕРНО";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "Другие могут сканировать этот QR код чтобы получить ваш bitcoin адрес. Каждый может отправить bitcoins на ваш кошелек путем передачи их на ваш адрес.";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "Другие могут сканировать этот QR код чтобы получить ваш dash адрес. Каждый может отправить dash на ваш кошелек путем передачи их на ваш адрес.";
 
 /* No comment provided by engineer. */
 "minute" = "минут";

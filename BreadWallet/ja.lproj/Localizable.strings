@@ -38,7 +38,7 @@
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\nカメラへのアクセスを有効化するには\n設定⇒プライバシー⇒カメラ⇒%@";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery phrase or they can spend your bitcoins.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\n復元フレーズは絶対に\n誰にも見せないで下さい！\n復元フレーズを知っている人はあなたの\nビットコインを簡単に\n盗むことができます。\n\nパスワード管理アプリや、信用できない\n端末に復元フレーズは絶対に\n打ち込んだり写真撮ったりしないで\n下さい。ウィルスやマルウェアによって\n盗まれ兼ねません。\n";
+"\nDO NOT let anyone see your recovery phrase or they can spend your dash.\n\nNEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.\n" = "\n復元フレーズは絶対に\n誰にも見せないで下さい！\n復元フレーズを知っている人はあなたの\nビットコインを簡単に\n盗むことができます。\n\nパスワード管理アプリや、信用できない\n端末に復元フレーズは絶対に\n打ち込んだり写真撮ったりしないで\n下さい。ウィルスやマルウェアによって\n盗まれ兼ねません。\n";
 
 /* No comment provided by engineer. */
 "\nnetwork fee +%@ (%@)" = "\nネットワーク手数料 +%1$@ (%2$@)";
@@ -80,8 +80,7 @@
 "Dash address" = "ビットコインアドレス";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. "\
-"A dash address always starts with 'X' or 'Y'." = "ビットコインアドレスをクリップボードにコピーすることもできます。\nビットコインアドレスは\n常に 'X' または 'Y' で始まります。";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "ビットコインアドレスをクリップボードにコピーすることもできます。\nビットコインアドレスは\n常に 'X' または 'Y' で始まります。";
 
 /* No comment provided by engineer. */
 "dash network fee" = "ビットコインネットワーク手数料";
@@ -159,7 +158,7 @@
 "do it later" = "後でやります";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = "復元フレーズは絶対に\n誰にも見せないで下さい！\n復元フレーズを知っている人は\nあなたのビットコインを\n簡単に盗むことができます。";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = "復元フレーズは絶対に\n誰にも見せないで下さい！\n復元フレーズを知っている人は\nあなたのビットコインを\n簡単に盗むことができます。";
 
 /* No comment provided by engineer. */
 "done" = "完了";
@@ -210,7 +209,7 @@
 "INVALID" = "無効";
 
 /* No comment provided by engineer. */
-"Let others scan this QR code to get your bitcoin address. Anyone can send bitcoins to your wallet by transferring them to your address." = "このQRコードを人に見せる、または\nビットコインアドレスをコピーして人に\n送るとすぐに送金を受け取れます。";
+"Let others scan this QR code to get your digital cash (DASH) address. Anyone can send dash to your wallet by transferring them to your address." = "このQRコードを人に見せる、または\nビットコインアドレスをコピーして人に\n送るとすぐに送金を受け取れます。";
 
 /* No comment provided by engineer. */
 "minute" = "分";
