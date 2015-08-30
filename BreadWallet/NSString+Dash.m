@@ -397,4 +397,11 @@ static const UniChar base58chars[] = {
 }
 
 
+-(NSInteger)indexOfCharacter:(unichar)character {
+    for (int i = 0;i < self.length; i++) {
+        if ([self characterAtIndex:i] == character) return i;
+    }
+    return NSNotFound;
+}
+
 @end

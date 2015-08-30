@@ -242,7 +242,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     
     _unknownFormat = [NSNumberFormatter new];
     self.unknownFormat.lenient = YES;
-    self.unknownFormat.numberStyle = NSNumberFormatterCurrencyStyle;
+    self.unknownFormat.numberStyle = NSNumberFormatterDecimalStyle;
     self.unknownFormat.generatesDecimalNumbers = YES;
     self.unknownFormat.negativeFormat = [self.unknownFormat.positiveFormat
                                          stringByReplacingCharactersInRange:[self.unknownFormat.positiveFormat rangeOfString:@"#"]

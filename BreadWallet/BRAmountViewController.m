@@ -426,14 +426,19 @@ replacementString:(NSString *)string
     } else {
         formatter = (self.swapped) ? m.localFormat:m.dashFormat;
     }
+    NSNumberFormatter *basicFormatter = m.unknownFormat;
     NSUInteger minDigits = formatter.minimumFractionDigits;
     NSUInteger maxDigits = formatter.maximumFractionDigits;
     
     formatter.minimumFractionDigits = 0;
     
     NSString * previousString = amountLabel.text;
-    if (!self.swapped && [previousString characterAtIndex:0] == NSAttachmentCharacter) {
-        previousString = [previousString stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:DASH];
+    if (!self.swapped) {
+        NSInteger dashCharPos = [previousString indexOfCharacter:NSAttachmentCharacter];
+        if (dashCharPos != NSNotFound) {
+            previousString = [previousString stringByReplacingCharactersInRange:NSMakeRange(dashCharPos, 1) withString:DASH];
+        }
+        
     }
     
     NSUInteger digitLocationOld = [previousString rangeOfString:formatter.currencyDecimalSeparator].location;
@@ -456,18 +461,29 @@ replacementString:(NSString *)string
             formattedAmount = [formatter stringFromNumber:inputNumber];
         }
     }
-    if (!self.swapped && [formattedAmount characterAtIndex:0] == NSAttachmentCharacter) {
-        formattedAmount = [formattedAmount stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:DASH];
+    if (!self.swapped) {
+        NSInteger dashCharPos = [formattedAmount indexOfCharacter:NSAttachmentCharacter];
+        if (dashCharPos != NSNotFound) {
+            formattedAmount = [formattedAmount stringByReplacingCharactersInRange:NSMakeRange(dashCharPos, 1) withString:DASH];
+        }
     }
-    NSUInteger digitLocationNew = [formattedAmount rangeOfString:formatter.currencyDecimalSeparator].location;
+    NSNumber * currentNumber = [formatter numberFromString:formattedAmount];
+    basicFormatter.maximumFractionDigits++;
+    NSString * basicFormattedAmount = [basicFormatter stringFromNumber:currentNumber]; //without the DASH symbol
+    NSUInteger digitLocationNewBasicFormatted = [basicFormattedAmount rangeOfString:basicFormatter.currencyDecimalSeparator].location;
+    basicFormatter.maximumFractionDigits--;
     NSUInteger digits = 0;
-    if (digitLocationNew != NSNotFound) {
-        digits = formattedAmount.length - digitLocationNew - 1;
+    
+    if (digitLocationNewBasicFormatted != NSNotFound) {
+        digits = basicFormattedAmount.length - digitLocationNewBasicFormatted - 1;
     }
     NSNumber * number = [formatter numberFromString:formattedAmount];
     
     formatter.minimumFractionDigits = minDigits;
 
+    
+    NSUInteger digitLocationNew = [formattedAmount rangeOfString:formatter.currencyDecimalSeparator].location;
+    
     //special cases
     if (! string.length) { // delete trailing char
         if (![number floatValue] && digitLocationNew == NSNotFound) { // there is no decimal
