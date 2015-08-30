@@ -1497,8 +1497,8 @@
                                     <constraint firstAttribute="width" constant="320" id="sXY-hv-AdA"/>
                                 </constraints>
                             </view>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dashwallet-big" translatesAutoresizingMaskIntoConstraints="NO" id="Q5d-52-Dwn">
-                                <rect key="frame" x="150" y="276" width="20" height="16"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dashwallet-white" translatesAutoresizingMaskIntoConstraints="NO" id="Q5d-52-Dwn">
+                                <rect key="frame" x="112" y="275" width="97" height="18"/>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dOa-zm-TDG">
                                 <rect key="frame" x="70" y="210" width="180" height="44"/>
@@ -1992,16 +1992,6 @@
                                             <constraint firstAttribute="height" constant="0.5" id="yy7-el-RW3"/>
                                         </constraints>
                                     </view>
-                                    <label opaque="NO" clipsSubviews="YES" tag="411" contentMode="left" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="300" translatesAutoresizingMaskIntoConstraints="NO" id="uvz-hk-Nr4">
-                                        <rect key="frame" x="44" y="24" width="233" height="81"/>
-                                        <gestureRecognizers/>
-                                        <string key="text">dashwallet v%ver%%net%
-copyright © 2015 Aaron Voisine
-
-this app is open source</string>
-                                        <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="300" translatesAutoresizingMaskIntoConstraints="NO" id="5OA-tB-Exg">
                                         <rect key="frame" x="103" y="105" width="115" height="41"/>
                                         <string key="text">dashwallet.com
@@ -2013,7 +2003,7 @@ this app is open source</string>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="300" translatesAutoresizingMaskIntoConstraints="NO" id="D4H-hd-LsX">
                                         <rect key="frame" x="58" y="146" width="205" height="36"/>
                                         <string key="text">exchange rate data provided by
-bitpay.com/rates</string>
+bitpay, cryptsy and bitfinex</string>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="15"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
@@ -2025,6 +2015,16 @@ bitpay.com/rates</string>
                                             <constraint firstAttribute="height" constant="0.5" id="UhR-to-ytR"/>
                                         </constraints>
                                     </view>
+                                    <label opaque="NO" clipsSubviews="YES" tag="411" contentMode="left" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="300" translatesAutoresizingMaskIntoConstraints="NO" id="uvz-hk-Nr4">
+                                        <rect key="frame" x="27" y="24" width="267" height="81"/>
+                                        <gestureRecognizers/>
+                                        <string key="text">dashwallet v%ver%%net%
+copyright © 2015 Quantum Explorer
+
+this app is open source</string>
+                                        <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="0.5" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                 <gestureRecognizers/>
@@ -2234,7 +2234,7 @@ Other devices may be infected.
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="CsT-dR-Qwt">
                                 <rect key="frame" x="12" y="69" width="296" height="269"/>
                                 <color key="backgroundColor" white="1" alpha="0.67000000000000004" colorSpace="calibratedWhite"/>
-                                <color key="textColor" red="1" green="0.49803921569999998" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="yes" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                 <connections>
@@ -2423,7 +2423,6 @@ Other devices may be infected.
         <image name="cameraguide-small" width="20" height="20"/>
         <image name="checkbox-empty" width="22" height="22"/>
         <image name="dashwallet" width="93" height="15"/>
-        <image name="dashwallet-big" width="20" height="16"/>
         <image name="dashwallet-white" width="97" height="18"/>
         <image name="deletetoleft" width="29" height="23"/>
         <image name="deletetoleft-pressed" width="29" height="23"/>

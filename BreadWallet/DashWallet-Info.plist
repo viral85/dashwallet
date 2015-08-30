@@ -59,20 +59,20 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>bitcoin</string>
+			<string>dash</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>bitcoin</string>
+				<string>dash</string>
 			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>org.voisine.bread</string>
+			<string>com.darkcoinfoundation.dashwallet</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>bread</string>
+				<string>dashwallet</string>
 			</array>
 		</dict>
 	</array>
