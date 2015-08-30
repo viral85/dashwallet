@@ -21,21 +21,21 @@
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="240"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hqe-ao-zmT" userLabel="Left Container View">
-                                        <rect key="frame" x="0.0" y="0.0" width="124" height="240"/>
+                                        <rect key="frame" x="4" y="0.0" width="120" height="240"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="send" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QMM-JV-cTG">
-                                                <rect key="frame" x="45" y="6" width="34" height="18"/>
+                                                <rect key="frame" x="43" y="6" width="34" height="18"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <color key="textColor" red="1" green="1" blue="1" alpha="0.70000000000000007" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <visualEffectView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DNB-4V-cRh">
-                                                <rect key="frame" x="24" y="74" width="76" height="76"/>
+                                                <rect key="frame" x="22" y="74" width="76" height="76"/>
                                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="Db2-ZH-5aM">
                                                     <rect key="frame" x="0.0" y="0.0" width="76" height="76"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
-                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="5F5914E6-7C50-47D4-9D76-0A426FF88B34" translatesAutoresizingMaskIntoConstraints="NO" id="cGS-d8-28j">
+                                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="scanbutton" translatesAutoresizingMaskIntoConstraints="NO" id="cGS-d8-28j">
                                                             <rect key="frame" x="0.0" y="0.0" width="76" height="76"/>
                                                         </imageView>
                                                     </subviews>
@@ -55,12 +55,12 @@
                                                 </vibrancyEffect>
                                             </visualEffectView>
                                             <button opaque="NO" alpha="0.59999999999999998" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="A3s-aK-YRq" userLabel="scanButton">
-                                                <rect key="frame" x="24" y="74" width="76" height="76"/>
+                                                <rect key="frame" x="22" y="74" width="76" height="76"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="76" id="7OJ-fC-G2u"/>
                                                     <constraint firstAttribute="height" constant="76" id="JtG-cM-NpV"/>
                                                 </constraints>
-                                                <state key="normal" image="5F5914E6-7C50-47D4-9D76-0A426FF88B34">
+                                                <state key="normal" image="5478223B-1178-4210-A3C6-9EC31256F238">
                                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                 </state>
                                                 <connections>
@@ -68,7 +68,7 @@
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="scan QR code" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JgG-Ah-UZk">
-                                                <rect key="frame" x="16" y="158" width="92" height="17"/>
+                                                <rect key="frame" x="16" y="158" width="88" height="17"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <color key="textColor" red="1" green="1" blue="1" alpha="0.70000000000000007" colorSpace="calibratedRGB"/>
                                                 <nil key="highlightedColor"/>
@@ -76,10 +76,12 @@
                                         </subviews>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <constraints>
+                                            <constraint firstAttribute="width" secondItem="hqe-ao-zmT" secondAttribute="height" multiplier="1:2" id="5fj-7p-OqP"/>
                                             <constraint firstAttribute="centerY" secondItem="A3s-aK-YRq" secondAttribute="centerY" constant="8" id="AWA-lh-LYB"/>
                                             <constraint firstAttribute="centerX" secondItem="JgG-Ah-UZk" secondAttribute="centerX" id="Bd0-90-JPE"/>
                                             <constraint firstAttribute="width" constant="124" id="LdS-T5-KsH"/>
                                             <constraint firstAttribute="centerX" secondItem="A3s-aK-YRq" secondAttribute="centerX" id="PVJ-SG-Bgr"/>
+                                            <constraint firstAttribute="width" constant="124" id="Ppn-9k-Kij"/>
                                             <constraint firstItem="JgG-Ah-UZk" firstAttribute="leading" secondItem="hqe-ao-zmT" secondAttribute="leading" constant="16" id="aSu-XG-Mlm"/>
                                             <constraint firstAttribute="centerX" secondItem="QMM-JV-cTG" secondAttribute="centerX" id="mRC-um-YLb"/>
                                             <constraint firstAttribute="centerX" secondItem="DNB-4V-cRh" secondAttribute="centerX" id="oVw-KI-cBa"/>
@@ -87,6 +89,12 @@
                                             <constraint firstAttribute="centerY" secondItem="DNB-4V-cRh" secondAttribute="centerY" constant="8" id="wza-cD-aDM"/>
                                             <constraint firstItem="QMM-JV-cTG" firstAttribute="top" secondItem="hqe-ao-zmT" secondAttribute="top" constant="6" id="ya4-Ya-Utb"/>
                                         </constraints>
+                                        <variation key="default">
+                                            <mask key="constraints">
+                                                <exclude reference="LdS-T5-KsH"/>
+                                                <exclude reference="Ppn-9k-Kij"/>
+                                            </mask>
+                                        </variation>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aus-tt-hb6" userLabel="Right Container View">
                                         <rect key="frame" x="124" y="0.0" width="196" height="240"/>
@@ -186,6 +194,7 @@
                                 <gestureRecognizers/>
                                 <constraints>
                                     <constraint firstItem="hqe-ao-zmT" firstAttribute="height" secondItem="ZgQ-IE-5k2" secondAttribute="height" id="4S3-Tq-eDl"/>
+                                    <constraint firstItem="aus-tt-hb6" firstAttribute="leading" secondItem="hqe-ao-zmT" secondAttribute="trailing" id="6dA-jk-DMi"/>
                                     <constraint firstAttribute="trailing" secondItem="aus-tt-hb6" secondAttribute="trailing" id="F55-my-VyD"/>
                                     <constraint firstItem="aus-tt-hb6" firstAttribute="top" secondItem="ZgQ-IE-5k2" secondAttribute="top" id="WgS-2h-cqL"/>
                                     <constraint firstItem="aus-tt-hb6" firstAttribute="height" secondItem="ZgQ-IE-5k2" secondAttribute="height" id="c56-fB-dY9"/>
@@ -198,6 +207,7 @@
                                 </constraints>
                                 <variation key="default">
                                     <mask key="constraints">
+                                        <exclude reference="lhl-3I-hDh"/>
                                         <exclude reference="wc0-7W-Noi"/>
                                         <exclude reference="y4L-cn-kRf"/>
                                     </mask>
@@ -308,7 +318,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="5F5914E6-7C50-47D4-9D76-0A426FF88B34" width="50" height="50">
+        <image name="5478223B-1178-4210-A3C6-9EC31256F238" width="50" height="50">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGPj9YJHZlcnNpb25YJG9iamVjdHNZJGFyY2hpdmVyVCR0b3ASAAGGoK4HCBMU
 GR4fIyQsLzI4O1UkbnVsbNUJCgsMDQ4PEBESVk5TU2l6ZVYkY2xhc3NcTlNJbWFnZUZsYWdzVk5TUmVw
@@ -527,5 +537,6 @@ AzEIMRAxEzEYMSAxIzE1MTgxPQAAAAAAAAIBAAAAAAAAAEIAAAAAAAAAAAAAAAAAADE/A
         </image>
         <image name="button-bg-white-pressed" width="11" height="10"/>
         <image name="dashwallet-wide" width="97" height="18"/>
+        <image name="scanbutton" width="50" height="50"/>
     </resources>
 </document>
