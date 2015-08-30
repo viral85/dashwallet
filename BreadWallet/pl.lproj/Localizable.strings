@@ -59,10 +59,14 @@
 "Bitcoin address" = "Adres bitcoin";
 
 /* No comment provided by engineer. */
-"Bitcoin addresses can also be copied to the clipboard. A bitcoin address always starts with '1' or '3'." = "Adresy Bitcoin można skopiować do schowka. Adres Bitcoin zaczyna się zawsze od '1' lub '3'.";
+"Dash address" = "Adres dash";
 
 /* No comment provided by engineer. */
-"dash network fee" = "prowizja sieci bitcoin";
+"Dash addresses can also be copied to the clipboard. "\
+"A dash address always starts with 'X' or 'Y'." = "Adresy Bitcoin można skopiować do schowka. Adres Bitcoin zaczyna się zawsze od 'X' lub 'Y'.";
+
+/* No comment provided by engineer. */
+"dash network fee" = "prowizja sieci dash";
 
 /* No comment provided by engineer. */
 "cancel" = "anuluj";

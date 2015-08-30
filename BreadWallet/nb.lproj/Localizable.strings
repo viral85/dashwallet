@@ -77,19 +77,23 @@
 "Bitcoin address" = "Bitcoin-adresse";
 
 /* No comment provided by engineer. */
-"Bitcoin addresses can also be copied to the clipboard. A bitcoin address always starts with '1' or '3'." = "Bitcoin-adresser kan også kopieres til utklippstavlen. En Bitcoin-adresse starter alltid med '1' eller '3'.";
+"Dash address" = "Dash-adresse";
 
 /* No comment provided by engineer. */
-"dash network fee" = "bitcoin nettverksavgift";
+"Dash addresses can also be copied to the clipboard. "\
+"A dash address always starts with 'X' or 'Y'." = "Dash-adresser kan også kopieres til utklippstavlen. En Dash-adresse starter alltid med 'X' eller 'Y'.";
 
 /* No comment provided by engineer. */
-"bitcoin payments can't be less than %@" = "beløp for bitcoin-betalinger kan ikke være lavere enn %@";
+"dash network fee" = "dash nettverksavgift";
 
 /* No comment provided by engineer. */
-"bitcoin transaction not signed" = "bitcoin-transaksjon ikke signert";
+"dash payments can't be less than %@" = "beløp for dash-betalinger kan ikke være lavere enn %@";
 
 /* No comment provided by engineer. */
-"bitcoin transaction outputs can't be less than %@" = "output for bitcoin-transaksjon kan ikke være lavere enn %@";
+"dash transaction not signed" = "dash-transaksjon ikke signert";
+
+/* No comment provided by engineer. */
+"dash transaction outputs can't be less than %@" = "output for dash-transaksjon kan ikke være lavere enn %@";
 
 /* No comment provided by engineer. */
 "block #%d of %d" = "blokk #%1$d of %2$d";

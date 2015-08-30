@@ -77,19 +77,23 @@
 "Bitcoin address" = "Биткойн адрес";
 
 /* No comment provided by engineer. */
-"Bitcoin addresses can also be copied to the clipboard. A bitcoin address always starts with '1' or '3'." = "Bitcoin адреса также могут быть скопированы в буфер обмена. Bitcoin адрес всегда начинается с «1» или «3».";
+"Dash address" = "Dash адрес";
 
 /* No comment provided by engineer. */
-"dash network fee" = "сетевая плата bitcoin";
+"Dash addresses can also be copied to the clipboard. "\
+"A dash address always starts with 'X' or 'Y'." = "Dash адреса также могут быть скопированы в буфер обмена. Dash адрес всегда начинается с «X» или «Y».";
 
 /* No comment provided by engineer. */
-"bitcoin payments can't be less than %@" = "bitcoin-платежи не могут быть меньше чем %@";
+"dash network fee" = "сетевая плата dash";
 
 /* No comment provided by engineer. */
-"bitcoin transaction not signed" = "bitcoin транзакция не подписана";
+"dash payments can't be less than %@" = "dash-платежи не могут быть меньше чем %@";
 
 /* No comment provided by engineer. */
-"bitcoin transaction outputs can't be less than %@" = "выходы bitcoin транзакций не могут быть меньше чем %@";
+"dash transaction not signed" = "dash транзакция не подписана";
+
+/* No comment provided by engineer. */
+"dash transaction outputs can't be less than %@" = "выходы dash транзакций не могут быть меньше чем %@";
 
 /* No comment provided by engineer. */
 "block #%d of %d" = "блок #%1$d %2$d";

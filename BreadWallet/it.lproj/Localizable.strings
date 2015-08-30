@@ -77,19 +77,23 @@
 "Bitcoin address" = "Indirizzo Bitcoin";
 
 /* No comment provided by engineer. */
-"Bitcoin addresses can also be copied to the clipboard. A bitcoin address always starts with '1' or '3'." = "Gli indirizzi Bitcoin possono anche essere copiati negli Appunti. Un indirizzo bitcoin inizia sempre con '1' o '3'.";
+"Dash address" = "Indirizzo Dash";
 
 /* No comment provided by engineer. */
-"dash network fee" = "tassa di rete bitcoin";
+"Dash addresses can also be copied to the clipboard. "\
+"A dash address always starts with 'X' or 'Y'." = "Gli indirizzi Dash possono anche essere copiati negli Appunti. Un indirizzo dash inizia sempre con 'X' o 'Y'.";
 
 /* No comment provided by engineer. */
-"bitcoin payments can't be less than %@" = "i pagamneti in Bitcoin non possono essere inferiore a %@";
+"dash network fee" = "tassa di rete dash";
 
 /* No comment provided by engineer. */
-"bitcoin transaction not signed" = "transazione bitcoin non firmata";
+"dash payments can't be less than %@" = "i pagamneti in Dash non possono essere inferiore a %@";
 
 /* No comment provided by engineer. */
-"bitcoin transaction outputs can't be less than %@" = "transazioni bitcoin in uscita non possono essere inferiori a %@";
+"dash transaction not signed" = "transazione dash non firmata";
+
+/* No comment provided by engineer. */
+"dash transaction outputs can't be less than %@" = "transazioni dash in uscita non possono essere inferiori a %@";
 
 /* No comment provided by engineer. */
 "block #%d of %d" = "blocco #%1$d di %2$d";

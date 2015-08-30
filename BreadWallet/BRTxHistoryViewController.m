@@ -274,7 +274,7 @@ static NSString *dateFormat(NSString *template)
 
     if (! f1) { //BUG: need to watch for NSCurrentLocaleDidChangeNotification
         f1 = [NSDateFormatter new];
-        f1.dateFormat = dateFormat(@"Mdja");
+        f1.dateFormat = dateFormat(@"Mdjmma");
         f2 = [NSDateFormatter new];
         f2.dateFormat = dateFormat(@"yyMdja");
         f3 = [NSDateFormatter new];
@@ -289,9 +289,7 @@ static NSString *dateFormat(NSString *template)
     
     if (tx.timestamp <= 1 && t <= week) f = (t > year) ? f3 : f4;
 
-    date = [[[[f stringFromDate:[NSDate dateWithTimeIntervalSinceReferenceDate:t]] lowercaseString]
-             stringByReplacingOccurrencesOfString:@"am" withString:@"a"]
-            stringByReplacingOccurrencesOfString:@"pm" withString:@"p"];
+    date = [[f stringFromDate:[NSDate dateWithTimeIntervalSinceReferenceDate:t]] lowercaseString];
     if (tx.blockHeight != TX_UNCONFIRMED) self.txDates[tx.txHash] = date;
     return date;
 }
