@@ -187,7 +187,7 @@ static const char *dns_seeds[] = {
 {
     if (_peers.count >= PEER_MAX_CONNECTIONS) return _peers;
 
-    @synchronized(self) {
+    if ([NSThread isMainThread]) {
         if (_peers.count >= PEER_MAX_CONNECTIONS) return _peers;
         _peers = [NSMutableOrderedSet orderedSet];
 
@@ -245,8 +245,15 @@ static const char *dns_seeds[] = {
             [self sortPeers];
         }
 
-        return _peers;
+        
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self peers];
+        });
     }
+    
+    return _peers;
+    
 }
 
 - (NSMutableDictionary *)blocks
