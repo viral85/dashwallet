@@ -428,7 +428,6 @@ replacementString:(NSString *)string
     }
     NSNumberFormatter *basicFormatter = m.unknownFormat;
     NSUInteger minDigits = formatter.minimumFractionDigits;
-    NSUInteger maxDigits = formatter.maximumFractionDigits;
     
     formatter.minimumFractionDigits = 0;
     
