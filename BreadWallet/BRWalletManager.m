@@ -870,7 +870,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
-                                   NSLog(@"%@", connectionError);
+                                   NSLog(@"connectionError %@ (status %d)", connectionError,((NSHTTPURLResponse*)response).statusCode);
                                    return;
                                }
                                NSError *error = nil;
@@ -931,7 +931,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
     completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         if (connectionError) {
-            NSLog(@"%@", connectionError);
+            NSLog(@"connectionError %@ (status %d)", connectionError,((NSHTTPURLResponse*)response).statusCode);
             return;
         }
 
@@ -977,7 +977,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
         [defs setObject:self.currencyNames forKey:CURRENCY_NAMES_KEY];
         [defs setObject:self.currencyPrices forKey:CURRENCY_PRICES_KEY];
         [defs synchronize];
-        NSLog(@"exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
+        NSLog(@"bitcoin exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
               [self dashStringForAmount:DUFFS]);
     }];
 }

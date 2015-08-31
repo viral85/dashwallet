@@ -187,67 +187,68 @@ static const char *dns_seeds[] = {
 {
     if (_peers.count >= PEER_MAX_CONNECTIONS) return _peers;
 
-    if ([NSThread isMainThread]) {
-        if (_peers.count >= PEER_MAX_CONNECTIONS) return _peers;
-        _peers = [NSMutableOrderedSet orderedSet];
-
-        NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
-
-        [[BRPeerEntity context] performBlockAndWait:^{
-            for (BRPeerEntity *e in [BRPeerEntity allObjects]) {
-                if (e.misbehavin == 0) [_peers addObject:[e peer]];
-                else [self.misbehavinPeers addObject:[e peer]];
-            }
-        }];
-
-        [self sortPeers];
-
-        if (_peers.count < PEER_MAX_CONNECTIONS ||
-            [(BRPeer *)_peers[PEER_MAX_CONNECTIONS - 1] timestamp] < now - 3*24*60*60) {
+    if (![NSThread isMainThread]) { //this should never be called on the main thread
+        @synchronized(self) {
+            if (_peers.count >= PEER_MAX_CONNECTIONS) return _peers;
+            _peers = [NSMutableOrderedSet orderedSet];
             
-            struct addrinfo hints = { 0, AF_UNSPEC, SOCK_STREAM, 0, 0, 0, NULL, NULL }, *servinfo, *p;
-            NSString *servname = [@(DASH_STANDARD_PORT) stringValue];
+            NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
             
-            for (int i = 0; i < sizeof(dns_seeds)/sizeof(*dns_seeds); i++) { // DNS peer discovery
-                NSLog(@"DNS lookup %s", dns_seeds[i]);
-                if (getaddrinfo(dns_seeds[i], [servname UTF8String], &hints, &servinfo) != 0) continue;
+            [[BRPeerEntity context] performBlockAndWait:^{
+                for (BRPeerEntity *e in [BRPeerEntity allObjects]) {
+                    if (e.misbehavin == 0) [_peers addObject:[e peer]];
+                    else [self.misbehavinPeers addObject:[e peer]];
+                }
+            }];
+            
+            [self sortPeers];
+            
+            if (_peers.count < PEER_MAX_CONNECTIONS ||
+                [(BRPeer *)_peers[PEER_MAX_CONNECTIONS - 1] timestamp] < now - 3*24*60*60) {
                 
-                for (p = servinfo; p != NULL; p = p->ai_next) {
-                    if (p->ai_addr->sa_family != AF_INET) continue;
+                struct addrinfo hints = { 0, AF_UNSPEC, SOCK_STREAM, 0, 0, 0, NULL, NULL }, *servinfo, *p;
+                NSString *servname = [@(DASH_STANDARD_PORT) stringValue];
                 
-                    uint32_t addr = CFSwapInt32BigToHost(((struct sockaddr_in *)p->ai_addr)->sin_addr.s_addr);
-                    uint16_t port = CFSwapInt16BigToHost(((struct sockaddr_in *)p->ai_addr)->sin_port);
+                for (int i = 0; i < sizeof(dns_seeds)/sizeof(*dns_seeds); i++) { // DNS peer discovery
+                    NSLog(@"DNS lookup %s", dns_seeds[i]);
+                    if (getaddrinfo(dns_seeds[i], [servname UTF8String], &hints, &servinfo) != 0) continue;
                     
-                    // give dns peers a timestamp between 3 and 7 days ago
-
-                    [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:port
-                     timestamp:now - (3*24*60*60 + arc4random_uniform(4*24*60*60)) services:SERVICES_NODE_NETWORK]];
+                    for (p = servinfo; p != NULL; p = p->ai_next) {
+                        if (p->ai_addr->sa_family != AF_INET) continue;
+                        
+                        uint32_t addr = CFSwapInt32BigToHost(((struct sockaddr_in *)p->ai_addr)->sin_addr.s_addr);
+                        uint16_t port = CFSwapInt16BigToHost(((struct sockaddr_in *)p->ai_addr)->sin_port);
+                        
+                        // give dns peers a timestamp between 3 and 7 days ago
+                        
+                        [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:port
+                                                                timestamp:now - (3*24*60*60 + arc4random_uniform(4*24*60*60)) services:SERVICES_NODE_NETWORK]];
+                    }
+                    
+                    freeaddrinfo(servinfo);
                 }
-
-                freeaddrinfo(servinfo);
-            }
-
+                
 #if DASH_TESTNET
-            [self sortPeers];
-            return _peers;
+                [self sortPeers];
+                return _peers;
 #endif
-            if (_peers.count < PEER_MAX_CONNECTIONS) {
-//                 if DNS peer discovery fails, fall back on a hard coded list of peers (masternode list from dash core client)
-                for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
-                                           pathForResource:FIXED_PEERS ofType:@"plist"]]) {
-                    // give hard coded peers a timestamp between 7 and 14 days ago
-                    [_peers addObject:[[BRPeer alloc] initWithAddress:address.unsignedIntValue
-                     port:DASH_STANDARD_PORT timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
-                     services:SERVICES_NODE_NETWORK]];
+                if (_peers.count < PEER_MAX_CONNECTIONS) {
+                    //                 if DNS peer discovery fails, fall back on a hard coded list of peers (masternode list from dash core client)
+                    for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
+                                                                                pathForResource:FIXED_PEERS ofType:@"plist"]]) {
+                        // give hard coded peers a timestamp between 7 and 14 days ago
+                        [_peers addObject:[[BRPeer alloc] initWithAddress:address.unsignedIntValue
+                                                                     port:DASH_STANDARD_PORT timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
+                                                                 services:SERVICES_NODE_NETWORK]];
+                    }
                 }
+                
+                [self sortPeers];
             }
-            
-            [self sortPeers];
         }
-
         
     } else {
-        dispatch_sync(dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
             [self peers];
         });
     }
