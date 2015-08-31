@@ -150,7 +150,7 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         [self changeAddress];
     }
 
-    if ([NSThread isMainThread]) {
+    @synchronized(self) {
         [a setArray:(internal) ? self.internalAddresses : self.externalAddresses];
         i = a.count;
 
@@ -188,12 +188,6 @@ masterPublicKey:(NSData *)masterPublicKey seed:(NSData *(^)(NSString *authprompt
         }
     
         return a;
-    } else {
-        __block NSArray * rAddresses;
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            rAddresses = [self addressesWithGapLimit:gapLimit internal:internal];
-        });
-        return rAddresses;
     }
 }
 
