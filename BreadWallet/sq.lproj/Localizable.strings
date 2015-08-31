@@ -32,7 +32,7 @@
 "\nA device passcode is needed to safeguard your wallet. Go to settings and turn passcode on to continue." = "\nNjë PIN është i nevojshëm për sigurinë e kuletës suaj. Shko në konfigurimet dhe aktivizo PIN dhe vazhdo.";
 
 /* No comment provided by engineer. */
-"\nADDRESS ALREADY USED\n\nbitcoin addresses are intended for single use only\n\nre-use reduces privacy for both you and the recipient and can result in loss if the recipient doesn't directly control the address" = "\nADRESA TASHMË ËSHTË PËRDORUR\n\nbitcoin adresat mendohet të përdoren vetëm njëherë\n\nri-përdorimi i adresave vetëm e zvogëlon privaticitetin e të dyve juve dhe pranuesin e monedhave dhe mund të rezultoj në humbje nëse pranuesi nuk e kontrollon direkt adresën";
+"\nADDRESS ALREADY USED\n\ndash addresses are intended for single use only\n\nre-use reduces privacy for both you and the recipient and can result in loss if the recipient doesn't directly control the address" = "\nADRESA TASHMË ËSHTË PËRDORUR\n\ndash adresat mendohet të përdoren vetëm njëherë\n\nri-përdorimi i adresave vetëm e zvogëlon privaticitetin e të dyve juve dhe pranuesin e monedhave dhe mund të rezultoj në humbje nëse pranuesi nuk e kontrollon direkt adresën";
 
 /* No comment provided by engineer. */
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\nlejo çasjen e kamerës në\nSettings->Privacy->Camera->%@";
@@ -116,7 +116,7 @@
 "choose passcode for %@" = "zgjedhni PIN për %@";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid dash address" = "memorja nuk përmban një bitcoin adresë valide";
+"clipboard doesn't contain a valid Dash or Bitcoin address" = "memorja nuk përmban një dash ose bitcoin adresë valide";
 
 /* No comment provided by engineer. */
 "close app" = "mbyll aplikacionin";
@@ -146,13 +146,13 @@
 "couldn't sweep balance" = "nuk mund të shpenzohet bilanci";
 
 /* No comment provided by engineer. */
-"couldn't transmit payment to dash network" = "nuk mund të transmetohet pagesa në rrjetin bitcoin";
+"couldn't transmit payment to dash network" = "nuk mund të transmetohet pagesa në rrjetin dash";
 
 /* No comment provided by engineer. */
-"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your bitcoins)." = "SIGURIA E PAJISJES ËSHTË KOMPROMETUAR\n\nÇdo aplikacion 'jailbreak' mund të ketë çasje në të dhënat e aplikacioneve tjera (dhe mund të ju vjedhin bitcoin-at e juaj).";
+"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your dash)." = "SIGURIA E PAJISJES ËSHTË KOMPROMETUAR\n\nÇdo aplikacion 'jailbreak' mund të ketë çasje në të dhënat e aplikacioneve tjera (dhe mund të ju vjedhin dash-at e juaj).";
 
 /* No comment provided by engineer. */
-"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your bitcoins). Wipe this wallet immediately and restore on a secure device." = "SIGURIA E PAJISJES ËSHTË KOMPROMETUAR\n\nÇdo aplikacion 'jailbreak' mund të ketë çasje në të dhënat e aplikacioneve tjera (dhe mund të ju vjedhin bitcoin-at e juaj). Fshij këtë kuletë menjëherë dhe riktheni atë në një pajisje të sigurtë.";
+"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your dash). Wipe this wallet immediately and restore on a secure device." = "SIGURIA E PAJISJES ËSHTË KOMPROMETUAR\n\nÇdo aplikacion 'jailbreak' mund të ketë çasje në të dhënat e aplikacioneve tjera (dhe mund të ju vjedhin dash-at e juaj). Fshij këtë kuletë menjëherë dhe riktheni atë në një pajisje të sigurtë.";
 
 /* No comment provided by engineer. */
 "do it later" = "bëje më vonë";
@@ -173,7 +173,7 @@
 "enter old passcode" = "shëno PIN e vjetër";
 
 /* No comment provided by engineer. */
-"error signing bitcoin transaction" = "gabim duke firmosur bitcoin transaksionin";
+"error signing dash transaction" = "gabim duke firmosur dash transaksionin";
 
 /* No comment provided by engineer. */
 "error signing transaction" = "gabim duke firmosur transaksionin";
@@ -239,16 +239,16 @@
 "no peers found" = "nuk janë gjetur peers";
 
 /* No comment provided by engineer. */
-"not a bitcoin QR code" = "nuk është bitcoin QR kod";
+"not a dash QR code" = "nuk është dash QR kod";
 
 /* No comment provided by engineer. */
-"not a valid bitcoin address" = "nuk është bitcoin adresë valide";
+"not a valid dash address" = "nuk është dash adresë valide";
 
 /* No comment provided by engineer. */
-"not a valid private key" = "jo një bitcoin çelës privat valid";
+"not a valid private key" = "jo një dash çelës privat valid";
 
 /* No comment provided by engineer. */
-"not connected to the dash network" = "nuk jeni konektuar në rrjetin bitcoin";
+"not connected to the dash network" = "nuk jeni konektuar në rrjetin dash";
 
 /* No comment provided by engineer. */
 "ok" = "ok";
@@ -278,7 +278,7 @@
 "post-dated" = "e ardhshme";
 
 /* No comment provided by engineer. */
-"Receive bitcoins at this address: %@" = "Prano bitcoin në këtë adresë: %@";
+"Receive dash at this address: %@" = "Prano dash në këtë adresë: %@";
 
 /* No comment provided by engineer. */
 "received" = "të pranuara";
@@ -323,7 +323,7 @@
 "reset" = "reseto";
 
 /* No comment provided by engineer. */
-"Scan someone else's QR code to get their bitcoin address. You can send a payment to anyone with an address." = "Skano QR kodin e dikujt tjetër për të marrë bitcoin adresën e tyre. Mund të dergoni pages gjithkujt me një adresë.";
+"Scan someone else's QR code to get their dash address. You can send a payment to anyone with an address." = "Skano QR kodin e dikujt tjetër për të marrë dash adresën e tyre. Mund të dergoni pages gjithkujt me një adresë.";
 
 /* No comment provided by engineer. */
 "Screenshots are visible to other apps and devices. Generate a new recovery phrase and keep it secret." = "Screenshot mund të shihen nga aplikacionet dhe pajisjet tjera. Gjenero një frazë tjetër rikthyese dhe mbaje sekret.";
@@ -386,10 +386,10 @@
 "the app will now close" = "aplikacioni tash do të mbyllet";
 
 /* No comment provided by engineer. */
-"This is your bitcoin address. Tap to copy it or send it by email or sms. The address will change each time you receive funds, but old addresses always work." = "Kjo është bitcoin adresa juaj. Tap për ta kopjuar ose dërguar atë përmes email ose sms. Adresa ndryshon secilën herë që ju pranoni fonde, por adresat e vjetra gjithmonë punojn.";
+"This is your dash address. Tap to copy it or send it by email or sms. The address will change each time you receive funds, but old addresses always work." = "Kjo është dash adresa juaj. Tap për ta kopjuar ose dërguar atë përmes email ose sms. Adresa ndryshon secilën herë që ju pranoni fonde, por adresat e vjetra gjithmonë punojn.";
 
 /* No comment provided by engineer. */
-"This is your bitcoin balance. Bitcoin is a currency. The exchange rate changes with the market." = "Kjo është bitcoin bilanci juaj. Bitcoin është një monedhë. Kursi i këmbimit ndryshon nga tregu.";
+"This is your dash balance. Dash is a currency. The exchange rate changes with the market." = "Kjo është dash bilanci juaj. Dash është një monedhë. Kursi i këmbimit ndryshon nga tregu.";
 
 /* No comment provided by engineer. */
 "this payment address is already in your wallet" = "kjo adresë ekziston tashmë ne kuletën tuaj";
@@ -476,7 +476,7 @@
 "WRITE DOWN YOUR RECOVERY PHRASE" = "SHKRUAJE FRAZËN RIKTHYESE DIKU SIGURTË";
 
 /* No comment provided by engineer. */
-"you received bitcoin!" = "ju pranuat bitcoin!";
+"you received dash!" = "ju pranuat dash!";
 
 /* No comment provided by engineer. */
 "Your wallet may be out of sync.\nThis can often be fixed by rescanning the blockchain." = "Si duket kuleta juaj nuk është e sinkronizuar.\nKjo shpesh mund të rregullohet duke riskanuar blockchain.";

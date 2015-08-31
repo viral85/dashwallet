@@ -32,7 +32,7 @@
 "\nA device passcode is needed to safeguard your wallet. Go to settings and turn passcode on to continue." = "\nNecesitas un Código de acceso para proteger tu cartera. Ve a configuración y activa el Código de acceso para continuar.";
 
 /* No comment provided by engineer. */
-"\nADDRESS ALREADY USED\n\nbitcoin addresses are intended for single use only\n\nre-use reduces privacy for both you and the recipient and can result in loss if the recipient doesn't directly control the address" = "\nDIRECCIÓN EN USO\n\nlas direcciones bitcoin sirven para un solo uso\n\nla reutilización de direcciones reduce tu privacidad y la del destinatario, y puede ocasionar pérdidas si este no controla directamente la dirección";
+"\nADDRESS ALREADY USED\n\ndash addresses are intended for single use only\n\nre-use reduces privacy for both you and the recipient and can result in loss if the recipient doesn't directly control the address" = "\nDIRECCIÓN EN USO\n\nlas direcciones dash sirven para un solo uso\n\nla reutilización de direcciones reduce tu privacidad y la del destinatario, y puede ocasionar pérdidas si este no controla directamente la dirección";
 
 /* No comment provided by engineer. */
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\npermitir el acceso a la cámara en\nConfiguración->Privacidad->Cámara->%@";
@@ -116,7 +116,7 @@
 "choose passcode for %@" = "seleccionar código de acceso para %@";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid dash address" = "el portapapeles no contiene ninguna dirección dash válida";
+"clipboard doesn't contain a valid Dash or Bitcoin address" = "el portapapeles no contiene ninguna dirección dash o bitcoin válida";
 
 /* No comment provided by engineer. */
 "close app" = "cerrar app";
@@ -146,13 +146,13 @@
 "couldn't sweep balance" = "no se pudo barrer el saldo";
 
 /* No comment provided by engineer. */
-"couldn't transmit payment to dash network" = "no se pudo transmitir el pago a la red bitcoin";
+"couldn't transmit payment to dash network" = "no se pudo transmitir el pago a la red dash";
 
 /* No comment provided by engineer. */
-"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your bitcoins)." = "DISPOSITIVO DE SEGURIDAD DUDOSA\nCualquier aplicación de 'jailbreak' puede acceder a la cadena de datos de otras aplicaciones (y robar tus bitcoin).";
+"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your dash)." = "DISPOSITIVO DE SEGURIDAD DUDOSA\nCualquier aplicación de 'jailbreak' puede acceder a la cadena de datos de otras aplicaciones (y robar tus dash).";
 
 /* No comment provided by engineer. */
-"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your bitcoins). Wipe this wallet immediately and restore on a secure device." = "DISPOSITIVO DE SEGURIDAD DUDOSA\nCualquier aplicación de 'jailbreak' puede acceder a la cadena de datos de otras aplicaciones (y robar tus bitcoin). Borra inmediatamente esta cartera para restablecerla en un dispositivo seguro.";
+"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your dash). Wipe this wallet immediately and restore on a secure device." = "DISPOSITIVO DE SEGURIDAD DUDOSA\nCualquier aplicación de 'jailbreak' puede acceder a la cadena de datos de otras aplicaciones (y robar tus dash). Borra inmediatamente esta cartera para restablecerla en un dispositivo seguro.";
 
 /* No comment provided by engineer. */
 "do it later" = "hazlo más tarde";
@@ -173,7 +173,7 @@
 "enter old passcode" = "introduce el Código de acceso antiguo";
 
 /* No comment provided by engineer. */
-"error signing bitcoin transaction" = "error en la firma de transacción de bitcoin";
+"error signing dash transaction" = "error en la firma de transacción de dash";
 
 /* No comment provided by engineer. */
 "error signing transaction" = "error en la firma de transacción";
@@ -203,7 +203,7 @@
 "insufficient funds" = "saldo insuficiente";
 
 /* No comment provided by engineer. */
-"insufficient funds for dash network fee" = "fondos insuficientes para la cuota de red bitcoin";
+"insufficient funds for dash network fee" = "fondos insuficientes para la cuota de red dash";
 
 /* No comment provided by engineer. */
 "INVALID" = "NO VÁLIDO";
@@ -239,16 +239,16 @@
 "no peers found" = "no se encontraron pares";
 
 /* No comment provided by engineer. */
-"not a bitcoin QR code" = "no es un código QR de bitcoin";
+"not a dash QR code" = "no es un código QR de dash";
 
 /* No comment provided by engineer. */
-"not a valid bitcoin address" = "no es una dirección válida de bitcoin";
+"not a valid dash address" = "no es una dirección válida de dash";
 
 /* No comment provided by engineer. */
 "not a valid private key" = "no es una clave privada válida";
 
 /* No comment provided by engineer. */
-"not connected to the dash network" = "no conectado a la red bitcoin";
+"not connected to the dash network" = "no conectado a la red dash";
 
 /* No comment provided by engineer. */
 "ok" = "de acuerdo";
@@ -278,7 +278,7 @@
 "post-dated" = "postdatado";
 
 /* No comment provided by engineer. */
-"Receive bitcoins at this address: %@" = "Recibe bitcoins en esta dirección: %@";
+"Receive dash at this address: %@" = "Recibe dash en esta dirección: %@";
 
 /* No comment provided by engineer. */
 "received" = "recibido";
@@ -323,7 +323,7 @@
 "reset" = "reiniciar";
 
 /* No comment provided by engineer. */
-"Scan someone else's QR code to get their bitcoin address. You can send a payment to anyone with an address." = "Escanee el código QR de terceros para obtener su dirección bitcoin. Puede enviar un pago a cualquier poseedor de una dirección.";
+"Scan someone else's QR code to get their dash address. You can send a payment to anyone with an address." = "Escanee el código QR de terceros para obtener su dirección dash. Puede enviar un pago a cualquier poseedor de una dirección.";
 
 /* No comment provided by engineer. */
 "Screenshots are visible to other apps and devices. Generate a new recovery phrase and keep it secret." = "Las capturas de pantalla son visibles para otras aplicaciones y dispositivos. Genere una nueva frase de recuperación y téngala en secreto.";
@@ -335,7 +335,7 @@
 "seen by %d of %d peers" = "visto por %1$d de %2$d pares";
 
 /* No comment provided by engineer. */
-"Send %@ (%@) from this private key into your wallet? The dash network will receive a fee of %@ (%@)." = "¿Enviar %1$@ (%2$@) de esta clave privada a su cartera? La red bitcoin deducirá una tasa de %3$@ (%4$@).";
+"Send %@ (%@) from this private key into your wallet? The dash network will receive a fee of %@ (%@)." = "¿Enviar %1$@ (%2$@) de esta clave privada a su cartera? La red dash deducirá una tasa de %3$@ (%4$@).";
 
 /* No comment provided by engineer. */
 "send address as email" = "enviar dirección como correo electrónico";
@@ -386,10 +386,10 @@
 "the app will now close" = "la aplicación se cerrará ahora";
 
 /* No comment provided by engineer. */
-"This is your bitcoin address. Tap to copy it or send it by email or sms. The address will change each time you receive funds, but old addresses always work." = "Esta es su dirección bitcoin. Pulse para copiarla o enviarla por correo electrónico o sms. La dirección cambiará cada vez que reciba fondos, si bien las direcciones antiguas funcionarán siempre.";
+"This is your dash address. Tap to copy it or send it by email or sms. The address will change each time you receive funds, but old addresses always work." = "Esta es su dirección dash. Pulse para copiarla o enviarla por correo electrónico o sms. La dirección cambiará cada vez que reciba fondos, si bien las direcciones antiguas funcionarán siempre.";
 
 /* No comment provided by engineer. */
-"This is your bitcoin balance. Bitcoin is a currency. The exchange rate changes with the market." = "Este es su saldo bitcoin. Bitcoin es una moneda. La tasa de cambio fluctúa con el mercado.";
+"This is your dash balance. Dash is a currency. The exchange rate changes with the market." = "Este es su saldo dash. Dash es una moneda. La tasa de cambio fluctúa con el mercado.";
 
 /* No comment provided by engineer. */
 "this payment address is already in your wallet" = "esta dirección de pago ya está en su cartera";
@@ -476,7 +476,7 @@
 "WRITE DOWN YOUR RECOVERY PHRASE" = "ANOTE SU FRASE DE RECUPERACIÓN";
 
 /* No comment provided by engineer. */
-"you received bitcoin!" = "¡ha recibido bitcoin!";
+"you received dash!" = "¡ha recibido dash!";
 
 /* No comment provided by engineer. */
 "Your wallet may be out of sync.\nThis can often be fixed by rescanning the blockchain." = "Su cartera puede estar desincronizada.\nCon frecuencia se puede solucionar escaneando de nuevo la cadena de bloques.";

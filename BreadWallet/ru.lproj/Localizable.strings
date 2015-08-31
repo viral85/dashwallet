@@ -32,7 +32,7 @@
 "\nA device passcode is needed to safeguard your wallet. Go to settings and turn passcode on to continue." = "Пароль устройство необходим для защиты вашего бумажника. Перейдите в настройки и включите код доступа что бы продолжить.";
 
 /* No comment provided by engineer. */
-"\nADDRESS ALREADY USED\n\nbitcoin addresses are intended for single use only\n\nre-use reduces privacy for both you and the recipient and can result in loss if the recipient doesn't directly control the address" = " АДРЕС уже используется \n\nbitcoin адреса предназначены для одного использования только \n\nповторное использование уменьшает приватность для вас и получателя и может привести к потере, если получатель не контролирует адрес напрямую";
+"\nADDRESS ALREADY USED\n\ndash addresses are intended for single use only\n\nre-use reduces privacy for both you and the recipient and can result in loss if the recipient doesn't directly control the address" = " АДРЕС уже используется \n\ndash адреса предназначены для одного использования только \n\nповторное использование уменьшает приватность для вас и получателя и может привести к потере, если получатель не контролирует адрес напрямую";
 
 /* No comment provided by engineer. */
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = " разрешить доступ к камере в \nнастройки-> конфиденциальность-> камера->%@";
@@ -116,7 +116,7 @@
 "choose passcode for %@" = "выберите пароль для %@";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid dash address" = "буфер обмена не содержит действительный bitcoin адрес";
+"clipboard doesn't contain a valid Dash or Bitcoin address" = "буфер обмена не содержит действительный dash или bitcoin адрес";
 
 /* No comment provided by engineer. */
 "close app" = "закрыть программу";
@@ -146,19 +146,19 @@
 "couldn't sweep balance" = "не получилось ? баланс";
 
 /* No comment provided by engineer. */
-"couldn't transmit payment to dash network" = "не получилось передать платеж сети bitcoin";
+"couldn't transmit payment to dash network" = "не получилось передать платеж сети dash";
 
 /* No comment provided by engineer. */
-"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your bitcoins)." = "УСТРОЙСТВА безопасности ОСЛАБЛЕНН\nЛюбое 'jailbreak' приложение может получить доступ к любому другому брелку  данных приложения (и украсть ваши bitcoins).";
+"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your dash)." = "УСТРОЙСТВА безопасности ОСЛАБЛЕНН\nЛюбое 'jailbreak' приложение может получить доступ к любому другому брелку  данных приложения (и украсть ваши dash).";
 
 /* No comment provided by engineer. */
-"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your bitcoins). Wipe this wallet immediately and restore on a secure device." = "УСТРОЙСТВА безопасности ОСЛАБЛЕНН\nЛюбое 'jailbreak' приложение может получить доступ к любому другому брелку  данных приложения (и украсть ваши bitcoins).Немедленно сотрите этот кошелек и восстановите  его на безопасном устройстве.";
+"DEVICE SECURITY COMPROMISED\nAny 'jailbreak' app can access any other app's keychain data (and steal your dash). Wipe this wallet immediately and restore on a secure device." = "УСТРОЙСТВА безопасности ОСЛАБЛЕНН\nЛюбое 'jailbreak' приложение может получить доступ к любому другому брелку  данных приложения (и украсть ваши dash).Немедленно сотрите этот кошелек и восстановите  его на безопасном устройстве.";
 
 /* No comment provided by engineer. */
 "do it later" = "отложить на потом";
 
 /* No comment provided by engineer. */
-"\nDO NOT let anyone see your recovery\nphrase or they can spend your bitcoins.\n" = " НЕ позволяйте никому видеть ваши фразы восстановления или они могут потратить ваши bitcoins. ";
+"\nDO NOT let anyone see your recovery\nphrase or they can spend your dash.\n" = " НЕ позволяйте никому видеть ваши фразы восстановления или они могут потратить ваши dash. ";
 
 /* No comment provided by engineer. */
 "done" = "сделанно";
@@ -173,7 +173,7 @@
 "enter old passcode" = "введите старый пароль";
 
 /* No comment provided by engineer. */
-"error signing bitcoin transaction" = "ошибка подписания bitcoin транзакций";
+"error signing dash transaction" = "ошибка подписания dash транзакций";
 
 /* No comment provided by engineer. */
 "error signing transaction" = "ошибка подписания транзакции";
@@ -203,7 +203,7 @@
 "insufficient funds" = "недостаточно средств";
 
 /* No comment provided by engineer. */
-"insufficient funds for dash network fee" = "недостаток средств для bitcoin сетевой платы";
+"insufficient funds for dash network fee" = "недостаток средств для dash сетевой платы";
 
 /* No comment provided by engineer. */
 "INVALID" = "НЕВЕРНО";
@@ -239,16 +239,16 @@
 "no peers found" = "узлы не найдены";
 
 /* No comment provided by engineer. */
-"not a bitcoin QR code" = "не bitcoin QR код";
+"not a dash QR code" = "не dash QR код";
 
 /* No comment provided by engineer. */
-"not a valid bitcoin address" = "не допустимым bitcoin адрес";
+"not a valid dash address" = "не допустимым dash адрес";
 
 /* No comment provided by engineer. */
 "not a valid private key" = "не действительный приватный ключ ";
 
 /* No comment provided by engineer. */
-"not connected to the dash network" = "не подключен к сети bitcoin";
+"not connected to the dash network" = "не подключен к сети dash";
 
 /* No comment provided by engineer. */
 "ok" = "ok";
@@ -278,7 +278,7 @@
 "post-dated" = "чек с будущей датой";
 
 /* No comment provided by engineer. */
-"Receive bitcoins at this address: %@" = "Получить bitcoins на этот адрес: %@";
+"Receive dash at this address: %@" = "Получить dash на этот адрес: %@";
 
 /* No comment provided by engineer. */
 "received" = "полученно";
@@ -323,7 +323,7 @@
 "reset" = "сброс";
 
 /* No comment provided by engineer. */
-"Scan someone else's QR code to get their bitcoin address. You can send a payment to anyone with an address." = "Сканируйте QR код ваших друзей чтобы получить их bitcoin адреса. Вы можете отправить платеж кому угодно имея адрес.";
+"Scan someone else's QR code to get their dash address. You can send a payment to anyone with an address." = "Сканируйте QR код ваших друзей чтобы получить их dash адреса. Вы можете отправить платеж кому угодно имея адрес.";
 
 /* No comment provided by engineer. */
 "Screenshots are visible to other apps and devices. Generate a new recovery phrase and keep it secret." = "Скриншоты видимы другими приложениями и устройствами. Создайте новую фразу восстановления и держите ее в секрете.";
@@ -335,7 +335,7 @@
 "seen by %d of %d peers" = "видели %1$d %2$d сверстников";
 
 /* No comment provided by engineer. */
-"Send %@ (%@) from this private key into your wallet? The dash network will receive a fee of %@ (%@)." = "Отправить %1$@ (%2$@) из этого закрытого ключа в ваш кошелек? Сети bitcoin получат оплату %3$@ (%4$@).";
+"Send %@ (%@) from this private key into your wallet? The dash network will receive a fee of %@ (%@)." = "Отправить %1$@ (%2$@) из этого закрытого ключа в ваш кошелек? Сети dash получат оплату %3$@ (%4$@).";
 
 /* No comment provided by engineer. */
 "send address as email" = "отправить адрес в виде электронной почты";
@@ -386,10 +386,10 @@
 "the app will now close" = "приложение сейчас будет закрыта";
 
 /* No comment provided by engineer. */
-"This is your bitcoin address. Tap to copy it or send it by email or sms. The address will change each time you receive funds, but old addresses always work." = "Это ваш адрес bitcoin. Нажмите, чтобы скопировать его или отправить его по электронной почте или sms. Адрес будет меняться каждый раз когда вы получаете средства, но старые адреса всегда работают.";
+"This is your dash address. Tap to copy it or send it by email or sms. The address will change each time you receive funds, but old addresses always work." = "Это ваш адрес dash. Нажмите, чтобы скопировать его или отправить его по электронной почте или sms. Адрес будет меняться каждый раз когда вы получаете средства, но старые адреса всегда работают.";
 
 /* No comment provided by engineer. */
-"This is your bitcoin balance. Bitcoin is a currency. The exchange rate changes with the market." = "Это ваш баланс bitcoin. Bitcoin является валютой. Валютный курс меняется в соответствие с  рынком.";
+"This is your dash balance. Dash is a currency. The exchange rate changes with the market." = "Это ваш баланс dash. Dash является валютой. Валютный курс меняется в соответствие с  рынком.";
 
 /* No comment provided by engineer. */
 "this payment address is already in your wallet" = "этот адрес оплаты уже находится в вашем бумажнике";
@@ -476,7 +476,7 @@
 "WRITE DOWN YOUR RECOVERY PHRASE" = "ЗАПИШИТЕ ВАШУ ФРАЗУ ВОССТАНОВЛЕНИЯ";
 
 /* No comment provided by engineer. */
-"you received bitcoin!" = "вы получили bitcoin!";
+"you received dash!" = "вы получили dash!";
 
 /* No comment provided by engineer. */
 "Your wallet may be out of sync.\nThis can often be fixed by rescanning the blockchain." = "Ваш кошелек может быть несинхронизированным. Это часто может быть исправлено путем повторного сканирования blockchain.";

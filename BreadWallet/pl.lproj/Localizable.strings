@@ -32,7 +32,7 @@
 "\nA device passcode is needed to safeguard your wallet. Go to settings and turn passcode on to continue." = "\nHasło urządzenia jest potrzebne by zabezpieczyć twój portfel. Pójdź do ustawień i ustaw hasło by kontynuować.";
 
 /* No comment provided by engineer. */
-"\nADDRESS ALREADY USED\n\nbitcoin addresses are intended for single use only\n\nre-use reduces privacy for both you and the recipient and can result in loss if the recipient doesn't directly control the address" = "\nADRES JUŻ UŻYTY\n\nadresy bitcoin są przeznaczone do jednorazowego użytku\n\nponowne użycie zmniejsza prywatność twoją i odbiorcy i może skutkować utratą pieniędzy jeśli odbiorca nie kontroluje adresu";
+"\nADDRESS ALREADY USED\n\ndash addresses are intended for single use only\n\nre-use reduces privacy for both you and the recipient and can result in loss if the recipient doesn't directly control the address" = "\nADRES JUŻ UŻYTY\n\nadresy dash są przeznaczone do jednorazowego użytku\n\nponowne użycie zmniejsza prywatność twoją i odbiorcy i może skutkować utratą pieniędzy jeśli odbiorca nie kontroluje adresu";
 
 /* No comment provided by engineer. */
 "\nallow camera access in\nSettings->Privacy->Camera->%@" = "\nzezwalaj na dostęp do kamery w\nUstawienia->Prywatność->Kamera->%@";
@@ -62,7 +62,7 @@
 "Dash address" = "Adres dash";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Adresy Bitcoin można skopiować do schowka. Adres Bitcoin zaczyna się zawsze od 'X' lub 'Y'.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Adresy Dash można skopiować do schowka. Adres Dash zaczyna się zawsze od 'X' lub 'Y'.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "prowizja sieci dash";
@@ -86,7 +86,7 @@
 "choose passcode for %@" = "ustal hasło dla %@";
 
 /* No comment provided by engineer. */
-"clipboard doesn't contain a valid dash address" = "w schowku nie ma prawidłowego adresu dash";
+"clipboard doesn't contain a valid Dash or Bitcoin address" = "w schowku nie ma prawidłowego adresu dash lub bitcoin";
 
 /* No comment provided by engineer. */
 "close app" = "zamknij aplikację";
@@ -173,10 +173,10 @@
 "no peers found" = "nie znaleziono węzłów sieci";
 
 /* No comment provided by engineer. */
-"not a bitcoin QR code" = "nieprawidłowy kod QR";
+"not a dash QR code" = "nieprawidłowy kod QR";
 
 /* No comment provided by engineer. */
-"not a valid bitcoin address" = "nieprawidłowy adres bitcoin";
+"not a valid dash address" = "nieprawidłowy adres dash";
 
 /* No comment provided by engineer. */
 "not a valid private key" = "nieprawidłowy klucz prywatny";
@@ -206,7 +206,7 @@
 "post-dated" = "do odebrania w przyszłości";
 
 /* No comment provided by engineer. */
-"Receive bitcoins at this address: %@" = "Otrzymaj wpłatę na ten adres: %@";
+"Receive dash at this address: %@" = "Otrzymaj wpłatę na ten adres: %@";
 
 /* No comment provided by engineer. */
 "received" = "otrzymano";
@@ -287,10 +287,10 @@
 "the app will now close" = "aplikacja zamknie się teraz";
 
 /* No comment provided by engineer. */
-"This is your bitcoin address. Tap to copy it or send it by email or sms. The address will change each time you receive funds, but old addresses always work." = "To jest twój adres bitcoin. Stuknij by go skopiować lub wysłać przez e-mail lub sms. Adres będzie się zmieniał za każdym razem kiedy otrzymasz środki, ale stare adresy będą zawsze działać.";
+"This is your dash address. Tap to copy it or send it by email or sms. The address will change each time you receive funds, but old addresses always work." = "To jest twój adres dash. Stuknij by go skopiować lub wysłać przez e-mail lub sms. Adres będzie się zmieniał za każdym razem kiedy otrzymasz środki, ale stare adresy będą zawsze działać.";
 
 /* No comment provided by engineer. */
-"This is your bitcoin balance. Bitcoin is a currency. The exchange rate changes with the market." = "To jest twoje saldo bitcoin. Bitcoin jest walutą. Kurs walutowy zmienia się z rynkiem.";
+"This is your dash balance. Dash is a currency. The exchange rate changes with the market." = "To jest twoje saldo dash. Dash jest walutą. Kurs walutowy zmienia się z rynkiem.";
 
 /* No comment provided by engineer. */
 "this payment address is already in your wallet" = "ten adres do celów płatności jest już w twoim portfelu";
@@ -377,7 +377,7 @@
 "WRITE DOWN YOUR RECOVERY PHRASE" = "ZAPISZ FRAZĘ ODZYSKIWANIA DANYCH";
 
 /* No comment provided by engineer. */
-"you received bitcoin!" = "otrzymałeś bitcoin!";
+"you received dash!" = "otrzymałeś dash!";
 
 /* No comment provided by engineer. */
 "Your wallet may be out of sync.\nThis can often be fixed by rescanning the blockchain." = "Twój portfel może nie być zsynchronizowany.\nTo często może zostać naprawione przez ponowne skanowanie łańcucha bloków.";
