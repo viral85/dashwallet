@@ -56,6 +56,10 @@
         <attribute name="value" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <relationship name="transaction" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="BRTransactionEntity" inverseName="outputs" inverseEntity="BRTransactionEntity" syncable="YES"/>
     </entity>
+    <entity name="DCMasternodeEntity" syncable="YES">
+        <attribute name="address" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="txHash" optional="YES" attributeType="Binary" syncable="YES"/>
+    </entity>
     <entity name="DCShapeshiftEntity" representedClassName="DCShapeshiftEntity" syncable="YES">
         <attribute name="errorMessage" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="expiresAt" optional="YES" attributeType="Date" syncable="YES"/>
@@ -79,5 +83,6 @@
         <element name="BRTxMetadataEntity" positionX="0" positionY="0" width="128" height="90"/>
         <element name="BRTxOutputEntity" positionX="0" positionY="0" width="128" height="165"/>
         <element name="DCShapeshiftEntity" positionX="0" positionY="0" width="128" height="225"/>
+        <element name="DCMasternodeEntity" positionX="9" positionY="99" width="128" height="75"/>
     </elements>
 </model>

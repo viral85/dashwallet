@@ -108,6 +108,7 @@
 		FBCFA6C61B82158600831F99 /* FBShimmeringView.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6C41B82158600831F99 /* FBShimmeringView.m */; };
 		FBCFA6C91B87B9EF00831F99 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6C81B87B9EF00831F99 /* MBProgressHUD.m */; };
 		FBCFA6D01B88D49100831F99 /* DCShapeshiftEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = FBCFA6CF1B88D49100831F99 /* DCShapeshiftEntity.m */; };
+		FBD9DCCC1B95AE5700C422D1 /* DCMasternodeControlTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FBD9DCCB1B95AE5700C422D1 /* DCMasternodeControlTableViewController.m */; };
 		FBE49E961B7BB1830020FAA6 /* Dash-Light.png in Resources */ = {isa = PBXBuildFile; fileRef = FBE49E951B7BB1830020FAA6 /* Dash-Light.png */; };
 		FBE49E9C1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE49E9B1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m */; };
 		FBE49E9E1B7C86770020FAA6 /* FixedPeers.plist in Resources */ = {isa = PBXBuildFile; fileRef = FBE49E9D1B7C86770020FAA6 /* FixedPeers.plist */; };
@@ -435,6 +436,8 @@
 		FBCFA6C81B87B9EF00831F99 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		FBCFA6CE1B88D49100831F99 /* DCShapeshiftEntity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCShapeshiftEntity.h; sourceTree = "<group>"; };
 		FBCFA6CF1B88D49100831F99 /* DCShapeshiftEntity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCShapeshiftEntity.m; sourceTree = "<group>"; };
+		FBD9DCCA1B95AE5700C422D1 /* DCMasternodeControlTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCMasternodeControlTableViewController.h; sourceTree = "<group>"; };
+		FBD9DCCB1B95AE5700C422D1 /* DCMasternodeControlTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCMasternodeControlTableViewController.m; sourceTree = "<group>"; };
 		FBE49E951B7BB1830020FAA6 /* Dash-Light.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Dash-Light.png"; sourceTree = "<group>"; };
 		FBE49E9A1B7BE73C0020FAA6 /* NSAttributedString+Attachments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+Attachments.h"; sourceTree = "<group>"; };
 		FBE49E9B1B7BE73C0020FAA6 /* NSAttributedString+Attachments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+Attachments.m"; sourceTree = "<group>"; };
@@ -691,6 +694,8 @@
 				757BE7E8192D4E880061CB20 /* BRSeedViewController.m */,
 				FB00F67C1B5AE1E50061C2FB /* DCTickerViewController.h */,
 				FB00F67D1B5AE1E50061C2FB /* DCTickerViewController.m */,
+				FBD9DCCA1B95AE5700C422D1 /* DCMasternodeControlTableViewController.h */,
+				FBD9DCCB1B95AE5700C422D1 /* DCMasternodeControlTableViewController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -1207,6 +1212,7 @@
 				759816E719357D6F005060EA /* BRBubbleView.m in Sources */,
 				75878BC6192B1AF0002505AB /* BRTxHistoryViewController.m in Sources */,
 				FB3952541B9190520013BA41 /* UIImage+Utility.m in Sources */,
+				FBD9DCCC1B95AE5700C422D1 /* DCMasternodeControlTableViewController.m in Sources */,
 				757BE7E3192C0E9D0061CB20 /* BRRestoreViewController.m in Sources */,
 				FB00F69D1B5AE2AA0061C2FB /* AxisX.m in Sources */,
 				757BE7E6192C1FF70061CB20 /* BRWelcomeViewController.m in Sources */,
