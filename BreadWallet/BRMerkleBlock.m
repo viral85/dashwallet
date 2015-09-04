@@ -230,39 +230,21 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     return txHashes;
 }
 
-// Verifies the block difficulty target is correct for the block's position in the chain. Transition time may be 0 if
-// height is not a multiple of BLOCK_DIFFICULTY_INTERVAL.
-//
-// The difficulty target algorithm works as follows:
-// The target must be the same as in the previous block unless the block's height is a multiple of 2016. Every 2016
-// blocks there is a difficulty transition where a new difficulty is calculated. The new target is the previous target
-// multiplied by the time between the last transition block's timestamp and this one (in seconds), divided by the
-// targeted time between transitions (14*24*60*60 seconds). If the new difficulty is more than 4x or less than 1/4 of
-// the previous difficulty, the change is limited to either 4x or 1/4. There is also a minimum difficulty value
-// intuitively named MAX_PROOF_OF_WORK... since larger values are less difficult.
 - (BOOL)verifyDifficultyWithPreviousBlocks:(NSMutableDictionary *)previousBlocks
 {
-    
-    if (self.height == 246499) {
-        NSLog(@"here");
-    }
     uint32_t darkGravityWaveTarget = [self darkGravityWaveTargetWithPreviousBlocks:previousBlocks];
     int32_t diff = (self.target & 0x00ffffffu) - darkGravityWaveTarget;
-    if (diff) {
-        NSLog(@"%d %d",self.height,diff);
-    }
-    return (abs(diff) < 5); //improve this later, rounding errors on the long double, should be more precise
+    return (abs(diff) < 2); //the core client has is less precise with a rounding error that can sometimes cause a problem. We are very rarely 1 off
 }
 
 -(int32_t)darkGravityWaveTargetWithPreviousBlocks:(NSMutableDictionary *)previousBlocks {
-    /* current difficulty formula, darkcoin - DarkGravity v3, original work done by evan duffield, modified for iOS */
+    /* current difficulty formula, darkcoin - based on DarkGravity v3, original work done by evan duffield, modified for iOS */
     BRMerkleBlock *previousBlock = previousBlocks[self.prevBlock];
     
     int64_t nActualTimespan = 0;
     int64_t lastBlockTime = 0;
     int64_t blockCount = 0;
-    long double pastDifficultyAverage = 0;
-    long double pastDifficultyAveragePrev = 0;
+    int64_t sumTargets = 0;
     
     if (_prevBlock == NULL || previousBlock.height == 0 || previousBlock.height < DGW_PAST_BLOCKS_MIN) {
         // This is the first block or the height is < PastBlocksMin
@@ -272,17 +254,16 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     
     BRMerkleBlock *currentBlock = previousBlock;
     // loop over the past n blocks, where n == PastBlocksMax
-    for (unsigned int i = 1; currentBlock && currentBlock.height > 0 && i<=DGW_PAST_BLOCKS_MAX; i++) {
-        blockCount++;
+    for (blockCount = 1; currentBlock && currentBlock.height > 0 && blockCount<=DGW_PAST_BLOCKS_MAX; blockCount++) {
         
         // Calculate average difficulty based on the blocks we iterate over in this for loop
         if(blockCount <= DGW_PAST_BLOCKS_MIN) {
             uint32_t currentTarget = currentBlock.target & 0x00ffffffu;
-            if (blockCount == 1) { pastDifficultyAverage = currentTarget; }
-            else {
-                pastDifficultyAverage = ((pastDifficultyAveragePrev * (long double)blockCount)+ (long double)currentTarget) / (long double)(blockCount+1);
+            if (blockCount == 1) {
+                sumTargets = currentTarget * 2;
+            } else {
+                sumTargets += currentTarget;
             }
-            pastDifficultyAveragePrev = pastDifficultyAverage;
         }
         
         // If this is the second iteration (LastBlockTime was set)
@@ -293,7 +274,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
             // Increment the actual timespan
             nActualTimespan += diff;
         }
-        // Set LasBlockTime to the block time for the block in current iteration
+        // Set lastBlockTime to the block time for the block in current iteration
         lastBlockTime = currentBlock.timestamp;
         
         if (previousBlock == NULL) { assert(currentBlock); break; }
@@ -301,10 +282,10 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     }
     
     // darkTarget is the difficulty
-    long double darkTarget = pastDifficultyAverage;
+    long double darkTarget = sumTargets / (long double)(blockCount);
     
     // nTargetTimespan is the time that the CountBlocks should have taken to be generated.
-    long double nTargetTimespan = blockCount* (2.5*60);
+    long double nTargetTimespan = (blockCount - 1)* (2.5*60);
     
     // Limit the re-adjustment to 3x or 0.33x
     // We don't want to increase/decrease diff too much.
@@ -314,8 +295,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         nActualTimespan = nTargetTimespan*3.0f;
     
     // Calculate the new difficulty based on actual and target timespan.
-    darkTarget *= nActualTimespan;
-    darkTarget = darkTarget / nTargetTimespan;
+    darkTarget *= nActualTimespan / nTargetTimespan;
     
     // If calculated difficulty is lower than the minimal diff, set the new difficulty to be the minimal diff.
     if (darkTarget > MAX_PROOF_OF_WORK){

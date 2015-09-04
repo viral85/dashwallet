@@ -79,11 +79,12 @@ static const struct { uint32_t height; char *hash; time_t timestamp; uint32_t ta
     { 217752, "00000000000a7baeb2148272a7e14edf5af99a64af456c0afc23d15a0918b704", 1423563332, 0x1b10c9b6u },//dash
     { 227121, "00000000000455a2b3a2ed5dfb03990043ca0074568b939acec62820e89a6c45", 1425039295, 0x1b1261d6u },//dash
     { 246209, "00000000000eec6f7871d3d70321ae98ef1007ab0812d876bda1208afcfb7d7d", 1428046505, 0x1b1a5e27u },//dash
-    //{ 273524, "00000000000bec4e6834d736b7a4d5f9f2b7a4308e6b9324d967a3e533daf551", 1432362681, 0x1b139922u },//dash
+    { 298549, "00000000000cc467fbfcfd49b82e4f9dc8afb0ef83be7c638f573be6a852ba56", 1436306353, 0x1b1ff0dbu },//dash
+    { 312645, "0000000000059dcb71ad35a9e40526c44e7aae6c99169a9e7017b7d84b1c2daf", 1438525019, 0x1b1c46ceu }//dash
 };
 
 static const char *dns_seeds[] = {
-    "dnsseed.masternode.io","dnsseed.darkcoin.qa","dnsseed.dashpay.io"
+    "dnsseed.dashpay.io","dnsseed.masternode.io","dnsseed.darkcoin.qa"
 };
 
 #endif
@@ -238,7 +239,7 @@ static const char *dns_seeds[] = {
                                                                                 pathForResource:FIXED_PEERS ofType:@"plist"]]) {
                         // give hard coded peers a timestamp between 7 and 14 days ago
                         [_peers addObject:[[BRPeer alloc] initWithAddress:address.unsignedIntValue
-                                                                     port:DASH_STANDARD_PORT timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
+                                                                     port:DASH_STANDARD_PORT timestamp:now - (WEEK_TIME_INTERVAL + arc4random_uniform(WEEK_TIME_INTERVAL))
                                                                  services:SERVICES_NODE_NETWORK]];
                     }
                 }
@@ -325,7 +326,7 @@ static const char *dns_seeds[] = {
 
     // if we don't have any blocks yet, use the latest checkpoint that's at least a week older than earliestKeyTime
     for (int i = CHECKPOINT_COUNT - 1; ! _lastBlock && i >= 0; i--) {
-        if (i == 0 || checkpoint_array[i].timestamp + 7*24*60*60 < self.earliestKeyTime + NSTimeIntervalSince1970) {
+        if (i == 0 || checkpoint_array[i].timestamp + WEEK_TIME_INTERVAL < self.earliestKeyTime + NSTimeIntervalSince1970) {
             _lastBlock = [[BRMerkleBlock alloc]
                           initWithBlockHash:[NSString stringWithUTF8String:checkpoint_array[i].hash].hexToData.reverse
                           version:1 prevBlock:nil merkleRoot:nil timestamp:checkpoint_array[i].timestamp
@@ -480,7 +481,7 @@ static const char *dns_seeds[] = {
 
         // start the chain download from the most recent checkpoint that's at least a week older than earliestKeyTime
         for (int i = CHECKPOINT_COUNT - 1; ! _lastBlock && i >= 0; i--) {
-            if (i == 0 || checkpoint_array[i].timestamp + 7*24*60*60 < self.earliestKeyTime + NSTimeIntervalSince1970) {
+            if (i == 0 || checkpoint_array[i].timestamp + WEEK_TIME_INTERVAL < self.earliestKeyTime + NSTimeIntervalSince1970) {
                 _lastBlock = self.blocks[[NSString stringWithUTF8String:checkpoint_array[i].hash].hexToData.reverse];
             }
         }
@@ -890,7 +891,8 @@ static const char *dns_seeds[] = {
             dispatch_async(self.q, ^{
                 // request just block headers up to a week before earliestKeyTime, and then merkleblocks after that
                 // BUG: XXX headers can timeout on slow connections (each message is over 160k)
-                if (self.lastBlock.timestamp + 7*24*60*60 >= self.earliestKeyTime + NSTimeIntervalSince1970) {
+                // 604800 is one week in seconds WEEK_TIME_INTERVAL
+                if (self.lastBlock.timestamp + WEEK_TIME_INTERVAL >= self.earliestKeyTime + NSTimeIntervalSince1970) {
                     [peer sendGetblocksMessageWithLocators:[self blockLocatorArray] andHashStop:nil];
                 }
                 else [peer sendGetheadersMessageWithLocators:[self blockLocatorArray] andHashStop:nil];
@@ -1073,7 +1075,7 @@ static const char *dns_seeds[] = {
 {
     // ignore block headers that are newer than one week before earliestKeyTime (headers have 0 totalTransactions)
     if (block.totalTransactions == 0 &&
-        block.timestamp + 7*24*60*60 > self.earliestKeyTime + NSTimeIntervalSince1970 + 2*60*60) return;
+        block.timestamp + WEEK_TIME_INTERVAL > self.earliestKeyTime + NSTimeIntervalSince1970 + 2*60*60) return;
 
     // track the observed bloom filter false positive rate using a low pass filter to smooth out variance
     if (peer == self.downloadPeer && block.totalTransactions > 0) {
@@ -1108,7 +1110,7 @@ static const char *dns_seeds[] = {
               block.blockHash,block.height, block.prevBlock, self.lastBlock.blockHash, self.lastBlockHeight);
 
         // ignore orphans older than one week ago
-        if (block.timestamp < [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 - 7*24*60*60) return;
+        if (block.timestamp < [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 - WEEK_TIME_INTERVAL) return;
 
         // call getblocks, unless we already did with the previous block, or we're still downloading the chain
         if (self.lastBlockHeight >= peer.lastblock && ! [self.lastOrphan.blockHash isEqual:block.prevBlock]) {
@@ -1139,12 +1141,14 @@ static const char *dns_seeds[] = {
     }
     
     // verify block difficulty if block is past last checkpoint
-//    if (block.height > (checkpoint_array[CHECKPOINT_COUNT - 1].height + DGW_PAST_BLOCKS_MAX) && ![block verifyDifficultyWithPreviousBlocks:self.blocks]) {
-//        NSLog(@"%@:%d relayed block with invalid difficulty height %d target %x, blockHash: %@", peer.host, peer.port,
-//              block.height,block.target, block.blockHash);
-//        [self peerMisbehavin:peer];
-//        return;
-//    }
+    if (
+        (block.height > (checkpoint_array[CHECKPOINT_COUNT - 2].height + DGW_PAST_BLOCKS_MAX)) &&
+        ![block verifyDifficultyWithPreviousBlocks:self.blocks]) {
+        NSLog(@"%@:%d relayed block with invalid difficulty height %d target %x, blockHash: %@", peer.host, peer.port,
+              block.height,block.target, block.blockHash);
+        [self peerMisbehavin:peer];
+        return;
+    }
 
     // verify block chain checkpoints
     if (self.checkpoints[@(block.height)] && ! [block.blockHash isEqual:self.checkpoints[@(block.height)]]) {

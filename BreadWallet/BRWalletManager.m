@@ -431,7 +431,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 {
     NSData *d = getKeychainData(CREATION_TIME_KEY, nil);
 
-    return (d.length < sizeof(NSTimeInterval)) ? BIP39_CREATION_TIME : *(const NSTimeInterval *)d.bytes;
+    return (d.length < sizeof(NSTimeInterval)) ? BIP39_DASH_ACTIVATION_TIME : *(const NSTimeInterval *)d.bytes;
 }
 
 // true if touch id is enabled

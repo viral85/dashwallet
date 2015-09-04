@@ -136,7 +136,7 @@ static NSString *dateFormat(NSString *template)
             [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncStartedNotification object:nil
             queue:nil usingBlock:^(NSNotification *note) {
                 if ([[BRPeerManager sharedInstance]
-                     timestampForBlockHeight:[[BRPeerManager sharedInstance] lastBlockHeight]] + 60*60*24*7 <
+                     timestampForBlockHeight:[[BRPeerManager sharedInstance] lastBlockHeight]] + WEEK_TIME_INTERVAL <
                     [NSDate timeIntervalSinceReferenceDate] &&
                     m.seedCreationTime + 60*60*24 < [NSDate timeIntervalSinceReferenceDate]) {
                     self.navigationItem.titleView = nil;

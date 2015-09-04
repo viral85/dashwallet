@@ -43,7 +43,6 @@
 #define LOCAL_HOST         0x7f000001u
 #define ZERO_HASH          [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH]
 #define CONNECT_TIMEOUT    3.0
-#define DASH_ONLY_PULL_BLOCKS 1
 
 typedef enum {
     error = 0,
@@ -740,14 +739,14 @@ services:(uint64_t)services
     // immediately, and switch to requesting blocks when we receive a header newer than earliestKeyTime
     NSTimeInterval t = [message UInt32AtOffset:l + 81*(count - 1) + 68] - NSTimeIntervalSince1970;
 
-    if (count >= 2000 || t + 7*24*60*60 >= self.earliestKeyTime - 2*60*60) {
+    if (count >= 2000 || t + WEEK_TIME_INTERVAL >= self.earliestKeyTime - 2*60*60) {
         NSData *firstHash = [message subdataWithRange:NSMakeRange(l, 80)].x11,
                *lastHash = [message subdataWithRange:NSMakeRange(l + 81*(count - 1), 80)].x11;
 
-        if ((t + 7*24*60*60 >= self.earliestKeyTime - 2*60*60) || DASH_ONLY_PULL_BLOCKS) { // request blocks for the remainder of the chain
+        if ((t + WEEK_TIME_INTERVAL >= self.earliestKeyTime - 2*60*60)) { // request blocks for the remainder of the chain
             t = [message UInt32AtOffset:l + 81 + 68] - NSTimeIntervalSince1970;
 
-            for (off = l; t > 0 && t + 7*24*60*60 < self.earliestKeyTime - 2*60*60;) {
+            for (off = l; t > 0 && t + WEEK_TIME_INTERVAL < self.earliestKeyTime - 2*60*60;) {
                 off += 81;
                 t = [message UInt32AtOffset:off + 81 + 68] - NSTimeIntervalSince1970;
             }
@@ -756,7 +755,10 @@ services:(uint64_t)services
             NSLog(@"%@:%u calling getblocks with locators: %@", self.host, self.port, @[lastHash, firstHash]);
             [self sendGetblocksMessageWithLocators:@[lastHash, firstHash] andHashStop:nil];
         }
-        else [self sendGetheadersMessageWithLocators:@[lastHash, firstHash] andHashStop:nil];
+        else {
+            //NSLog(@"%@:%u calling getheaders with locators: %@", self.host, self.port, @[lastHash, firstHash]);
+            [self sendGetheadersMessageWithLocators:@[lastHash, firstHash] andHashStop:nil];
+        }
     }
     else {
         [self error:@"non-standard headers message, %u is fewer headers than expected", (int)count];
