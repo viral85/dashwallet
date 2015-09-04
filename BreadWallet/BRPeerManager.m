@@ -1141,8 +1141,7 @@ static const char *dns_seeds[] = {
     }
     
     // verify block difficulty if block is past last checkpoint
-    if (
-        (block.height > (checkpoint_array[CHECKPOINT_COUNT - 2].height + DGW_PAST_BLOCKS_MAX)) &&
+    if ((block.height > (checkpoint_array[CHECKPOINT_COUNT - 1].height + DGW_PAST_BLOCKS_MAX)) &&
         ![block verifyDifficultyWithPreviousBlocks:self.blocks]) {
         NSLog(@"%@:%d relayed block with invalid difficulty height %d target %x, blockHash: %@", peer.host, peer.port,
               block.height,block.target, block.blockHash);
