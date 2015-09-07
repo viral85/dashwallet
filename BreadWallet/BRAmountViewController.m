@@ -446,16 +446,27 @@ replacementString:(NSString *)string
     
     NSNumber * previousNumber = [formatter numberFromString:previousString];
     NSString *formattedAmount;
+    NSString *formattedAmountForDigit;
     
     if (!self.amountFieldIsEmpty) {
         if (![previousNumber floatValue] && digitLocationOld == NSNotFound && !([formatter.currencyDecimalSeparator isEqualToString:string])) {
             formattedAmount = [formatter stringFromNumber:inputNumber];
         } else {
             formattedAmount = [amountLabel.text stringByReplacingCharactersInRange:range withString:string];
+            formattedAmountForDigit = [amountLabel.text stringByReplacingCharactersInRange:range withString:@"1"];
         }
     } else {
         if ([formatter.currencyDecimalSeparator isEqualToString:string]) {
-            formattedAmount = [amountLabel.text stringByReplacingCharactersInRange:range withString:string];
+            if (digitLocationOld != NSNotFound) { //0,00 Euros
+                NSUInteger locationOfCurrencySymbol = [previousString rangeOfString:formatter.currencySymbol].location;
+                if (locationOfCurrencySymbol > digitLocationOld) {
+                    formattedAmount = [NSString stringWithFormat:@"0%@ %@",formatter.currencyDecimalSeparator,formatter.currencySymbol];
+                } else {
+                    formattedAmount = [NSString stringWithFormat:@"%@ 0%@",formatter.currencySymbol,formatter.currencyDecimalSeparator];
+                }
+            } else {
+                formattedAmount = [amountLabel.text stringByReplacingCharactersInRange:range withString:string];
+            }
         } else {
             formattedAmount = [formatter stringFromNumber:inputNumber];
         }
@@ -465,10 +476,18 @@ replacementString:(NSString *)string
         if (dashCharPos != NSNotFound) {
             formattedAmount = [formattedAmount stringByReplacingCharactersInRange:NSMakeRange(dashCharPos, 1) withString:DASH];
         }
+        if (formattedAmountForDigit) {
+            NSInteger dashCharPosForDigit = [formattedAmountForDigit indexOfCharacter:NSAttachmentCharacter];
+            if (dashCharPosForDigit != NSNotFound) {
+                formattedAmountForDigit = [formattedAmountForDigit stringByReplacingCharactersInRange:NSMakeRange(dashCharPosForDigit, 1) withString:DASH];
+            }
+        }
     }
     NSNumber * currentNumber = [formatter numberFromString:formattedAmount];
+    if (!formattedAmountForDigit) formattedAmountForDigit = formattedAmount;
+    NSNumber * epsilonNumber = [formatter numberFromString:formattedAmountForDigit];
     basicFormatter.maximumFractionDigits++;
-    NSString * basicFormattedAmount = [basicFormatter stringFromNumber:currentNumber]; //without the DASH symbol
+    NSString * basicFormattedAmount = [basicFormatter stringFromNumber:epsilonNumber]; //without the DASH symbol
     NSUInteger digitLocationNewBasicFormatted = [basicFormattedAmount rangeOfString:basicFormatter.currencyDecimalSeparator].location;
     basicFormatter.maximumFractionDigits--;
     NSUInteger digits = 0;
@@ -485,20 +504,19 @@ replacementString:(NSString *)string
     
     //special cases
     if (! string.length) { // delete trailing char
-        if (![number floatValue] && digitLocationNew == NSNotFound) { // there is no decimal
+        if (![number floatValue] && (!formattedAmount || digitLocationNew == NSNotFound)) { // there is no decimal
             self.amountFieldIsEmpty = TRUE;
             formattedAmount = [formatter stringFromNumber:@0];
         }
     }
     else if (digits > formatter.maximumFractionDigits) { //can't send too small a value
         return; // too many digits
+    } else if (currentNumber && ![currentNumber floatValue] && inputNumber && ![inputNumber floatValue] && digitLocationNew && ([[formattedAmount componentsSeparatedByString:@"0"] count] > formatter.maximumFractionDigits + 2)) { //current number is 0, inputing a 0
+        return;
     }
-    else if ([string isEqualToString:formatter.currencyDecimalSeparator]) {  //adding a digit
+    else if (!self.amountFieldIsEmpty && [string isEqualToString:formatter.currencyDecimalSeparator]) {  //adding a digit
         if (digitLocationOld != NSNotFound) {
             return;
-        }
-        if (![number integerValue]) {formattedAmount = [formatter stringFromNumber:@0]; // if first char is '.', prepend a zero
-        formattedAmount = [formattedAmount stringByReplacingCharactersInRange:NSMakeRange(formattedAmount.length, 0) withString:formatter.currencyDecimalSeparator];
         }
         self.amountFieldIsEmpty = FALSE;
     } else {
