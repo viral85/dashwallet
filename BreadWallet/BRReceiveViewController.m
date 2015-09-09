@@ -80,7 +80,7 @@
     if (! groupDefs) groupDefs = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_ID];
     
     if (req.amount > 0) {
-        NSMutableAttributedString * attributedString = [[m attributedDashStringForAmount:req.amount] mutableCopy];
+        NSMutableAttributedString * attributedString = [[m attributedDashStringForAmount:req.amount withTintColor:self.label.textColor dashSymbolSize:CGSizeMake(12, 12)] mutableCopy];
         [attributedString appendAttributedString:[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)",[m localCurrencyStringForDashAmount:req.amount]]]];
         self.label.attributedText = attributedString;
     }
