@@ -1138,11 +1138,11 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (int64_t)amountForDashString:(NSString *)string
 {
     if (! string.length) return 0;
-    if ([string characterAtIndex:0] == NSAttachmentCharacter) {
-        string = [NSString stringWithFormat:@"%@%@",DASH,[string substringFromIndex:1]];
+    NSInteger dashCharPos = [string indexOfCharacter:NSAttachmentCharacter];
+    if (dashCharPos != NSNotFound) {
+        string = [string stringByReplacingCharactersInRange:NSMakeRange(dashCharPos, 1) withString:DASH];
     }
-    string = [[string stringByReplacingOccurrencesOfString:DASH withString:@""] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    return [[[NSDecimalNumber decimalNumberWithString:string]
+    return [[[NSDecimalNumber decimalNumberWithDecimal:[[self.dashFormat numberFromString:string] decimalValue]]
              decimalNumberByMultiplyingByPowerOf10:self.dashFormat.maximumFractionDigits] longLongValue];
 }
 
