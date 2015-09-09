@@ -206,13 +206,17 @@ static const char *dns_seeds[] = {
             
             if (_peers.count < PEER_MAX_CONNECTIONS ||
                 [(BRPeer *)_peers[PEER_MAX_CONNECTIONS - 1] timestamp] < now - 3*24*60*60) {
+                NSMutableArray *peers = [NSMutableArray array];
                 
-                struct addrinfo hints = { 0, AF_UNSPEC, SOCK_STREAM, 0, 0, 0, NULL, NULL }, *servinfo, *p;
-                NSString *servname = [@(DASH_STANDARD_PORT) stringValue];
+                for (int i = 0; i < sizeof(dns_seeds)/sizeof(*dns_seeds); i++) [peers addObject:[NSMutableArray array]];
                 
-                for (int i = 0; i < sizeof(dns_seeds)/sizeof(*dns_seeds); i++) { // DNS peer discovery
+                dispatch_apply(peers.count, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(size_t i) {
+                                    NSString *servname = [@(DASH_STANDARD_PORT) stringValue];
+                                    struct addrinfo hints = { 0, AF_UNSPEC, SOCK_STREAM, 0, 0, 0, NULL, NULL }, *servinfo, *p;
+                
+
                     NSLog(@"DNS lookup %s", dns_seeds[i]);
-                    if (getaddrinfo(dns_seeds[i], [servname UTF8String], &hints, &servinfo) != 0) continue;
+                    if (getaddrinfo(dns_seeds[i], [servname UTF8String], &hints, &servinfo) != 0) return;
                     
                     for (p = servinfo; p != NULL; p = p->ai_next) {
                         if (p->ai_addr->sa_family != AF_INET) continue;
@@ -222,12 +226,14 @@ static const char *dns_seeds[] = {
                         
                         // give dns peers a timestamp between 3 and 7 days ago
                         
-                        [_peers addObject:[[BRPeer alloc] initWithAddress:addr port:port
-                                                                timestamp:now - (3*24*60*60 + arc4random_uniform(4*24*60*60)) services:SERVICES_NODE_NETWORK]];
+                        [peers[i] addObject:[[BRPeer alloc] initWithAddress:addr port:port
+                                                                  timestamp:now - (3*24*60*60 + arc4random_uniform(4*24*60*60)) services:SERVICES_NODE_NETWORK]];
                     }
-                    
                     freeaddrinfo(servinfo);
-                }
+                });
+                
+                for (NSArray *a in peers) [_peers addObjectsFromArray:a];
+                
                 
 #if DASH_TESTNET
                 [self sortPeers];
