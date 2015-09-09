@@ -48,7 +48,7 @@
 #define BITFINEX_TICKER_URL  @"https://api.bitfinex.com/v1/pubticker/drkbtc"
 
 #define SEED_ENTROPY_LENGTH    (128/8)
-#define SEC_ATTR_SERVICE       @"org.dash.dashwallet"
+#define SEC_ATTR_SERVICE       @"com.darkcoinfoundation.dashwallet"
 #define DEFAULT_CURRENCY_PRICE 3.0
 #define DEFAULT_CURRENCY_CODE  @"USD"
 #define DEFAULT_SPENT_LIMIT    DUFFS
