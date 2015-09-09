@@ -86,7 +86,7 @@
         if ([s isValidBitcoinAddress]) {
             url = [NSURL URLWithString:[NSString stringWithFormat:@"bitcoin://%@", s]];
             self.type = @"bitcoin";
-        } else {
+        } else if ([s isValidDigitalCashAddress]) {
             url = [NSURL URLWithString:[NSString stringWithFormat:@"dash://%@", s]];
             self.type = @"dash";
         }
@@ -98,6 +98,7 @@
     
     self.paymentAddress = url.host;
     
+    if ([url.scheme isEqualToString:@"dash"] || [url.scheme isEqualToString:@"bitcoin"])
     //TODO: correctly handle unknown but required url arguments (by reporting the request invalid)
     for (NSString *arg in [url.query componentsSeparatedByString:@"&"]) {
         NSArray *pair = [arg componentsSeparatedByString:@"="]; // if more than one '=', then pair[1] != value
@@ -120,6 +121,7 @@
         }
         else if ([pair[0] isEqual:@"r"]) self.r = value;
     }
+    else if (url) self.r = s; // BIP73 url: https://github.com/bitcoin/bips/blob/master/bip-0073.mediawiki
 }
 
 - (NSString *)string
@@ -183,9 +185,9 @@
 - (BOOL)isValid
 {
     if ([self.type isEqualToString:@"dash"]) {
-        if (![self.paymentAddress isValidDigitalCashAddress] && (! self.r || ! [NSURL URLWithString:self.r])) return NO;
+        return ([self.paymentAddress isValidDigitalCashAddress] || (self.r && [NSURL URLWithString:self.r])) ? YES : NO;
     } else if ([self.type isEqualToString:@"bitcoin"]) {
-        if (![self.paymentAddress isValidBitcoinAddress] && (! self.r || ! [NSURL URLWithString:self.r])) return NO;
+        return ([self.paymentAddress isValidBitcoinAddress] || (self.r && [NSURL URLWithString:self.r])) ? YES : NO;
     } else {
         return NO;
     }
