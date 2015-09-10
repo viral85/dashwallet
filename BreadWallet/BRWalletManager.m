@@ -38,8 +38,8 @@
 #import "Reachability.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 
-#define CIRCLE @"\xE2\x97\x8C" // dotted circle (utf-8)
-#define DOT    @"\xE2\x97\x8F" // black circle (utf-8)
+#define CIRCLE  @"\xE2\x97\x8C" // dotted circle (utf-8)
+#define DOT     @"\xE2\x97\x8F" // black circle (utf-8)
 
 #define UNSPENT_URL    @"https://api.chain.com/v2/%@/addresses/%@/unspents?api-key-id=eed0d7697a880144bb854676f88d123f"
 #define TICKER_URL     @"https://bitpay.com/rates"
@@ -73,8 +73,8 @@ static BOOL setKeychainData(NSData *data, NSString *key, BOOL authenticated)
 {
     if (! key) return NO;
 
-    id accessible = (authenticated) ? (__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly :
-                    (__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly;
+    id accessible = (authenticated) ? (__bridge id)kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+                                    : (__bridge id)kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly;
     NSDictionary *query = @{(__bridge id)kSecClass:(__bridge id)kSecClassGenericPassword,
                             (__bridge id)kSecAttrService:SEC_ATTR_SERVICE,
                             (__bridge id)kSecAttrAccount:key};
@@ -82,7 +82,7 @@ static BOOL setKeychainData(NSData *data, NSString *key, BOOL authenticated)
     if (SecItemCopyMatching((__bridge CFDictionaryRef)query, NULL) == errSecItemNotFound) {
         if (! data) return YES;
 
-        NSDictionary *item = @{(__bridge id)kSecClass:(__bridge id)kSecClassGenericPassword,
+        NSDictionary *item = @{(__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
                                (__bridge id)kSecAttrService:SEC_ATTR_SERVICE,
                                (__bridge id)kSecAttrAccount:key,
                                (__bridge id)kSecAttrAccessible:accessible,
@@ -177,6 +177,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 @property (nonatomic, strong) void (^sweepCompletion)(BRTransaction *tx, uint64_t fee, NSError *error);
 @property (nonatomic, strong) UIAlertView *alertView;
 @property (nonatomic, strong) UITextField *pinField;
+@property (nonatomic, strong) NSString *currentPin;
 @property (nonatomic, strong) NSMutableSet *failedPins;
 @property (nonatomic, strong) id protectedObserver;
 
@@ -496,6 +497,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     _pinField.keyboardType = UIKeyboardTypeNumberPad;
     _pinField.secureTextEntry = YES;
     _pinField.delegate = self;
+    self.currentPin = nil;
     return _pinField;
 }
 
@@ -556,20 +558,20 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     self.pinField = nil; // reset pinField so a new one is created
     [self.alertView setValue:self.pinField forKey:@"accessoryView"];
     [self.alertView show];
-    [self.pinField becomeFirstResponder];
+    //[self.pinField becomeFirstResponder]; // this causes pin dialog to jump around in iOS 9 beta
     
     for (;;) {
-        while ((! self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
+        while ((! self.didPresent || self.alertView.visible) && self.currentPin.length < 4) {
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
         
         if (! self.alertView.visible) break; // user canceled
         
         // count unique attempts before checking success
-        if (! [self.failedPins containsObject:self.pinField.text]) setKeychainInt(++failCount, PIN_FAIL_COUNT_KEY, NO);
+        if (! [self.failedPins containsObject:self.currentPin]) setKeychainInt(++failCount, PIN_FAIL_COUNT_KEY, NO);
 
-        if ([self.pinField.text isEqual:pin]) { // successful pin attempt
-            self.pinField.text = nil;
+        if ([self.currentPin isEqual:pin]) { // successful pin attempt
+            self.pinField.text = self.currentPin = nil;
             [self.failedPins removeAllObjects];
             self.didAuthenticate = YES;
 
@@ -582,8 +584,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             return YES;
         }
 
-        if (! [self.failedPins containsObject:self.pinField.text]) {
-            [self.failedPins addObject:self.pinField.text];
+        if (! [self.failedPins containsObject:self.currentPin]) {
+            [self.failedPins addObject:self.currentPin];
         
             if (failCount >= 8) { // wipe wallet after 8 failed pin attempts and 24+ hours of lockout
                 self.seedPhrase = nil;
@@ -602,7 +604,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
             if (failCount >= 3) return [self authenticatePinWithTitle:title message:message]; // wallet disabled
         }
         
-        self.pinField.text = nil;
+        self.pinField.text = self.currentPin = nil;
         
         // walking the view hierarchy is prone to breaking, but it's still functional even if the animation doesn't work
         UIView *v = self.pinField.superview.superview.superview;
@@ -658,13 +660,13 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     }
     
     for (;;) {
-        while ((! self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
+        while ((! self.didPresent || self.alertView.visible) && self.currentPin.length < 4) {
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
     
         if (! self.alertView.visible) break;
-        pin = self.pinField.text;
-        self.pinField.text = nil;
+        pin = self.currentPin;
+        self.pinField.text = self.currentPin = nil;
         
         UIView *v = self.pinField.superview.superview.superview;
         CGPoint p = v.center;
@@ -680,21 +682,21 @@ static NSString *getKeychainString(NSString *key, NSError **error)
              animations:^{ v.center = p; } completion:nil];
         }];
 
-        while (self.alertView.visible && self.pinField.text.length < 4) {
+        while (self.alertView.visible && self.currentPin.length < 4) {
             [[NSRunLoop mainRunLoop] limitDateForMode:NSDefaultRunLoopMode];
         }
 
         if (! self.alertView.visible) break;
     
-        if ([self.pinField.text isEqual:pin]) {
-            self.pinField.text = nil;
+        if ([self.currentPin isEqual:pin]) {
+            self.pinField.text = self.currentPin = nil;
             setKeychainString(pin, PIN_KEY, NO);
             [self.alertView dismissWithClickedButtonIndex:self.alertView.cancelButtonIndex animated:YES];
             [self hideKeyboard];
             return YES;
         }
         
-        self.pinField.text = nil;
+        self.pinField.text = self.currentPin = nil;
         
         [UIView animateWithDuration:0.05 delay:0.1 options:UIViewAnimationOptionCurveEaseInOut animations:^{ // shake
             v.center = CGPointMake(p.x + 30.0, p.y);
@@ -1090,7 +1092,9 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range
 replacementString:(NSString *)string
 {
-    NSUInteger l = textField.text.length + string.length - range.length;
+    self.currentPin = [textField.text stringByReplacingCharactersInRange:range withString:string];
+
+    NSUInteger l = self.currentPin.length;
 
     self.alertView.title = [NSString stringWithFormat:@"%@\t%@\t%@\t%@%@", (l > 0 ? DOT : CIRCLE),
                             (l > 1 ? DOT : CIRCLE), (l > 2 ? DOT : CIRCLE), (l > 3 ? DOT : CIRCLE),
@@ -1112,10 +1116,12 @@ replacementString:(NSString *)string
 {
     @autoreleasepool { // @autoreleasepool ensures sensitive data will be dealocated immediately
         if ([textView.text rangeOfString:@"\n"].location != NSNotFound) {
-            NSString *phrase = [self.mnemonic normalizePhrase:textView.text];
+            NSString *phrase = [self.mnemonic cleanupPhrase:textView.text];
             
-            if (! [[self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:phrase
-                                                           withPassphrase:nil]] isEqual:self.masterPublicKey]) {
+            if (! [phrase isEqual:textView.text]) textView.text = phrase;
+            
+            if (! [[self.sequence masterPublicKeyFromSeed:[self.mnemonic deriveKeyFromPhrase:[self.mnemonic
+                   normalizePhrase:phrase] withPassphrase:nil]] isEqual:self.masterPublicKey]) {
                 self.alertView.title = NSLocalizedString(@"recovery phrase doesn't match", nil);
                 [self.alertView performSelector:@selector(setTitle:)
                  withObject:NSLocalizedString(@"recovery phrase", nil) afterDelay:3.0];
@@ -1144,7 +1150,7 @@ replacementString:(NSString *)string
 - (void)didPresentAlertView:(UIAlertView *)alertView
 {
     self.didPresent = YES;
-    if (_pinField && ! _pinField.isFirstResponder) [_pinField becomeFirstResponder]; // fix for iOS 7 missing keyboard
+    if (_pinField && ! _pinField.isFirstResponder) [_pinField becomeFirstResponder];
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
