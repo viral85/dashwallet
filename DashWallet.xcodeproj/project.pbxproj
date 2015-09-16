@@ -134,7 +134,6 @@
 		FBE689DF1AC07C1800467F4C /* NSData+Skein.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DE1AC07C1800467F4C /* NSData+Skein.m */; };
 		FBE689E01AC07C1800467F4C /* NSData+Skein.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE689DE1AC07C1800467F4C /* NSData+Skein.m */; };
 		FBFB9AFC1AE804FF008D2249 /* DCMasternode.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9AFB1AE804FF008D2249 /* DCMasternode.m */; };
-		FBFB9AFF1AE8085F008D2249 /* DCDataStream.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9AFE1AE8085F008D2249 /* DCDataStream.m */; };
 		FBFB9B021AEBADA1008D2249 /* NSString+DCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = FBFB9B011AEBADA1008D2249 /* NSString+DCAdditions.m */; };
 /* End PBXBuildFile section */
 
@@ -411,24 +410,14 @@
 		FB3952521B9190520013BA41 /* UIImage+Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Utility.h"; sourceTree = "<group>"; };
 		FB3952531B9190520013BA41 /* UIImage+Utility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Utility.m"; sourceTree = "<group>"; };
 		FB39525B1B9268070013BA41 /* dashwallet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = dashwallet.entitlements; sourceTree = "<group>"; };
-		FB6C29B91AE3785600CEB807 /* darksend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = darksend.cpp; sourceTree = "<group>"; };
-		FB6C29BA1AE3785600CEB807 /* darksend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = darksend.h; sourceTree = "<group>"; };
-		FB6C29BD1AE7FCE500CEB807 /* DCDarksendPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendPool.h; sourceTree = "<group>"; };
-		FB6C29BE1AE7FCE500CEB807 /* DCDarksendPool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendPool.m; sourceTree = "<group>"; };
 		FB6C29C11AE7FFAE00CEB807 /* DCDarksendTransaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendTransaction.h; sourceTree = "<group>"; };
 		FB6C29C21AE7FFAE00CEB807 /* DCDarksendTransaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendTransaction.m; sourceTree = "<group>"; };
-		FB6C29C51AE8004C00CEB807 /* DCDarksendService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendService.h; sourceTree = "<group>"; };
-		FB6C29C61AE8004C00CEB807 /* DCDarksendService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendService.m; sourceTree = "<group>"; };
-		FB6C29C91AE801D100CEB807 /* DCDarksendScript.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendScript.h; sourceTree = "<group>"; };
-		FB6C29CA1AE801D100CEB807 /* DCDarksendScript.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendScript.m; sourceTree = "<group>"; };
 		FB84DDF91AC80E5400A80499 /* Log.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
 		FBACD6191B9E189B00FB04A4 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FBACD61A1B9E189B00FB04A4 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FBACD61B1B9E189B00FB04A4 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Main.strings; sourceTree = "<group>"; };
 		FBACD61C1B9E189B00FB04A4 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FBBFEF631ABD796000CA937F /* aes_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes_helper.c; sourceTree = "<group>"; };
-		FBC731631AEE74AF001355A4 /* DCDarksendQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendQueue.h; sourceTree = "<group>"; };
-		FBC731641AEE74AF001355A4 /* DCDarksendQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendQueue.m; sourceTree = "<group>"; };
 		FBCFA6BA1B820C3C00831F99 /* DashWallet.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DashWallet.xcdatamodel; sourceTree = "<group>"; };
 		FBCFA6BC1B8210E800831F99 /* Shapeshift.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Shapeshift.png; sourceTree = "<group>"; };
 		FBCFA6C01B82158600831F99 /* FBShimmering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FBShimmering.h; sourceTree = "<group>"; };
@@ -470,12 +459,8 @@
 		FBE689DA1AC07BFF00467F4C /* NSData+Simd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Simd.m"; sourceTree = "<group>"; };
 		FBE689DD1AC07C1800467F4C /* NSData+Skein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Skein.h"; sourceTree = "<group>"; };
 		FBE689DE1AC07C1800467F4C /* NSData+Skein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Skein.m"; sourceTree = "<group>"; };
-		FBFB9AF61AE80473008D2249 /* DCDarksendTxIn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDarksendTxIn.h; sourceTree = "<group>"; };
-		FBFB9AF71AE80473008D2249 /* DCDarksendTxIn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDarksendTxIn.m; sourceTree = "<group>"; };
 		FBFB9AFA1AE804FF008D2249 /* DCMasternode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCMasternode.h; sourceTree = "<group>"; };
 		FBFB9AFB1AE804FF008D2249 /* DCMasternode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCMasternode.m; sourceTree = "<group>"; };
-		FBFB9AFD1AE8085F008D2249 /* DCDataStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCDataStream.h; sourceTree = "<group>"; };
-		FBFB9AFE1AE8085F008D2249 /* DCDataStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCDataStream.m; sourceTree = "<group>"; };
 		FBFB9B001AEBADA1008D2249 /* NSString+DCAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+DCAdditions.h"; sourceTree = "<group>"; };
 		FBFB9B011AEBADA1008D2249 /* NSString+DCAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+DCAdditions.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -878,20 +863,8 @@
 		FB6C29B41AE36FC000CEB807 /* Darksend */ = {
 			isa = PBXGroup;
 			children = (
-				FB6C29B91AE3785600CEB807 /* darksend.cpp */,
-				FB6C29BA1AE3785600CEB807 /* darksend.h */,
-				FB6C29BD1AE7FCE500CEB807 /* DCDarksendPool.h */,
-				FB6C29BE1AE7FCE500CEB807 /* DCDarksendPool.m */,
 				FB6C29C11AE7FFAE00CEB807 /* DCDarksendTransaction.h */,
 				FB6C29C21AE7FFAE00CEB807 /* DCDarksendTransaction.m */,
-				FB6C29C51AE8004C00CEB807 /* DCDarksendService.h */,
-				FB6C29C61AE8004C00CEB807 /* DCDarksendService.m */,
-				FB6C29C91AE801D100CEB807 /* DCDarksendScript.h */,
-				FB6C29CA1AE801D100CEB807 /* DCDarksendScript.m */,
-				FBFB9AF61AE80473008D2249 /* DCDarksendTxIn.h */,
-				FBFB9AF71AE80473008D2249 /* DCDarksendTxIn.m */,
-				FBC731631AEE74AF001355A4 /* DCDarksendQueue.h */,
-				FBC731641AEE74AF001355A4 /* DCDarksendQueue.m */,
 			);
 			name = Darksend;
 			sourceTree = "<group>";
@@ -963,8 +936,6 @@
 			children = (
 				FBFB9AFA1AE804FF008D2249 /* DCMasternode.h */,
 				FBFB9AFB1AE804FF008D2249 /* DCMasternode.m */,
-				FBFB9AFD1AE8085F008D2249 /* DCDataStream.h */,
-				FBFB9AFE1AE8085F008D2249 /* DCDataStream.m */,
 			);
 			name = Masternodes;
 			sourceTree = "<group>";
@@ -1241,7 +1212,6 @@
 				759FBB37193290F600AB4465 /* BRSendViewController.m in Sources */,
 				FBE689C31ABF9A1B00467F4C /* NSData+Echo.m in Sources */,
 				752E28F119234E8100DB5A3C /* Reachability.m in Sources */,
-				FBFB9AFF1AE8085F008D2249 /* DCDataStream.m in Sources */,
 				75D5F3CE191EC270004AB296 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
