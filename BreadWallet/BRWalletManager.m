@@ -870,7 +870,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
-                                   NSLog(@"connectionError %@ (status %d)", connectionError,((NSHTTPURLResponse*)response).statusCode);
+                                   NSLog(@"connectionError %@ (status %ld)", connectionError,(long)((NSHTTPURLResponse*)response).statusCode);
                                    return;
                                }
                                NSError *error = nil;
@@ -1260,7 +1260,7 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (NSString *)localCurrencyStringForDashAmount:(int64_t)amount
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
-
+    if (!self.localCurrencyBitcoinPrice || !self.bitcoinDashPrice) return NSLocalizedString(@"Updating Price",@"Updating Price");
 
     NSNumber * local = [NSNumber numberWithDouble:self.localCurrencyBitcoinPrice*self.bitcoinDashPrice];
 
