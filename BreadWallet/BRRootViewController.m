@@ -743,11 +743,19 @@
     }
 
     UINavigationBar *b = self.navigationController.navigationBar;
-    NSString *tip = (self.percent.hidden) ? [NSString stringWithFormat:@"%@ \n 1%@ = %@%@ (%@)",BALANCE_TIP_START,DASH,@(m.bitcoinDashPrice),BTC,[m localCurrencyStringForDashAmount:DUFFS]] :
-                    [NSString stringWithFormat:NSLocalizedString(@"block #%d of %d", nil),
-                     [[BRPeerManager sharedInstance] lastBlockHeight],
-                     [[BRPeerManager sharedInstance] estimatedBlockHeight]];
-
+    NSString *tip;
+    if (m.bitcoinDashPrice) {
+        tip = (self.percent.hidden) ? [NSString stringWithFormat:@"%@ \n 1%@ = %@%@ (%@)",BALANCE_TIP_START,DASH,@(m.bitcoinDashPrice),BTC,[m localCurrencyStringForDashAmount:DUFFS]] :
+        [NSString stringWithFormat:NSLocalizedString(@"block #%d of %d", nil),
+         [[BRPeerManager sharedInstance] lastBlockHeight],
+         [[BRPeerManager sharedInstance] estimatedBlockHeight]];
+    } else {
+        tip = (self.percent.hidden) ? [NSString stringWithFormat:@"%@",BALANCE_TIP_START]:
+        [NSString stringWithFormat:NSLocalizedString(@"block #%d of %d", nil),
+         [[BRPeerManager sharedInstance] lastBlockHeight],
+         [[BRPeerManager sharedInstance] estimatedBlockHeight]];
+    }
+    
     self.tipView = [BRBubbleView viewWithAttributedText:[tip attributedStringForDashSymbolWithTintColor:[UIColor whiteColor] dashSymbolSize:CGSizeMake(13, 11)]
                     tipPoint:CGPointMake(b.center.x, b.frame.origin.y + b.frame.size.height - 10)
                     tipDirection:BRBubbleTipDirectionUp];

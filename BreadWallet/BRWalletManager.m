@@ -616,7 +616,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     self.pinField = nil; // reset pinField so a new one is created
     [self.alertView setValue:self.pinField forKey:@"accessoryView"];
     [self.alertView show];
-    [self.pinField becomeFirstResponder];
+    //[self.pinField becomeFirstResponder];
     
     for (;;) {
         while ((! self.didPresent || self.alertView.visible) && self.pinField.text.length < 4) {
