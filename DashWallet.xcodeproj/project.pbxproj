@@ -1469,6 +1469,7 @@
 					"$(SRCROOT)",
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallettest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WARNING_CFLAGS = "-Wno-gnu";
@@ -1598,6 +1599,7 @@
 					"$(SRCROOT)",
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallettest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WARNING_CFLAGS = "-Wno-gnu";
@@ -1625,6 +1627,7 @@
 					"$(SRCROOT)",
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallettest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "99e0c0fc-72e4-4b33-bf81-2a2713acbf61";
 				WARNING_CFLAGS = "-Wno-gnu";
