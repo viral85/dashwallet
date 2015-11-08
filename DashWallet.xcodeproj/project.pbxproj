@@ -91,7 +91,6 @@
 		FB00F6AF1B5AE2AA0061C2FB /* StockSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */; };
 		FB00F6B01B5AE2AA0061C2FB /* StockSeries.m in Sources */ = {isa = PBXBuildFile; fileRef = FB00F69A1B5AE2AA0061C2FB /* StockSeries.m */; };
 		FB3952371B918EEF0013BA41 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB3952361B918EEF0013BA41 /* NotificationCenter.framework */; };
-		FB3952421B918EEF0013BA41 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = FB3952351B918EEF0013BA41 /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		FB39524B1B918F2C0013BA41 /* BRTodayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB3952491B918F2C0013BA41 /* BRTodayViewController.m */; };
 		FB39524C1B918F2C0013BA41 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FB39524A1B918F2C0013BA41 /* MainInterface.storyboard */; };
 		FB39524F1B918F4F0013BA41 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FB39524D1B918F4F0013BA41 /* Media.xcassets */; };
@@ -152,28 +151,7 @@
 			remoteGlobalIDString = 75D5F3BD191EC270004AB296;
 			remoteInfo = BreadWallet;
 		};
-		FB3952401B918EEF0013BA41 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 75D5F3B6191EC270004AB296 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = FB3952341B918EEF0013BA41;
-			remoteInfo = TodayExtension;
-		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		FB3952471B918EEF0013BA41 /* Embed App Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				FB3952421B918EEF0013BA41 /* TodayExtension.appex in Embed App Extensions */,
-			);
-			name = "Embed App Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		7509C10C1AF3076000D03FD5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
@@ -967,13 +945,11 @@
 				75D5F3BA191EC270004AB296 /* Sources */,
 				75D5F3BB191EC270004AB296 /* Frameworks */,
 				75D5F3BC191EC270004AB296 /* Resources */,
-				FB3952471B918EEF0013BA41 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				757FC2531ADA30D100A1FDF7 /* PBXTargetDependency */,
-				FB3952411B918EEF0013BA41 /* PBXTargetDependency */,
 			);
 			name = dashwallet;
 			productName = BreadWallet;
@@ -1032,13 +1008,13 @@
 						DevelopmentTeam = 44RJ69WHFF;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
-								enabled = 1;
+								enabled = 0;
 							};
 							com.apple.BackgroundModes = {
 								enabled = 1;
 							};
 							com.apple.DataProtection = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -1050,7 +1026,7 @@
 						DevelopmentTeam = 44RJ69WHFF;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
@@ -1271,11 +1247,6 @@
 			isa = PBXTargetDependency;
 			target = 75D5F3BD191EC270004AB296 /* dashwallet */;
 			targetProxy = 75D5F3EA191EC270004AB296 /* PBXContainerItemProxy */;
-		};
-		FB3952411B918EEF0013BA41 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = FB3952341B918EEF0013BA41 /* TodayExtension */;
-			targetProxy = FB3952401B918EEF0013BA41 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1614,8 +1585,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = dashwallet.entitlements;
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1629,7 +1600,7 @@
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallettest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "99e0c0fc-72e4-4b33-bf81-2a2713acbf61";
+				PROVISIONING_PROFILE = "";
 				WARNING_CFLAGS = "-Wno-gnu";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1683,8 +1654,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = TodayExtension/TodayExtension.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -1710,8 +1680,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = TodayExtension/TodayExtension.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -1734,8 +1703,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = TodayExtension/TodayExtension.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
