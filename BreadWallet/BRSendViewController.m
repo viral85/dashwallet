@@ -65,7 +65,7 @@ static NSString *sanitizeString(NSString *s)
 
 @interface BRSendViewController ()
 
-@property (nonatomic, assign) BOOL clearClipboard, useClipboard, showTips, showBalance, canChangeAmount;
+@property (nonatomic, assign) BOOL clearClipboard, useClipboard, showTips, showBalance, canChangeAmount, sendInstantly;
 @property (nonatomic, strong) BRTransaction *sweepTx;
 @property (nonatomic, strong) BRPaymentProtocolRequest *request;
 @property (nonatomic, strong) NSURL *url;
@@ -146,6 +146,7 @@ static NSString *sanitizeString(NSString *s)
             [self startObservingShapeshift:shapeshift];
         }
     }
+    self.sendInstantly = TRUE;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -464,22 +465,22 @@ static NSString *sanitizeString(NSString *s)
             
             if (shapeshift) {
                 tx = [m.wallet transactionForAmounts:protoReq.details.outputAmounts
-                                     toOutputScripts:protoReq.details.outputScripts withFee:YES toShapeshiftAddress:shapeshift.withdrawalAddress];
+                                     toOutputScripts:protoReq.details.outputScripts withFee:YES isInstant:NO toShapeshiftAddress:shapeshift.withdrawalAddress];
                 tx.associatedShapeshift = shapeshift;
             } else {
                 tx = [m.wallet transactionForAmounts:protoReq.details.outputAmounts
-                                     toOutputScripts:protoReq.details.outputScripts withFee:YES];
+                                     toOutputScripts:protoReq.details.outputScripts withFee:YES isInstant:self.sendInstantly toShapeshiftAddress:nil];
             }
         }
         else {
             
             if (shapeshift) {
                 tx = [m.wallet transactionForAmounts:@[@(self.amount)]
-                                     toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES toShapeshiftAddress:shapeshift.withdrawalAddress];
+                                     toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES isInstant:NO toShapeshiftAddress:shapeshift.withdrawalAddress];
                 tx.associatedShapeshift = shapeshift;
             } else {
                 tx = [m.wallet transactionForAmounts:@[@(self.amount)]
-                                     toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES];
+                                     toOutputScripts:@[protoReq.details.outputScripts.firstObject] withFee:YES isInstant:self.sendInstantly toShapeshiftAddress:nil];
             }
         }
         
@@ -488,7 +489,7 @@ static NSString *sanitizeString(NSString *s)
             fee = [m.wallet feeForTransaction:tx];
         }
         else {
-            fee = [m.wallet feeForTxSize:[m.wallet transactionFor:m.wallet.balance to:address withFee:NO].size];
+            fee = [m.wallet feeForTxSize:[m.wallet transactionFor:m.wallet.balance to:address withFee:NO].size isInstant:self.sendInstantly];
             amount += fee;
         }
         
@@ -575,8 +576,9 @@ static NSString *sanitizeString(NSString *s)
             // balance, offer to reduce the amount to available funds minus fee
             if ((self.amount <= [m amountForLocalCurrencyString:[m localCurrencyStringForDashAmount:m.wallet.balance]] ||
                  self.amount <= m.wallet.balance) && self.amount > 0) {
+                //todo sendinstantly should be in the protocol request
                 NSUInteger txSize = [m.wallet transactionForAmounts:@[@(m.wallet.balance)]
-                                                    toOutputScripts:@[self.request.details.outputScripts.firstObject] withFee:NO].size,
+                                                    toOutputScripts:@[self.request.details.outputScripts.firstObject] withFee:NO isInstant:self.sendInstantly].size,
                 cpfpSize = 0;
                 
                 for (tx in m.wallet.recentTransactions) { // add up size of unconfirmed inputs for child-pays-for-parent
@@ -917,6 +919,10 @@ static NSString *sanitizeString(NSString *s)
     self.tipView.backgroundColor = [UIColor lightGrayColor];
     self.tipView.font = [UIFont fontWithName:@"HelveticaNeue" size:15.0];
     [self.view addSubview:[self.tipView popIn]];
+}
+
+- (IBAction)enableInstantX:(id)sender {
+    self.sendInstantly = ((UISwitch*)sender).isOn;
 }
 
 - (IBAction)scanQR:(id)sender

@@ -45,6 +45,7 @@
 #define UNSPENT_URL @"https://api.chain.com/v2/%@/addresses/%@/unspents?api-key-id=eed0d7697a880144bb854676f88d123f"
 #define BITCOIN_TICKER_URL  @"https://bitpay.com/rates"
 #define CRYPTSY_TICKER_URL  @"http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=155"
+#define POLONIEX_TICKER_URL  @"https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_DASH&depth=1"
 #define BITFINEX_TICKER_URL  @"https://api.bitfinex.com/v1/pubticker/drkbtc"
 
 #define SEED_ENTROPY_LENGTH    (128/8)
@@ -62,6 +63,8 @@
 #define CURRENCY_PRICES_KEY         @"CURRENCY_PRICES"
 #define CRYPTSY_DASH_BTC_PRICE_KEY  @"CRYPTSY_DASH_BTC_PRICE"
 #define CRYPTSY_DASH_BTC_UPDATE_TIME_KEY  @"CRYPTSY_DASH_BTC_UPDATE_TIME"
+#define POLONIEX_DASH_BTC_PRICE_KEY  @"POLONIEX_DASH_BTC_PRICE"
+#define POLONIEX_DASH_BTC_UPDATE_TIME_KEY  @"POLONIEX_DASH_BTC_UPDATE_TIME"
 #define SPEND_LIMIT_AMOUNT_KEY      @"SPEND_LIMIT_AMOUNT"
 #define SECURE_TIME_KEY             @"SECURE_TIME"
 #define FEE_PER_KB_KEY              @"FEE_PER_KB"
@@ -838,8 +841,8 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     if (_bitcoinDashPrice == 0) {
         NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
         
-        double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
-        _bitcoinDashPrice = cryptsyPrice;
+        double poloniexPrice = [[defs objectForKey:POLONIEX_DASH_BTC_PRICE_KEY] doubleValue];
+        _bitcoinDashPrice = poloniexPrice;
         
     }
     return _bitcoinDashPrice;
@@ -847,7 +850,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 
 - (void)refreshBitcoinDashPrice{
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-    double cryptsyPrice = [[defs objectForKey:CRYPTSY_DASH_BTC_PRICE_KEY] doubleValue];
+    double cryptsyPrice = [[defs objectForKey:POLONIEX_DASH_BTC_PRICE_KEY] doubleValue];
     _bitcoinDashPrice = cryptsyPrice;
     if (! _wallet) return;
     
@@ -864,9 +867,10 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     [self performSelector:@selector(updateDashExchangeRate) withObject:nil afterDelay:60.0];
     if (self.reachability.currentReachabilityStatus == NotReachable) return;
     
-    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:CRYPTSY_TICKER_URL]
+
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:POLONIEX_TICKER_URL]
                                          cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
-    
+
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
                                if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
@@ -875,23 +879,60 @@ static NSString *getKeychainString(NSString *key, NSError **error)
                                }
                                NSError *error = nil;
                                NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-                               NSString * lastTradePriceString = [[[[json objectForKey:@"return"] objectForKey:@"markets"] objectForKey:@"DRK"] objectForKey:@"lasttradeprice"];
-                               if (lastTradePriceString) {
+                               NSArray * asks = [json objectForKey:@"asks"];
+                               NSArray * bids = [json objectForKey:@"bids"];
+                               if ([asks count] && [bids count] && [[asks objectAtIndex:0] count] && [[bids objectAtIndex:0] count]) {
+                               NSString * lastTradePriceStringAsks = [[asks objectAtIndex:0] objectAtIndex:0];
+                               NSString * lastTradePriceStringBids = [[bids objectAtIndex:0] objectAtIndex:0];
+                               if (lastTradePriceStringAsks && lastTradePriceStringBids) {
                                    NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
                                    NSLocale *usa = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
                                    numberFormatter.locale = usa;
                                    numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
-                                   NSNumber *lastTradePriceNumber = [numberFormatter numberFromString:lastTradePriceString];
+                                   NSNumber *lastTradePriceNumberAsks = [numberFormatter numberFromString:lastTradePriceStringAsks];
+                                   NSNumber *lastTradePriceNumberBids = [numberFormatter numberFromString:lastTradePriceStringBids];
+                                   NSNumber * lastTradePriceNumber = @((lastTradePriceNumberAsks.floatValue + lastTradePriceNumberBids.floatValue) / 2);
                                    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
-                                   [defs setObject:lastTradePriceNumber forKey:CRYPTSY_DASH_BTC_PRICE_KEY];
-                                   [defs setObject:[NSDate date] forKey:CRYPTSY_DASH_BTC_UPDATE_TIME_KEY];
+                                   [defs setObject:lastTradePriceNumber forKey:POLONIEX_DASH_BTC_PRICE_KEY];
+                                   [defs setObject:[NSDate date] forKey:POLONIEX_DASH_BTC_UPDATE_TIME_KEY];
                                    [defs synchronize];
                                    [self refreshBitcoinDashPrice];
                                }
-                               NSLog(@"cryptsy exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
+                               }
+                               NSLog(@"poloniex exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
                                      [self dashStringForAmount:DUFFS]);
                            }
      ];
+
+//    
+//    NSURLRequest *cryptsyreq = [NSURLRequest requestWithURL:[NSURL URLWithString:CRYPTSY_TICKER_URL]
+//                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+//    
+//    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
+//                           completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+//                               if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+//                                   NSLog(@"connectionError %@ (status %ld)", connectionError,(long)((NSHTTPURLResponse*)response).statusCode);
+//                                   return;
+//                               }
+//                               NSError *error = nil;
+//                               NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+//                               NSString * lastTradePriceString = [[[[json objectForKey:@"return"] objectForKey:@"markets"] objectForKey:@"DRK"] objectForKey:@"lasttradeprice"];
+//                               if (lastTradePriceString) {
+//                                   NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+//                                   NSLocale *usa = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+//                                   numberFormatter.locale = usa;
+//                                   numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+//                                   NSNumber *lastTradePriceNumber = [numberFormatter numberFromString:lastTradePriceString];
+//                                   NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+//                                   [defs setObject:lastTradePriceNumber forKey:CRYPTSY_DASH_BTC_PRICE_KEY];
+//                                   [defs setObject:[NSDate date] forKey:CRYPTSY_DASH_BTC_UPDATE_TIME_KEY];
+//                                   [defs synchronize];
+//                                   [self refreshBitcoinDashPrice];
+//                               }
+//                               NSLog(@"cryptsy exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:DUFFS],
+//                                     [self dashStringForAmount:DUFFS]);
+//                           }
+//     ];
 //    NSURLRequest *reqBitfinex = [NSURLRequest requestWithURL:[NSURL URLWithString:BITFINEX_TICKER_URL]
 //                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
 //    
@@ -931,7 +972,7 @@ static NSString *getKeychainString(NSString *key, NSError **error)
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue currentQueue]
     completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
         if (connectionError) {
-            NSLog(@"connectionError %@ (status %d)", connectionError,((NSHTTPURLResponse*)response).statusCode);
+            NSLog(@"connectionError %@ (status %ld)", connectionError,(long)((NSHTTPURLResponse*)response).statusCode);
             return;
         }
 
