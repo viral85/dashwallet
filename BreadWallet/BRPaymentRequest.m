@@ -70,13 +70,14 @@
 
 - (void)setString:(NSString *)string
 {
+    self.scheme = nil;
     self.paymentAddress = nil;
     self.label = nil;
     self.message = nil;
     self.amount = 0;
     self.r = nil;
 
-    if (! string.length) return;
+    if (string.length == 0) return;
 
     NSString *s = [[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
                    stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
@@ -85,51 +86,55 @@
     if (! url || ! url.scheme) {
         if ([s isValidBitcoinAddress]) {
             url = [NSURL URLWithString:[NSString stringWithFormat:@"bitcoin://%@", s]];
-            self.type = @"bitcoin";
-        } else if ([s isValidDigitalCashAddress]) {
+        } else if ([s isValidDigitalCashAddress] || [s isValidDigitalCashPrivateKey]) {
             url = [NSURL URLWithString:[NSString stringWithFormat:@"dash://%@", s]];
-            self.type = @"dash";
         }
     }
     else if (! url.host && url.resourceSpecifier) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@", url.scheme, url.resourceSpecifier]];
-        self.type = url.scheme;
     }
     
-    self.paymentAddress = url.host;
+    self.scheme = url.scheme;
     
-    if ([url.scheme isEqualToString:@"dash"] || [url.scheme isEqualToString:@"bitcoin"])
-    //TODO: correctly handle unknown but required url arguments (by reporting the request invalid)
-    for (NSString *arg in [url.query componentsSeparatedByString:@"&"]) {
-        NSArray *pair = [arg componentsSeparatedByString:@"="]; // if more than one '=', then pair[1] != value
-
-        if (pair.count < 2) continue;
+    if ([url.scheme isEqual:@"dash"] || [url.scheme isEqual:@"bitcoin"]) {
+        self.paymentAddress = url.host;
+        //TODO: correctly handle unknown but required url arguments (by reporting the request invalid)
+        for (NSString *arg in [url.query componentsSeparatedByString:@"&"]) {
+            NSArray *pair = [arg componentsSeparatedByString:@"="]; // if more than one '=', then pair[1] != value
+            
+            if (pair.count < 2) continue;
+            
+            NSString *value = [[[arg substringFromIndex:[pair[0] length] + 1]
+                                stringByReplacingOccurrencesOfString:@"+" withString:@" "]
+                               stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            
+            if ([pair[0] isEqual:@"amount"]) {
+                self.amount = [[[NSDecimalNumber decimalNumberWithString:value] decimalNumberByMultiplyingByPowerOf10:8]
+                               unsignedLongLongValue];
+            }
+            else if ([pair[0] isEqual:@"label"]) {
+                self.label = value;
+            }
+            else if ([pair[0] isEqual:@"message"]) {
+                self.message = value;
+            }
+            else if ([pair[0] isEqual:@"r"]) self.r = value;
+        }
         
-        NSString *value = [[[arg substringFromIndex:[pair[0] length] + 1]
-                            stringByReplacingOccurrencesOfString:@"+" withString:@" "]
-                           stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-
-        if ([pair[0] isEqual:@"amount"]) {
-            self.amount = [[[NSDecimalNumber decimalNumberWithString:value] decimalNumberByMultiplyingByPowerOf10:8]
-                           unsignedLongLongValue];
-        }
-        else if ([pair[0] isEqual:@"label"]) {
-            self.label = value;
-        }
-        else if ([pair[0] isEqual:@"message"]) {
-            self.message = value;
-        }
-        else if ([pair[0] isEqual:@"r"]) self.r = value;
     }
     else if (url) self.r = s; // BIP73 url: https://github.com/bitcoin/bips/blob/master/bip-0073.mediawiki
 }
 
 - (NSString *)string
 {
-    if (! self.paymentAddress) return nil;
-
-    NSMutableString *s = [NSMutableString stringWithFormat:@"%@:%@",self.type, self.paymentAddress];
+    if (! [self.scheme isEqual:@"dash"] && ! [self.scheme isEqual:@"bitcoin"]) return self.r;
+    
+    NSMutableString *s = [NSMutableString stringWithFormat:@"%@:", self.scheme];
     NSMutableArray *q = [NSMutableArray array];
+    NSMutableCharacterSet *charset = [[NSCharacterSet URLQueryAllowedCharacterSet] mutableCopy];
+    
+    [charset removeCharactersInString:@"&="];
+    if (self.paymentAddress) [s appendString:self.paymentAddress];
     
     if (self.amount > 0) {
         [q addObject:[@"amount=" stringByAppendingString:[[(id)[NSDecimalNumber numberWithUnsignedLongLong:self.amount]
@@ -184,9 +189,9 @@
 
 - (BOOL)isValid
 {
-    if ([self.type isEqualToString:@"dash"]) {
+    if ([self.scheme isEqual:@"dash"]) {
         return ([self.paymentAddress isValidDigitalCashAddress] || (self.r && [NSURL URLWithString:self.r])) ? YES : NO;
-    } else if ([self.type isEqualToString:@"bitcoin"]) {
+    } else if ([self.scheme isEqual:@"bitcoin"]) {
         return ([self.paymentAddress isValidBitcoinAddress] || (self.r && [NSURL URLWithString:self.r])) ? YES : NO;
     } else {
         return NO;
@@ -224,7 +229,7 @@
 }
 
 // fetches the request over HTTP and calls completion block
-+ (void)fetch:(NSString *)url type:(NSString*)type timeout:(NSTimeInterval)timeout
++ (void)fetch:(NSString *)url scheme:(NSString*)scheme timeout:(NSTimeInterval)timeout
 completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
 {
     if (! completion) return;
@@ -235,7 +240,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
 
     [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
     
-    [req setValue:[NSString stringWithFormat:@"application/%@-paymentrequest",type] forHTTPHeaderField:@"Accept"];
+    [req setValue:[NSString stringWithFormat:@"application/%@-paymentrequest",scheme] forHTTPHeaderField:@"Accept"];
 //  [req addValue:@"text/uri-list" forHTTPHeaderField:@"Accept"]; // breaks some BIP72 implementations, notably bitpay's
 
     if (! req || ! [NSURLConnection canHandleRequest:req]) {
@@ -258,7 +263,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
         network = @"test";
 #endif
         
-        if ([response.MIMEType.lowercaseString isEqual:[NSString stringWithFormat:@"application/%@-paymentrequest",type]] && data.length <= 50000) {
+        if ([response.MIMEType.lowercaseString isEqual:[NSString stringWithFormat:@"application/%@-paymentrequest",scheme]] && data.length <= 50000) {
             req = [BRPaymentProtocolRequest requestWithData:data];
         }
         else if ([response.MIMEType.lowercaseString isEqual:@"text/uri-list"] && data.length <= 50000) {
@@ -286,7 +291,7 @@ completion:(void (^)(BRPaymentProtocolRequest *req, NSError *error))completion
     }];
 }
 
-+ (void)postPayment:(BRPaymentProtocolPayment *)payment type:(NSString*)type to:(NSString *)paymentURL timeout:(NSTimeInterval)timeout
++ (void)postPayment:(BRPaymentProtocolPayment *)payment scheme:(NSString*)scheme to:(NSString *)paymentURL timeout:(NSTimeInterval)timeout
 completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
 {
     NSURL *u = [NSURL URLWithString:paymentURL];
@@ -301,8 +306,8 @@ completion:(void (^)(BRPaymentProtocolACK *ack, NSError *error))completion
                                 cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:timeout];
 
     [req setValue:USER_AGENT forHTTPHeaderField:@"User-Agent"];
-    [req setValue:[NSString stringWithFormat:@"application/%@-payment",type] forHTTPHeaderField:@"Content-Type"];
-    [req addValue:[NSString stringWithFormat:@"application/%@-paymentack",type] forHTTPHeaderField:@"Accept"];
+    [req setValue:[NSString stringWithFormat:@"application/%@-payment",scheme] forHTTPHeaderField:@"Content-Type"];
+    [req addValue:[NSString stringWithFormat:@"application/%@-paymentack",scheme] forHTTPHeaderField:@"Accept"];
     [req setHTTPMethod:@"POST"];
     [req setHTTPBody:payment.data];
 
