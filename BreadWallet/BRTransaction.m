@@ -234,6 +234,11 @@ outputAddresses:(NSArray *)addresses outputAmounts:(NSArray *)amounts
     return ((self.size + 999)/1000)*TX_FEE_PER_KB;
 }
 
+- (uint64_t)standardInstantFee
+{
+    return TX_INSTANT_FEE;
+}
+
 // checks if all signatures exist, but does not verify them
 - (BOOL)isSigned
 {
