@@ -337,7 +337,7 @@ static NSString *sanitizeString(NSString *s)
     else if (request.r.length > 0) { // payment protocol over HTTP
         [(id)self.parentViewController.parentViewController startActivityWithTimeout:20.0];
         
-        [BRPaymentRequest fetch:request.r type:request.type timeout:20.0 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
+        [BRPaymentRequest fetch:request.r scheme:request.scheme timeout:20.0 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
             [(id)self.parentViewController.parentViewController stopActivityWithSuccess:(! error)];
             
             if (error && (![request.paymentAddress isValidBitcoinAddress] && ![request.paymentAddress isValidDigitalCashAddress])) {
@@ -349,7 +349,7 @@ static NSString *sanitizeString(NSString *s)
             else [self confirmProtocolRequest:(error) ? request.protocolRequest : req];
         }];
     }
-    else [self confirmProtocolRequest:request.protocolRequest currency:request.type associatedShapeshift:nil];
+    else [self confirmProtocolRequest:request.protocolRequest currency:request.scheme associatedShapeshift:nil];
 }
 
 - (void)confirmProtocolRequest:(BRPaymentProtocolRequest *)protoReq {
@@ -686,7 +686,7 @@ static NSString *sanitizeString(NSString *s)
         
         NSLog(@"posting payment to: %@", self.request.details.paymentURL);
         
-        [BRPaymentRequest postPayment:payment type:@"dash" to:self.request.details.paymentURL timeout:20.0
+        [BRPaymentRequest postPayment:payment scheme:@"dash" to:self.request.details.paymentURL timeout:20.0
                            completion:^(BRPaymentProtocolACK *ack, NSError *error) {
                                [(id)self.parentViewController.parentViewController stopActivityWithSuccess:(! error)];
                                
@@ -991,7 +991,7 @@ static NSString *sanitizeString(NSString *s)
             [self performSelector:@selector(confirmRequest:) withObject:req afterDelay:0.1];// delayed to show highlight
             return;
         } else if (req.r.length > 0) {
-            [BRPaymentRequest fetch:req.r type:req.type timeout:5.0 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
+            [BRPaymentRequest fetch:req.r scheme:req.scheme timeout:5.0 completion:^(BRPaymentProtocolRequest *req, NSError *error) {
                 if (error) {
                     [[[UIAlertView alloc] initWithTitle:@""
                                                 message:NSLocalizedString(@"clipboard doesn't contain a valid Dash or Bitcoin address", nil) delegate:nil
@@ -1163,25 +1163,69 @@ static NSString *sanitizeString(NSString *s)
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects
        fromConnection:(AVCaptureConnection *)connection
 {
-    for (AVMetadataMachineReadableCodeObject *o in metadataObjects) {
-        if (! [o.type isEqual:AVMetadataObjectTypeQRCode]) continue;
+    for (AVMetadataMachineReadableCodeObject *codeObject in metadataObjects) {
+        if (! [codeObject.type isEqual:AVMetadataObjectTypeQRCode]) continue;
         
-        NSString *s = [o.stringValue stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        BRPaymentRequest *request = [BRPaymentRequest requestWithString:s];
+        NSString *addr = [codeObject.stringValue stringByTrimmingCharactersInSet:
+                          [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        BRPaymentRequest *request = [BRPaymentRequest requestWithString:addr];
         
-        
-        if ((![request isValid] && ![s isValidDigitalCashPrivateKey] && ![s isValidDigitalCashBIP38Key]) ||
-            (request.r.length > 0 && !([s hasPrefix:@"bitcoin:"] || [s hasPrefix:@"dash:"]))) {
-            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetQRGuide) object:nil];
-            self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-red"];
-            [BRPaymentRequest fetch:request.r type:request.type timeout:5.0
-                         completion:^(BRPaymentProtocolRequest *req, NSError *error) {
+
+        if (request.isValid || [addr isValidDigitalCashPrivateKey] || [addr isValidDigitalCashBIP38Key] ||
+            (request.r.length > 0 && ([request.scheme isEqual:@"bitcoin"] || [request.scheme isEqual:@"dash"]))) {
+            self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-green"];
+            [self.scanController stop];
+            
+            if (request.r.length > 0) { // start fetching payment protocol request right away
+                [BRPaymentRequest fetch:request.r scheme:request.scheme timeout:5.0
+                             completion:^(BRPaymentProtocolRequest *req, NSError *error) {
+                                 dispatch_async(dispatch_get_main_queue(), ^{
+                                     if (error) request.r = nil;
+                                     
+                                     if (error && ! request.isValid) {
+                                         [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
+                                                                     message:error.localizedDescription delegate:nil
+                                                           cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+                                         [self cancel:nil];
+                                         // continue here and handle the invalid request inside confirmRequest:
+                                     }
+                                     
+                                     [self.navigationController dismissViewControllerAnimated:YES completion:^{
+                                         [self resetQRGuide];
+                                     }];
+                                     
+                                     if (error) {
+                                         [self confirmRequest:request]; // payment protocol fetch failed, so use standard request
+                                     }
+                                     else {
+                                         [self confirmProtocolRequest:req];
+                                     }
+                                 });
+                             }];
+            }
+            else { // standard non payment protocol request
+                [self.navigationController dismissViewControllerAnimated:YES completion:^{
+                    [self resetQRGuide];
+                    if (request.amount > 0) self.canChangeAmount = YES;
+                }];
+                
+                if (request.isValid && self.showBalance) {
+                    [self showBalance:request.paymentAddress];
+                    [self cancel:nil];
+                }
+                else [self confirmRequest:request];
+            }
+        }
+        else {
+            [BRPaymentRequest fetch:request.r scheme:request.scheme timeout:5.0
+                         completion:^(BRPaymentProtocolRequest *req, NSError *error) { // check to see if it's a BIP73 url
                              dispatch_async(dispatch_get_main_queue(), ^{
                                  [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetQRGuide) object:nil];
                                  
                                  if (req) {
                                      self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-green"];
                                      [self.scanController stop];
+                                     
                                      [self.navigationController dismissViewControllerAnimated:YES completion:^{
                                          [self resetQRGuide];
                                      }];
@@ -1191,14 +1235,15 @@ static NSString *sanitizeString(NSString *s)
                                  else {
                                      self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-red"];
                                      
-                                     if (([s hasPrefix:@"dash:"] && request.paymentAddress.length > 1) || [request.paymentAddress hasPrefix:@"X"] ||
-                                         [request.paymentAddress hasPrefix:@"Y"]) {
-                                         self.scanController.message.text = [NSString stringWithFormat:@"%@\n%@",
+                                     if (([request.scheme isEqual:@"dash"] && request.paymentAddress.length > 1) ||
+                                         [request.paymentAddress hasPrefix:@"X"] || [request.paymentAddress hasPrefix:@"7"]) {
+                                         self.scanController.message.text = [NSString stringWithFormat:@"%@:\n%@",
                                                                              NSLocalizedString(@"not a valid dash address", nil),
                                                                              request.paymentAddress];
-                                     } else if (([s hasPrefix:@"bitcoin:"] && request.paymentAddress.length > 1) || [request.paymentAddress hasPrefix:@"1"] ||
-                                                [request.paymentAddress hasPrefix:@"3"]) {
-                                         self.scanController.message.text = [NSString stringWithFormat:@"%@\n%@",
+                                     }
+                                     else if (([request.scheme isEqual:@"bitcoin"] && request.paymentAddress.length > 1) ||
+                                              [request.paymentAddress hasPrefix:@"1"] || [request.paymentAddress hasPrefix:@"3"]) {
+                                         self.scanController.message.text = [NSString stringWithFormat:@"%@:\n%@",
                                                                              NSLocalizedString(@"not a valid bitcoin address", nil),
                                                                              request.paymentAddress];
                                      }
@@ -1208,47 +1253,6 @@ static NSString *sanitizeString(NSString *s)
                                  }
                              });
                          }];
-        }
-        else {
-            self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-green"];
-            [self.scanController stop];
-            
-            if (request.r.length > 0) { // start fetching payment protocol request right away
-                [BRPaymentRequest fetch:request.r type:request.type timeout:5.0
-                             completion:^(BRPaymentProtocolRequest *req, NSError *error) {
-                                 if (error) request.r = nil;
-                                 
-                                 if (error && ! [request isValid]) {
-                                     [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"couldn't make payment", nil)
-                                                                 message:error.localizedDescription delegate:nil
-                                                       cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
-                                     [self cancel:nil];
-                                 }
-                                 
-                                 dispatch_async(dispatch_get_main_queue(), ^{
-                                     [self.navigationController dismissViewControllerAnimated:YES completion:^{
-                                         [self resetQRGuide];
-                                     }];
-                                     
-                                     if (error) {
-                                         [self confirmRequest:request];
-                                     }
-                                     else [self confirmProtocolRequest:req];
-                                 });
-                             }];
-            }
-            else {
-                [self.navigationController dismissViewControllerAnimated:YES completion:^{
-                    [self resetQRGuide];
-                    if (request.amount > 0) self.canChangeAmount = YES;
-                }];
-                
-                if (self.showBalance) {
-                    [self showBalance:request.paymentAddress];
-                    [self cancel:nil];
-                }
-                else [self confirmRequest:request];
-            }
         }
         
         break;

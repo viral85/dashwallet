@@ -42,7 +42,7 @@
 #define CIRCLE @"\xE2\x97\x8C" // dotted circle (utf-8)
 #define DOT    @"\xE2\x97\x8F" // black circle (utf-8)
 
-#define UNSPENT_URL @"https://api.chain.com/v2/%@/addresses/%@/unspents?api-key-id=eed0d7697a880144bb854676f88d123f"
+#define UNSPENT_URL @"http://%@insight.dash.siampm.com/api/addr/%@/utxo"
 #define BITCOIN_TICKER_URL  @"https://bitpay.com/rates"
 #define CRYPTSY_TICKER_URL  @"http://pubapi.cryptsy.com/api.php?method=singlemarketdata&marketid=155"
 #define POLONIEX_TICKER_URL  @"https://poloniex.com/public?command=returnOrderBook&currencyPair=BTC_DASH&depth=1"
@@ -167,12 +167,14 @@ static BOOL setKeychainString(NSString *s, NSString *key, BOOL authenticated)
 
 static NSString *getKeychainString(NSString *key, NSError **error)
 {
+    NSString * string = nil;
     @autoreleasepool {
         NSData *d = getKeychainData(key, error);
         
-        return (d) ? CFBridgingRelease(CFStringCreateFromExternalRepresentation(SecureAllocator(), (CFDataRef)d,
-                                                                                kCFStringEncodingUTF8)) : nil;
+        string = d ? (__bridge_transfer NSString *)CFStringCreateFromExternalRepresentation(SecureAllocator(), (CFDataRef)d,
+                                                                                kCFStringEncodingUTF8) : nil;
     }
+    return string;
 }
 
 @interface BRWalletManager()
@@ -1029,9 +1031,9 @@ static NSString *getKeychainString(NSString *key, NSError **error)
 - (void)utxosForAddress:(NSString *)address
 completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error))completion
 {
-    NSURL *u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"bitcoin", address]];
+    NSURL *u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"", address]];
 #ifdef BITCOIN_TESTNET
-    u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"testnet3", address]];
+    u = [NSURL URLWithString:[NSString stringWithFormat:UNSPENT_URL, @"test.", address]];
 #endif
     NSURLRequest *req = [NSURLRequest requestWithURL:u cachePolicy:NSURLRequestReloadIgnoringCacheData
                          timeoutInterval:20.0];
@@ -1062,25 +1064,26 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
         
         for (NSDictionary *utxo in json) {
             if (! [utxo isKindOfClass:[NSDictionary class]] ||
-                ! [utxo[@"transaction_hash"] isKindOfClass:[NSString class]] ||
-                [[utxo[@"transaction_hash"] hexToData] length] != CC_SHA256_DIGEST_LENGTH ||
-                ! [utxo[@"output_index"] isKindOfClass:[NSNumber class]] ||
-                ! [utxo[@"script_hex"] isKindOfClass:[NSString class]] ||
-                ! [utxo[@"script_hex"] hexToData] ||
-                ! [utxo[@"script_type"] isKindOfClass:[NSString class]] ||
-                ! [utxo[@"value"] isKindOfClass:[NSNumber class]]) {
+                ! [utxo[@"txid"] isKindOfClass:[NSString class]] ||
+                [[utxo[@"txid"] hexToData] length] != CC_SHA256_DIGEST_LENGTH ||
+                ! [utxo[@"vout"] isKindOfClass:[NSNumber class]] ||
+                ! [utxo[@"scriptPubKey"] isKindOfClass:[NSString class]] ||
+                ! [utxo[@"scriptPubKey"] hexToData] ||
+//                ! [utxo[@"script_type"] isKindOfClass:[NSString class]] ||
+                ! [utxo[@"amount"] isKindOfClass:[NSNumber class]]) {
                 completion(nil, nil, nil,
                            [NSError errorWithDomain:@"DashWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                             [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@",nil),u.host]}]);
                 return;
             }
             
-            if (! [utxo[@"script_type"] isEqual:@"pubkeyhash"] && ! [utxo[@"script_type"] isEqual:@"pubkey"]) continue;
-            o = [NSMutableData dataWithData:[[utxo[@"transaction_hash"] hexToData] reverse]];
-            [o appendUInt32:[utxo[@"output_index"] unsignedIntegerValue]];
+//            if (! [utxo[@"script_type"] isEqual:@"pubkeyhash"] && ! [utxo[@"script_type"] isEqual:@"pubkey"]) continue;
+            o = [NSMutableData dataWithData:[[utxo[@"txid"] hexToData] reverse]];
+            [o appendUInt32:[utxo[@"vout"] unsignedIntegerValue]];
             [utxos addObject:o];
-            [amounts addObject:utxo[@"value"]];
-            [scripts addObject:[utxo[@"script_hex"] hexToData]];
+//            [amounts addObject:utxo[@"amount"]];
+            [amounts addObject:[NSNumber numberWithFloat:[utxo[@"amount"] floatValue]*1e8]];
+            [scripts addObject:[utxo[@"scriptPubKey"] hexToData]];
         }
         
         completion(utxos, amounts, scripts, nil);
