@@ -167,12 +167,14 @@ static BOOL setKeychainString(NSString *s, NSString *key, BOOL authenticated)
 
 static NSString *getKeychainString(NSString *key, NSError **error)
 {
+    NSString * string = nil;
     @autoreleasepool {
         NSData *d = getKeychainData(key, error);
         
-        return (d) ? CFBridgingRelease(CFStringCreateFromExternalRepresentation(SecureAllocator(), (CFDataRef)d,
-                                                                                kCFStringEncodingUTF8)) : nil;
+        string = d ? (__bridge_transfer NSString *)CFStringCreateFromExternalRepresentation(SecureAllocator(), (CFDataRef)d,
+                                                                                kCFStringEncodingUTF8) : nil;
     }
+    return string;
 }
 
 @interface BRWalletManager()
