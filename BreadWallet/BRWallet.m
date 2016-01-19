@@ -29,6 +29,7 @@
 #import "BRTransaction.h"
 #import "BRTransactionEntity.h"
 #import "BRKeySequence.h"
+#import "BRPeerManager.h"
 #import "NSData+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
@@ -375,7 +376,7 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
 // returns an unsigned transaction that sends the specified amounts from the wallet to the specified output scripts
 - (BRTransaction *)transactionForAmounts:(NSArray *)amounts toOutputScripts:(NSArray *)scripts withFee:(BOOL)fee isInstant:(BOOL)isInstant toShapeshiftAddress:(NSString*)shapeshiftAddress
 {
-    uint64_t amount = 0, balance = 0, feeAmount = 0;
+    uint64_t amount = 0, balance = 0, balanceForInstantTransfer = 0, feeAmount = 0;
     BRTransaction *transaction = [BRTransaction new];
     NSUInteger i = 0, cpfpSize = 0;
     
@@ -394,8 +395,17 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
         uint32_t n = [o UInt32AtOffset:CC_SHA256_DIGEST_LENGTH];
         
         if (! tx) continue;
-        [transaction addInputHash:tx.txHash index:n script:tx.outputScripts[n]];
         balance += [tx.outputAmounts[n] unsignedLongLongValue];
+        if (isInstant) { //make sure we have 5 confirmations already
+            uint32_t txBlockHeight = tx.blockHeight;
+            uint32_t currentBlockHeight = [BRPeerManager sharedInstance].lastBlockHeight;
+            int32_t blockDiff = currentBlockHeight - txBlockHeight;
+            if (currentBlockHeight < txBlockHeight) break;//should never happen anyways
+            if (blockDiff < 5) break;
+        }
+        [transaction addInputHash:tx.txHash index:n script:tx.outputScripts[n]];
+        
+        balanceForInstantTransfer += [tx.outputAmounts[n] unsignedLongLongValue];
         
         // add up size of unconfirmed, non-change inputs for child-pays-for-parent fee calculation
         if (tx.blockHeight == TX_UNCONFIRMED && [self amountSentByTransaction:tx] == 0) cpfpSize += tx.size;
@@ -405,22 +415,47 @@ static NSUInteger txAddressIndex(BRTransaction *tx, NSArray *chain) {
         } else {
             if (fee) feeAmount = [self feeForTxSize:transaction.size + 34 + cpfpSize]; // assume we will add a change output
         }
-        if (balance == amount + feeAmount || balance >= amount + feeAmount + TX_MIN_OUTPUT_AMOUNT) break;
+        if (isInstant) {
+            if (balanceForInstantTransfer == amount + feeAmount || balanceForInstantTransfer >= amount + feeAmount + TX_MIN_OUTPUT_AMOUNT) break;
+        } else {
+            if (balance == amount + feeAmount || balance >= amount + feeAmount + TX_MIN_OUTPUT_AMOUNT) break;
+        }
     }
+    
     transaction.isInstant = isInstant;
     
-    if (balance < amount + feeAmount) { // insufficient funds
-        NSLog(@"Insufficient funds. %llu is less than transaction amount:%llu", balance, amount + feeAmount);
-        return nil;
+    if (isInstant) {
+        if (balanceForInstantTransfer < amount + feeAmount) { // insufficient instant funds
+            if (balance < amount + feeAmount) { // insufficient funds
+                NSLog(@"Insufficient funds. %llu is less than transaction amount:%llu", balance, amount + feeAmount);
+                return nil;
+            } else {
+                //we have enough funds just not for instant transfer
+                NSLog(@"Insufficient funds for instant transfer. %llu is less than transaction amount available for instant transfer:%llu (balance is %llu)", balanceForInstantTransfer, amount + feeAmount,balance);
+                return nil;
+            }
+        }
+    } else {
+        if (balance < amount + feeAmount) { // insufficient funds
+            NSLog(@"Insufficient funds. %llu is less than transaction amount:%llu", balance, amount + feeAmount);
+            return nil;
+        }
     }
     
     if (shapeshiftAddress) {
         [transaction addOutputShapeshiftAddress:shapeshiftAddress];
     }
     
-    if (balance - (amount + feeAmount) >= TX_MIN_OUTPUT_AMOUNT) {
-        [transaction addOutputAddress:self.changeAddress amount:balance - (amount + feeAmount)];
-        [transaction shuffleOutputOrder];
+    if (isInstant) {
+        if (balanceForInstantTransfer - (amount + feeAmount) >= TX_MIN_OUTPUT_AMOUNT) {
+            [transaction addOutputAddress:self.changeAddress amount:balanceForInstantTransfer - (amount + feeAmount)];
+            [transaction shuffleOutputOrder];
+        }
+    } else {
+        if (balance - (amount + feeAmount) >= TX_MIN_OUTPUT_AMOUNT) {
+            [transaction addOutputAddress:self.changeAddress amount:balance - (amount + feeAmount)];
+            [transaction shuffleOutputOrder];
+        }
     }
     
     return transaction;
