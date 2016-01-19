@@ -361,7 +361,7 @@ static NSString *sanitizeString(NSString *s)
     NSString *address;
     if ([currency isEqualToString:@"bitcoin"]) {
         address = [NSString bitcoinAddressWithScriptPubKey:protoReq.details.outputScripts.firstObject];
-
+        
     } else {
         address = [NSString addressWithScriptPubKey:protoReq.details.outputScripts.firstObject];
     }
@@ -489,7 +489,11 @@ static NSString *sanitizeString(NSString *s)
             fee = [m.wallet feeForTransaction:tx];
         }
         else {
-            fee = [m.wallet feeForTxSize:[m.wallet transactionFor:m.wallet.balance to:address withFee:NO].size isInstant:self.sendInstantly];
+            if (self.sendInstantly) {
+                fee = TX_INSTANT_FEE;
+            } else {
+                fee = [m.wallet feeForTxSize:[m.wallet transactionFor:m.wallet.balance to:address withFee:NO].size isInstant:self.sendInstantly];
+            }
             amount += fee;
         }
         
@@ -515,7 +519,7 @@ static NSString *sanitizeString(NSString *s)
         BRTransaction *tx = nil;
         
         if (protoReq.errorMessage.length > 0 && protoReq.commonName.length > 0 &&
-                 ! [self.okIdentity isEqual:protoReq.commonName]) {
+            ! [self.okIdentity isEqual:protoReq.commonName]) {
             self.request = protoReq;
             self.okIdentity = protoReq.commonName;
             [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"payee identity isn't certified", nil)
@@ -577,26 +581,39 @@ static NSString *sanitizeString(NSString *s)
             if ((self.amount <= [m amountForLocalCurrencyString:[m localCurrencyStringForDashAmount:m.wallet.balance]] ||
                  self.amount <= m.wallet.balance) && self.amount > 0) {
                 //todo sendinstantly should be in the protocol request
-                NSUInteger txSize = [m.wallet transactionForAmounts:@[@(m.wallet.balance)]
-                                                    toOutputScripts:@[self.request.details.outputScripts.firstObject] withFee:NO isInstant:self.sendInstantly].size,
-                cpfpSize = 0;
+                
+                NSUInteger cpfpSize = 0;
                 
                 for (tx in m.wallet.recentTransactions) { // add up size of unconfirmed inputs for child-pays-for-parent
                     if (tx.blockHeight != TX_UNCONFIRMED) break;
                     if ([m.wallet amountSentByTransaction:tx] == 0) cpfpSize += tx.size; // only non-change inputs count
                 }
-                
-                int64_t amount = m.wallet.balance - [m.wallet feeForTxSize:txSize + 34 + cpfpSize];
-                
-                [[[UIAlertView alloc]
-                  initWithTitle:NSLocalizedString(@"insufficient funds for dash network fee", nil)
-                  message:[NSString stringWithFormat:NSLocalizedString(@"reduce payment amount by\n%@ (%@)?", nil),
-                           [m dashStringForAmount:self.amount - amount],
-                           [m localCurrencyStringForDashAmount:self.amount - amount]] delegate:self
-                  cancelButtonTitle:NSLocalizedString(@"cancel", nil)
-                  otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:amount - self.amount],
-                                     [m localCurrencyStringForDashAmount:amount - self.amount]], nil] show];
-                self.amount = amount;
+                int64_t amount;
+                BOOL hasIssueWithInstantAmount = FALSE;
+                if (self.sendInstantly) {
+                    amount = m.wallet.balance - (TX_INSTANT_FEE);
+                    if (self.amount - amount > 0) {
+                        hasIssueWithInstantAmount = TRUE;
+                    }
+                } else {
+                    NSUInteger txSize = [m.wallet transactionForAmounts:@[@(m.wallet.balance)]
+                                                        toOutputScripts:@[self.request.details.outputScripts.firstObject] withFee:NO isInstant:self.sendInstantly].size;
+                    amount = m.wallet.balance - [m.wallet feeForTxSize:txSize + 34 + cpfpSize];
+                }
+                if (hasIssueWithInstantAmount) {
+                    [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"insufficient funds for sending with instantX, please wait a few minutes or send normally", nil) message:nil
+                                               delegate:self cancelButtonTitle:NSLocalizedString(@"ok", nil) otherButtonTitles:nil] show];
+                } else {
+                    [[[UIAlertView alloc]
+                      initWithTitle:NSLocalizedString(@"insufficient funds for dash network fee", nil)
+                      message:[NSString stringWithFormat:NSLocalizedString(@"reduce payment amount by\n%@ (%@)?", nil),
+                               [m dashStringForAmount:self.amount - amount],
+                               [m localCurrencyStringForDashAmount:self.amount - amount]] delegate:self
+                      cancelButtonTitle:NSLocalizedString(@"cancel", nil)
+                      otherButtonTitles:[NSString stringWithFormat:@"%@ (%@)", [m dashStringForAmount:amount - self.amount],
+                                         [m localCurrencyStringForDashAmount:amount - self.amount]], nil] show];
+                    self.amount = amount;
+                }
             }
             else {
                 [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"insufficient funds", nil) message:nil
@@ -640,7 +657,7 @@ static NSString *sanitizeString(NSString *s)
         else if (! sent) { //TODO: show full screen sent dialog with tx info, "you sent b10,000 to bob"
             if (tx.associatedShapeshift) {
                 [self startObservingShapeshift:tx.associatedShapeshift];
-
+                
             }
             sent = YES;
             [self.view addSubview:[[[BRBubbleView viewWithText:NSLocalizedString(@"sent!", nil)
@@ -896,9 +913,9 @@ static NSString *sanitizeString(NSString *s)
 
 -(void)startObservingShapeshift:(DCShapeshiftEntity*)shapeshift {
     
-        [shapeshift addObserver:self forKeyPath:@"shapeshiftStatus" options:NSKeyValueObservingOptionNew context:nil];
-        [shapeshift routinelyCheckStatusAtInterval:10];
-        self.shapeshiftView.hidden = FALSE;
+    [shapeshift addObserver:self forKeyPath:@"shapeshiftStatus" options:NSKeyValueObservingOptionNew context:nil];
+    [shapeshift routinelyCheckStatusAtInterval:10];
+    self.shapeshiftView.hidden = FALSE;
 }
 
 
@@ -955,7 +972,7 @@ static NSString *sanitizeString(NSString *s)
         for (CIQRCodeFeature *qr in [[CIDetector detectorOfType:CIDetectorTypeQRCode context:nil options:nil]
                                      featuresInImage:[CIImage imageWithCGImage:img.CGImage]]) {
             [a addObject:[qr.messageString
-                                       stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+                          stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
         }
     }
     
@@ -1055,7 +1072,7 @@ static NSString *sanitizeString(NSString *s)
             completionBlock();
         }
     }];
-
+    
 }
 
 - (void)amountViewController:(BRAmountViewController *)amountViewController shapeshiftBitcoinAmount:(uint64_t)amount approximateDashAmount:(uint64_t)dashAmount
@@ -1111,10 +1128,10 @@ static NSString *sanitizeString(NSString *s)
         self.amount = amount;
         DCShapeshiftEntity * shapeshift = [DCShapeshiftEntity shapeshiftHavingWithdrawalAddress:address];
         NSString * depositAddress = shapeshift.inputAddress;
-
+        
         if (shapeshift) {
             [hud hide:TRUE];
-                        BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=Shapeshift to %@",depositAddress,self.amount,sanitizeString(self.request.commonName),address]];
+            BRPaymentRequest * request = [BRPaymentRequest requestWithString:[NSString stringWithFormat:@"dash:%@?amount=%llu&label=%@&message=Shapeshift to %@",depositAddress,self.amount,sanitizeString(self.request.commonName),address]];
             [self confirmProtocolRequest:request.protocolRequest currency:@"dash" associatedShapeshift:shapeshift];
         } else {
             [[DCShapeshiftManager sharedInstance] POST_ShiftWithAddress:address returnAddress:returnAddress completionBlock:^(NSDictionary *shiftInfo, NSError *error) {
@@ -1154,7 +1171,7 @@ static NSString *sanitizeString(NSString *s)
         
         
         if ((![request isValid] && ![s isValidDigitalCashPrivateKey] && ![s isValidDigitalCashBIP38Key]) ||
-                        (request.r.length > 0 && !([s hasPrefix:@"bitcoin:"] || [s hasPrefix:@"dash:"]))) {
+            (request.r.length > 0 && !([s hasPrefix:@"bitcoin:"] || [s hasPrefix:@"dash:"]))) {
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(resetQRGuide) object:nil];
             self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-red"];
             [BRPaymentRequest fetch:request.r type:request.type timeout:5.0
@@ -1164,7 +1181,7 @@ static NSString *sanitizeString(NSString *s)
                                  
                                  if (req) {
                                      self.scanController.cameraGuide.image = [UIImage imageNamed:@"cameraguide-green"];
-                                    [self.scanController stop];
+                                     [self.scanController stop];
                                      [self.navigationController dismissViewControllerAnimated:YES completion:^{
                                          [self resetQRGuide];
                                      }];
@@ -1180,7 +1197,7 @@ static NSString *sanitizeString(NSString *s)
                                                                              NSLocalizedString(@"not a valid dash address", nil),
                                                                              request.paymentAddress];
                                      } else if (([s hasPrefix:@"bitcoin:"] && request.paymentAddress.length > 1) || [request.paymentAddress hasPrefix:@"1"] ||
-                                                   [request.paymentAddress hasPrefix:@"3"]) {
+                                                [request.paymentAddress hasPrefix:@"3"]) {
                                          self.scanController.message.text = [NSString stringWithFormat:@"%@\n%@",
                                                                              NSLocalizedString(@"not a valid bitcoin address", nil),
                                                                              request.paymentAddress];
