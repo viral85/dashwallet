@@ -77,7 +77,7 @@
 "dash address" = "dash address";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X'." = "Dash addresses can also be copied to the clipboard. A dash address always starts with 'X'.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "dash network fee";

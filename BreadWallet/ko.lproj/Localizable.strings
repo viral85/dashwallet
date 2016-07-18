@@ -80,7 +80,7 @@
 "Dash address" = "대쉬 주소";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "대쉬 주소를 클립보드로 복사할 수도 있습니다. 대쉬 주소는 항상 'X'이나 'Y'으로 시작합니다.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "대쉬 주소를 클립보드로 복사할 수도 있습니다. 대쉬 주소는 항상 'X'이나 '7'으로 시작합니다.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "대쉬 네트워크 수수료";

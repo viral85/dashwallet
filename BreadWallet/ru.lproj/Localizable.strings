@@ -80,7 +80,7 @@
 "Dash address" = "Dash адрес";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Dash адреса также могут быть скопированы в буфер обмена. Dash адрес всегда начинается с «X» или «Y».";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "Dash адреса также могут быть скопированы в буфер обмена. Dash адрес всегда начинается с «X» или «7».";
 
 /* No comment provided by engineer. */
 "dash network fee" = "сетевая плата dash";

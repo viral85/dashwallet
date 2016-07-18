@@ -80,7 +80,7 @@
 "Dash address" = "Dash-Adresse";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Dash-Adressen können auch in die Zwischenablage kopiert werden. Eine Dash-Adresse beginnt immer mit 'X' oder 'Y'.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "Dash-Adressen können auch in die Zwischenablage kopiert werden. Eine Dash-Adresse beginnt immer mit 'X' oder '7'.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "Transaktionsgebühr";
