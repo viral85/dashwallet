@@ -80,7 +80,7 @@
 "Dash address" = "Dash adresa";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Dash adresat gjithashtu mund të kopjohen në memorje. Një dash adresë gjithmon fillon me 'X' ose 'Y'.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "Dash adresat gjithashtu mund të kopjohen në memorje. Një dash adresë gjithmon fillon me 'X' ose '7'.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "dash tarifa";

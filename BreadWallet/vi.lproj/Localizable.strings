@@ -80,7 +80,7 @@
 "Dash address" = "Địa chỉ Dash";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Địa chỉ dash luôn có thể vào bộ đệm của máy. Một địa chỉ dash thường bắt đầu bằng 'X' hoặc 'Y'.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "Địa chỉ dash luôn có thể vào bộ đệm của máy. Một địa chỉ dash thường bắt đầu bằng 'X' hoặc '7'.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "phí giao dịch";

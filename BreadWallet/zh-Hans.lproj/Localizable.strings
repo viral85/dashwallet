@@ -80,7 +80,7 @@
 "Dash address" = "达世币地址";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "达世币地址也可以复制到剪贴板。一个达世币地址总是开始于'X'或'Y'";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "达世币地址也可以复制到剪贴板。一个达世币地址总是开始于'X'或'7'";
 
 /* No comment provided by engineer. */
 "dash network fee" = "达世币网络费";

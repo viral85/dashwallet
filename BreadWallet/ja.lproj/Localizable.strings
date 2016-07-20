@@ -80,7 +80,7 @@
 "Dash address" = "ダッシュアドレス";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "ダッシュアドレスをクリップボードにコピーすることもできます。\nダッシュアドレスは\n常に 'X' または 'Y' で始まります。";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "ダッシュアドレスをクリップボードにコピーすることもできます。\nダッシュアドレスは\n常に 'X' または '7' で始まります。";
 
 /* No comment provided by engineer. */
 "dash network fee" = "ダッシュネットワーク手数料";
