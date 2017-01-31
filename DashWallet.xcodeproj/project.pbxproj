@@ -1003,7 +1003,7 @@
 						CreatedOnToolsVersion = 6.1;
 					};
 					75D5F3BD191EC270004AB296 = {
-						DevelopmentTeam = ZR8F48GBJV;
+						DevelopmentTeam = 44RJ69WHFF;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 0;
@@ -1425,8 +1425,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Dash Foundation, Inc. (44RJ69WHFF)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Dash Foundation, Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1438,9 +1438,9 @@
 					"$(SRCROOT)",
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallettest0192;
+				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "d8c59c52-8a86-4024-aa61-84366584e38c";
 				WARNING_CFLAGS = "-Wno-gnu";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1555,8 +1555,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Dash Foundation, Inc. (44RJ69WHFF)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Dash Foundation, Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1568,9 +1568,9 @@
 					"$(SRCROOT)",
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallettest0192;
+				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "d8c59c52-8a86-4024-aa61-84366584e38c";
 				WARNING_CFLAGS = "-Wno-gnu";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1583,8 +1583,8 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: The Dash Foundation, Inc. (44RJ69WHFF)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: The Dash Foundation, Inc. (44RJ69WHFF)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/DashWallet-Prefix.pch";
 				GCC_WARN_PEDANTIC = YES;
@@ -1596,9 +1596,9 @@
 					"$(SRCROOT)",
 				);
 				INFOPLIST_FILE = "BreadWallet/DashWallet-Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallettest0192;
+				PRODUCT_BUNDLE_IDENTIFIER = com.darkcoinfoundation.dashwallet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "d8c59c52-8a86-4024-aa61-84366584e38c";
 				WARNING_CFLAGS = "-Wno-gnu";
 				WRAPPER_EXTENSION = app;
 			};

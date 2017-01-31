@@ -253,6 +253,12 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     }
     
     BRMerkleBlock *currentBlock = previousBlock;
+    if (currentBlock.height == 312691) {
+        if (1) {
+            
+        }
+        NSLog(@"here");
+    }
     // loop over the past n blocks, where n == PastBlocksMax
     for (blockCount = 1; currentBlock && currentBlock.height > 0 && blockCount<=DGW_PAST_BLOCKS_MAX; blockCount++) {
         
@@ -295,6 +301,7 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
         nActualTimespan = nTargetTimespan*3.0f;
     
     // Calculate the new difficulty based on actual and target timespan.
+    long double sss = darkTarget * nActualTimespan;
     darkTarget *= nActualTimespan / nTargetTimespan;
     
     // If calculated difficulty is lower than the minimal diff, set the new difficulty to be the minimal diff.
