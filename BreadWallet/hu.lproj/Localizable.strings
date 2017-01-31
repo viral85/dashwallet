@@ -80,7 +80,7 @@
 "Dash address" = "Dash cím";
 
 /* No comment provided by engineer. */
-"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or 'Y'." = "Dash címeket a vágólapra is lehet másolni. Egy dash cím mindig 'X'-gyel vagy 'Y'-mal kezdődik.";
+"Dash addresses can also be copied to the clipboard. A dash address always starts with 'X' or '7'." = "Dash címeket a vágólapra is lehet másolni. Egy dash cím mindig 'X'-gyel vagy '7'-mal kezdődik.";
 
 /* No comment provided by engineer. */
 "dash network fee" = "dash hálózati díj";
