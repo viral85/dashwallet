@@ -28,7 +28,7 @@
 #import "BRPeer.h"
 
 FOUNDATION_EXPORT NSString* _Nonnull const BRPeerManagerSyncStartedNotification;
-FOUNDATION_EXPORT NSString* _Nonnull const BRPeerManagerSyncFinishedNotification;
+FOUNDATION_EXPORT NSString* _Nonnull const BRPeerManagerSyncFinishedStepNotification;
 FOUNDATION_EXPORT NSString* _Nonnull const BRPeerManagerSyncFailedNotification;
 FOUNDATION_EXPORT NSString* _Nonnull const BRPeerManagerTxStatusNotification;
 

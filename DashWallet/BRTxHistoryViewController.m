@@ -190,7 +190,7 @@ static NSString *dateFormat(NSString *template)
     
     if (! self.syncFinishedObserver) {
         self.syncFinishedObserver =
-            [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedNotification object:nil
+            [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedStepNotification object:nil
             queue:nil usingBlock:^(NSNotification *note) {
                 if (! manager.didAuthenticate) self.navigationItem.titleView = self.logo;
                 else [self updateTitleView];

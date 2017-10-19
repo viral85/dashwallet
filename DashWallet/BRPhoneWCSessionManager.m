@@ -68,7 +68,7 @@
                 }];
 
             self.syncFinishedObserver =
-                [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedNotification
+                [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedStepNotification
                 object:nil queue:nil usingBlock:^(NSNotification * _Nonnull note) {
                     [self sendApplicationContext];
                 }];

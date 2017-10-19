@@ -376,7 +376,7 @@
                                                        }];
     
     self.syncFinishedObserver =
-    [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedNotification object:nil
+    [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedStepNotification object:nil
                                                        queue:nil usingBlock:^(NSNotification *note) {
                                                            if (self.timeout < 1.0) [self stopActivityWithSuccess:YES];
                                                            [self showBackupDialogIfNeeded];

@@ -26,6 +26,8 @@
 #import "BRPeer.h"
 #import "BRTransaction.h"
 #import "BRMerkleBlock.h"
+#import "DWGovObject.h"
+#import "DWSpork.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Bitcoin.h"
 #import "NSData+Dash.h"
@@ -46,13 +48,24 @@
 #define CONNECT_TIMEOUT    3.0
 #define MEMPOOL_TIMEOUT    5.0
 
-typedef enum : uint32_t {
-    inv_error = 0,
-    inv_tx,
-    inv_block,
-    inv_merkleblock,
-    inv_txlock_request,
-} inv_type;
+
+typedef NS_ENUM(uint32_t,InvType) {
+    InvError = 0,
+    InvTx = 1,
+    InvBlock = 2,
+    InvMerkleblock = 3,
+    InvTxLockRequest = 4,
+    InvTxLockVote = 5,
+    InvSpork = 6,
+    InvMasternodePaymentVote = 7,
+    InvMasternodePaymentBlock = 8,
+    InvMasternodeAnnounce = 14,
+    InvMasternodePing = 15,
+    InvDSTx = 16,
+    InvGovernanceObject = 17,
+    InvGovernanceObjectVote = 18,
+    InvMasternodeVerify = 19,
+};
 
 @interface BRPeer ()
 
@@ -290,7 +303,7 @@ services:(uint64_t)services
     });
 }
 
-// MARK: - send
+// MARK: - send Basic
 
 - (void)sendMessage:(NSData *)message type:(NSString *)type
 {
@@ -473,7 +486,7 @@ services:(uint64_t)services
     [msg appendVarInt:hashes.count];
 
     for (NSValue *hash in hashes) {
-        [msg appendUInt32:inv_tx];
+        [msg appendUInt32:InvTx];
         [hash getValue:&h];
         [msg appendBytes:&h length:sizeof(h)];
     }
@@ -497,13 +510,13 @@ services:(uint64_t)services
     [msg appendVarInt:txHashes.count + blockHashes.count];
     
     for (NSValue *hash in txHashes) {
-        [msg appendUInt32:inv_tx];
+        [msg appendUInt32:InvTx];
         [hash getValue:&h];
         [msg appendBytes:&h length:sizeof(h)];
     }
     
     for (NSValue *hash in blockHashes) {
-        [msg appendUInt32:inv_merkleblock];
+        [msg appendUInt32:InvMerkleblock];
         [hash getValue:&h];
         [msg appendBytes:&h length:sizeof(h)];
     }
@@ -543,7 +556,32 @@ services:(uint64_t)services
     }
 }
 
-// MARK: - accept
+// MARK: - send Dash Masternode
+
+-(void)sendGetSporks {
+    [self sendMessage:[NSData data] type:MSG_GETSPORKS];
+}
+
+// MARK: - send Dash Governance
+
+- (void)sendGovSync {
+//    NSMutableData *msg = [NSMutableData data];
+//    UInt256 h;
+//
+//    [msg appendUInt32:PROTOCOL_VERSION];
+//    [msg appendVarInt:locators.count];
+//
+//    for (NSValue *hash in locators) {
+//        [hash getValue:&h];
+//        [msg appendBytes:&h length:sizeof(h)];
+//    }
+//
+//    [msg appendBytes:&hashStop length:sizeof(hashStop)];
+//    self.sentGetblocks = YES;
+//    [self sendMessage:msg type:MSG_GETBLOCKS];
+}
+
+// MARK: - accept Bitcoin
 
 - (void)acceptMessage:(NSData *)message type:(NSString *)type
 {
@@ -570,6 +608,15 @@ services:(uint64_t)services
     else if ([MSG_MERKLEBLOCK isEqual:type]) [self acceptMerkleblockMessage:message];
     else if ([MSG_REJECT isEqual:type]) [self acceptRejectMessage:message];
     else if ([MSG_FEEFILTER isEqual:type]) [self acceptFeeFilterMessage:message];
+    //control
+    else if ([MSG_SPORK isEqual:type]) [self acceptSporkMessage:message];
+    //masternode
+    
+    //governance
+    else if ([MSG_GOVOBJVOTE isEqual:type]) [self acceptGovObjectVoteMessage:message];
+    else if ([MSG_GOVOBJ isEqual:type]) [self acceptGovObjectMessage:message];
+    else if ([MSG_GOVOBJSYNC isEqual:type]) [self acceptGovObjectSyncMessage:message];
+
     else {
 #if DROP_MESSAGE_LOGGING
         NSLog(@"%@:%u dropping %@, len:%u, not implemented", self.host, self.port, type, (int)message.length);
@@ -681,7 +728,9 @@ services:(uint64_t)services
 {
     NSNumber * l = nil;
     NSUInteger count = (NSUInteger)[message varIntAtOffset:0 length:&l];
-    NSMutableOrderedSet *txHashes = [NSMutableOrderedSet orderedSet], *blockHashes = [NSMutableOrderedSet orderedSet];
+    NSMutableOrderedSet *txHashes = [NSMutableOrderedSet orderedSet];
+    NSMutableOrderedSet *blockHashes = [NSMutableOrderedSet orderedSet];
+    NSMutableOrderedSet *sporks = [NSMutableOrderedSet orderedSet];
     
     if (l.unsignedIntegerValue == 0 || message.length < l.unsignedIntegerValue + count*36) {
         [self error:@"malformed inv message, length is %u, should be %u for %u items", (int)message.length,
@@ -697,17 +746,18 @@ services:(uint64_t)services
     //NSLog(@"%@:%u got inv with %u items", self.host, self.port, (int)count);
     
     for (NSUInteger off = l.unsignedIntegerValue; off < l.unsignedIntegerValue + 36*count; off += 36) {
-        inv_type type = [message UInt32AtOffset:off];
+        InvType type = [message UInt32AtOffset:off];
         UInt256 hash = [message hashAtOffset:off + sizeof(uint32_t)];
         
         if (uint256_is_zero(hash)) continue;
         
         switch (type) {
-            case inv_tx:
-            case inv_txlock_request:
+            case InvTx:
+            case InvTxLockRequest:
                 [txHashes addObject:uint256_obj(hash)]; break;
-            case inv_block: [blockHashes addObject:uint256_obj(hash)]; break;
-            case inv_merkleblock: [blockHashes addObject:uint256_obj(hash)]; break;
+            case InvBlock: [blockHashes addObject:uint256_obj(hash)]; break;
+            case InvMerkleblock: [blockHashes addObject:uint256_obj(hash)]; break;
+            case InvSpork: [sporks addObject:uint256_obj(hash)]; break;
             default: break;
         }
     }
@@ -907,15 +957,15 @@ services:(uint64_t)services
         NSMutableData *notfound = [NSMutableData data];
     
         for (NSUInteger off = l; off < l + count*36; off += 36) {
-            inv_type type = [message UInt32AtOffset:off];
+            InvType type = [message UInt32AtOffset:off];
             UInt256 hash = [message hashAtOffset:off + sizeof(uint32_t)];
             BRTransaction *transaction = nil;
         
             if (uint256_is_zero(hash)) continue;
         
             switch (type) {
-                case inv_tx:
-                case inv_txlock_request:
+                case InvTx:
+                case InvTxLockRequest:
                     transaction = [self.delegate peer:self requestedTransaction:hash];
                 
                     if (transaction) {
@@ -957,10 +1007,10 @@ services:(uint64_t)services
     NSLog(@"%@:%u got notfound with %u items", self.host, self.port, (int)count);
 
     for (NSUInteger off = l; off < l + 36*count; off += 36) {
-        if ([message UInt32AtOffset:off] == inv_tx) {
+        if ([message UInt32AtOffset:off] == InvTx) {
             [txHashes addObject:uint256_obj([message hashAtOffset:off + sizeof(uint32_t)])];
         }
-        else if ([message UInt32AtOffset:off] == inv_merkleblock) {
+        else if ([message UInt32AtOffset:off] == InvMerkleblock) {
             [blockHashes addObject:uint256_obj([message hashAtOffset:off + sizeof(uint32_t)])];
         }
     }
@@ -1087,6 +1137,60 @@ services:(uint64_t)services
     dispatch_async(self.delegateQueue, ^{
         [self.delegate peer:self setFeePerKb:self.feePerKb];
     });
+}
+
+// MARK: - accept Control
+
+- (void)acceptSporkMessage:(NSData *)message
+{
+    DWSpork * spork = [DWSpork sporkWithMessage:message];
+    
+    NSLog(@"%@",message);
+}
+
+// MARK: - accept Masternode
+
+// MARK: - accept Governance
+
+- (void)acceptGovObjectVoteMessage:(NSData *)message
+{
+
+}
+
+// https://dash-docs.github.io/en/developer-reference#govobj
+
+- (void)acceptGovObjectMessage:(NSData *)message
+{
+    BRMerkleBlock *block = [BRMerkleBlock blockWithMessage:message];
+    
+    if (! block.valid) {
+        [self error:@"invalid merkleblock: %@", uint256_obj(block.blockHash)];
+        return;
+    }
+    else if (! self.sentFilter && ! self.sentGetdata) {
+        [self error:@"got merkleblock message before loading a filter"];
+        return;
+    }
+    //else NSLog(@"%@:%u got merkleblock %@", self.host, self.port, block.blockHash);
+    
+    NSMutableOrderedSet *txHashes = [NSMutableOrderedSet orderedSetWithArray:block.txHashes];
+    
+    [txHashes minusOrderedSet:self.knownTxHashes];
+    
+    if (txHashes.count > 0) { // wait til we get all the tx messages before processing the block
+        self.currentBlock = block;
+        self.currentBlockTxHashes = txHashes;
+    }
+    else {
+        dispatch_async(self.delegateQueue, ^{
+            [self.delegate peer:self relayedBlock:block];
+        });
+    }
+}
+
+- (void)acceptGovObjectSyncMessage:(NSData *)message
+{
+
 }
 
 // MARK: - hash

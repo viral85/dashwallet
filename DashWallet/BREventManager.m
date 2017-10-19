@@ -75,7 +75,7 @@
         self.eventToNotifications = @{@"foreground": UIApplicationDidBecomeActiveNotification,
                                       @"background": UIApplicationDidEnterBackgroundNotification,
                                       @"sync_started": BRPeerManagerSyncStartedNotification,
-                                      @"sync_finished": BRPeerManagerSyncFinishedNotification,
+                                      @"sync_finished_step": BRPeerManagerSyncFinishedStepNotification,
                                       @"sync_failed": BRPeerManagerSyncFailedNotification};
         self.isConnected = NO;
         self._buffer = [NSMutableArray array];

@@ -209,7 +209,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
         }];
 
     syncFinishedObserver =
-        [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedNotification object:nil
+        [[NSNotificationCenter defaultCenter] addObserverForName:BRPeerManagerSyncFinishedStepNotification object:nil
         queue:nil usingBlock:^(NSNotification *note) {
             NSLog(@"background fetch sync finished");
             if (completion) completion(UIBackgroundFetchResultNewData);

@@ -37,6 +37,7 @@
 #import "NSData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
 #import "BREventManager.h"
+#import "DWSporkManager.h"
 #import <netdb.h>
 
 #if ! PEER_LOGGING
@@ -793,7 +794,7 @@ static const char *dns_seeds[] = {
                         
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [[NSNotificationCenter defaultCenter]
-                             postNotificationName:BRPeerManagerSyncFinishedNotification object:nil];
+                             postNotificationName:BRPeerManagerSyncFinishedStepNotification object:nil];
                         });
                     }
                 }];
@@ -803,8 +804,20 @@ static const char *dns_seeds[] = {
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter]
-                     postNotificationName:BRPeerManagerSyncFinishedNotification object:nil];
+                     postNotificationName:BRPeerManagerSyncFinishedStepNotification object:nil];
                 });
+            }
+        }];
+    }
+}
+
+-(void)getSporks {
+    for (BRPeer *p in self.connectedPeers) { // after syncing, get sporks from other peers
+        if (p.status != BRPeerStatusConnected) continue;
+        
+        [p sendPingMessageWithPongHandler:^(BOOL success) {
+            if (success) {
+                [p sendGetSporks];
             }
         }];
     }
@@ -1110,6 +1123,7 @@ static const char *dns_seeds[] = {
         self.syncStartHeight = 0;
         [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:SYNC_STARTHEIGHT_KEY];
         [self loadMempools];
+        [self getSporks];
     }
 }
 
@@ -1512,6 +1526,7 @@ static const char *dns_seeds[] = {
         [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:SYNC_STARTHEIGHT_KEY];
         [self saveBlocks];
         [self loadMempools];
+        [self getSporks];
     }
     
     if (block.height > _estimatedBlockHeight) {
@@ -1598,5 +1613,13 @@ static const char *dns_seeds[] = {
     
     return tx;
 }
+
+// MARK: Dash Specific
+
+- (void)peer:(BRPeer *)peer relayedSpork:(DWSpork *)spork {
+    [[DWSporkManager sharedInstance] peer:(BRPeer*)peer relayedSpork:spork];
+    
+}
+
 
 @end
