@@ -307,6 +307,7 @@ static NSUInteger _fetchBatchSize = 100;
     
     [self.context performBlockAndWait:^{
         if (self.context.hasChanges) {
+            [self.context setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
             @autoreleasepool {
                 NSError *error = nil;
                 NSUInteger taskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{}];

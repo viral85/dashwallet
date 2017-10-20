@@ -25,6 +25,7 @@
 
 #import "BRAppDelegate.h"
 #import "BRPeerManager.h"
+#import "DWSporkManager.h"
 #import "BRWalletManager.h"
 #import "BREventManager.h"
 #import "BRPhoneWCSessionManager.h"
@@ -85,6 +86,8 @@
 
     // start the event manager
     [[BREventManager sharedEventManager] up];
+    
+    [DWSporkManager sharedInstance];
     
     [BRWalletManager sharedInstance];
 

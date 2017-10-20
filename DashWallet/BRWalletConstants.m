@@ -19,3 +19,4 @@ NSString* const BRPeerManagerSyncFailedNotification =       @"BRPeerManagerSyncF
 NSString* const BRPeerManagerTxStatusNotification =         @"BRPeerManagerTxStatusNotification";
 NSString* const BRWalletManagerSeedChangedNotification =    @"BRWalletManagerSeedChangedNotification";
 NSString* const BRWalletBalanceChangedNotification =        @"BRWalletBalanceChangedNotification";
+NSString* const DWSporkManagerSporkUpdateNotification =     @"DWSporkManagerSporkUpdateNotification";

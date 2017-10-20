@@ -21,14 +21,20 @@
 #endif
 #define SPORK_MESSAGE_MAGIC @"DarkCoin Signed Message:\n"
 
+@interface DWSpork()
+
+@property (nonatomic,strong) NSData * signature;
+    
+@end
+
 @implementation DWSpork
-
-
+    
+    
 + (instancetype)sporkWithMessage:(NSData *)message
-{
-    return [[DWSpork alloc] initWithMessage:message];
-}
-
+    {
+        return [[DWSpork alloc] initWithMessage:message];
+    }
+    
 - (instancetype)initWithMessage:(NSData *)message
 {
     if (! (self = [self init])) return nil;
@@ -40,9 +46,24 @@
     NSData * signature = [message dataAtOffset:20 length:&lNumber];
     NSUInteger l = lNumber.unsignedIntegerValue;
     _valid = [self checkSignature:signature];
+    self.signature = signature;
     return self;
 }
-
+    
+- (instancetype)initWithIdentifier:(SporkIdentifier)identifier value:(uint64_t)value timeSigned:(uint64_t)timeSigned signature:(NSData*)signature {
+    if (! (self = [self init])) return nil;
+    _identifier = identifier;
+    _value = value;
+    _timeSigned = timeSigned;
+    _valid = TRUE;
+    self.signature = signature;
+    return self;
+}
+    
+-(BOOL)isEqualToSpork:(DWSpork*)spork {
+    return ((self.identifier == spork.identifier) && (self.value == spork.value) && (self.timeSigned == spork.timeSigned) && (self.valid == spork.valid));
+}
+    
 -(BOOL)checkSignature:(NSData*)signature {
     NSString * stringMessage = [NSString stringWithFormat:@"%d%llu%llu",self.identifier,self.value,self.timeSigned];
     NSMutableData * stringMessageData = [NSMutableData data];
@@ -53,5 +74,5 @@
     BRKey * messagePublicKey = [BRKey keyRecoveredFromCompactSig:signature andMessageDigest:messageDigest];
     return [sporkPublicKey.publicKey isEqualToData:messagePublicKey.publicKey];
 }
-
-@end
+    
+    @end

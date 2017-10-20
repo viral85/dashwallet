@@ -24,10 +24,15 @@ typedef NS_ENUM(uint32_t,SporkIdentifier) {
 @interface DWSpork : NSObject
 
 @property (nonatomic,assign,readonly) SporkIdentifier identifier;
-@property (nonatomic,assign,readonly) BOOL valid;
+@property (nonatomic,assign,readonly,getter=isValid) BOOL valid;
 @property (nonatomic,assign,readonly) uint64_t timeSigned;
 @property (nonatomic,assign,readonly) uint64_t value;
+@property (nonatomic,strong,readonly) NSData * signature;
 
 + (instancetype)sporkWithMessage:(NSData *)message;
+    
+- (instancetype)initWithIdentifier:(SporkIdentifier)identifier value:(uint64_t)value timeSigned:(uint64_t)timeSigned signature:(NSData*)signature;
+    
+-(BOOL)isEqualToSpork:(DWSpork*)spork;
 
 @end

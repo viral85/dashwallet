@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "DWSpork.h"
 
+FOUNDATION_EXPORT NSString* _Nonnull const DWSporkManagerSporkUpdateNotification;
+
 @class BRPeer;
 
 @interface DWSporkManager : NSObject

@@ -112,6 +112,7 @@
 		FB248B631F79BB7C00405AE0 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB248B621F79BB7C00405AE0 /* SafariServices.framework */; };
 		FB3FA3D61F2364140071FCC5 /* UIImage+Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = BAA4843B1B3EFFAF0075C749 /* UIImage+Utils.m */; };
 		FB9CC2711F8E27B80079309F /* DWGenerateViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FB9CC2701F8E27B80079309F /* DWGenerateViewController.m */; };
+		FBA796681F99F12C00DF9558 /* DWSporkEntity.m in Sources */ = {isa = PBXBuildFile; fileRef = FBA796671F99F12C00DF9558 /* DWSporkEntity.m */; };
 		FBE00A851F94A1B400087861 /* DWGovObject.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE00A841F94A1B400087861 /* DWGovObject.m */; };
 		FBE00A881F96B7BC00087861 /* DWSpork.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE00A871F96B7BC00087861 /* DWSpork.m */; };
 		FBE00A8B1F96B85100087861 /* DWSporkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FBE00A8A1F96B85100087861 /* DWSporkManager.m */; };
@@ -484,6 +485,9 @@
 		FB6DD3811F7FA48500BC1E4D /* dashwallet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = dashwallet.entitlements; sourceTree = "<group>"; };
 		FB9CC26F1F8E27B80079309F /* DWGenerateViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWGenerateViewController.h; sourceTree = "<group>"; };
 		FB9CC2701F8E27B80079309F /* DWGenerateViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWGenerateViewController.m; sourceTree = "<group>"; };
+		FBA796651F99EFE100DF9558 /* BreadWallet 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "BreadWallet 3.xcdatamodel"; sourceTree = "<group>"; };
+		FBA796661F99F12C00DF9558 /* DWSporkEntity.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWSporkEntity.h; sourceTree = "<group>"; };
+		FBA796671F99F12C00DF9558 /* DWSporkEntity.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWSporkEntity.m; sourceTree = "<group>"; };
 		FBE00A831F94A1B400087861 /* DWGovObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWGovObject.h; sourceTree = "<group>"; };
 		FBE00A841F94A1B400087861 /* DWGovObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DWGovObject.m; sourceTree = "<group>"; };
 		FBE00A861F96B7BC00087861 /* DWSpork.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DWSpork.h; sourceTree = "<group>"; };
@@ -1022,6 +1026,8 @@
 				FBF2680B1E419318001A1C8B /* DSShapeshiftEntity+CoreDataClass.m */,
 				FBF2680C1E419318001A1C8B /* DSShapeshiftEntity+CoreDataProperties.h */,
 				FBF2680D1E419318001A1C8B /* DSShapeshiftEntity+CoreDataProperties.m */,
+				FBA796661F99F12C00DF9558 /* DWSporkEntity.h */,
+				FBA796671F99F12C00DF9558 /* DWSporkEntity.m */,
 			);
 			name = Dash;
 			sourceTree = "<group>";
@@ -1380,6 +1386,7 @@
 				BAC7B6BE1BD9C29900165B84 /* BRPhoneWCSessionManager.m in Sources */,
 				752E28CF19234C3600DB5A3C /* BRBIP39Mnemonic.m in Sources */,
 				752E28DA19234C3600DB5A3C /* BRWallet.m in Sources */,
+				FBA796681F99F12C00DF9558 /* DWSporkEntity.m in Sources */,
 				FB021E561E47E17200D17638 /* FBShimmeringLayer.m in Sources */,
 				752E28DB19234C3600DB5A3C /* BRWalletManager.m in Sources */,
 				752E28D319234C3600DB5A3C /* BRMerkleBlock.m in Sources */,
@@ -2558,10 +2565,11 @@
 		752E2898192349CE00DB5A3C /* DashWallet.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				FBA796651F99EFE100DF9558 /* BreadWallet 3.xcdatamodel */,
 				759AB7F71AB8F45900303AAB /* BreadWallet 2.xcdatamodel */,
 				752E2899192349CE00DB5A3C /* BreadWallet.xcdatamodel */,
 			);
-			currentVersion = 759AB7F71AB8F45900303AAB /* BreadWallet 2.xcdatamodel */;
+			currentVersion = FBA796651F99EFE100DF9558 /* BreadWallet 3.xcdatamodel */;
 			path = DashWallet.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

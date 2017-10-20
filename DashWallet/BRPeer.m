@@ -1144,8 +1144,7 @@ services:(uint64_t)services
 - (void)acceptSporkMessage:(NSData *)message
 {
     DWSpork * spork = [DWSpork sporkWithMessage:message];
-    
-    NSLog(@"%@",message);
+    [self.delegate peer:self relayedSpork:spork];
 }
 
 // MARK: - accept Masternode

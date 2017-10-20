@@ -1617,8 +1617,11 @@ static const char *dns_seeds[] = {
 // MARK: Dash Specific
 
 - (void)peer:(BRPeer *)peer relayedSpork:(DWSpork *)spork {
-    [[DWSporkManager sharedInstance] peer:(BRPeer*)peer relayedSpork:spork];
-    
+    if (spork.isValid) {
+        [[DWSporkManager sharedInstance] peer:(BRPeer*)peer relayedSpork:spork];
+    } else {
+        [self peerMisbehavin:peer];
+    }
 }
 
 
