@@ -14,6 +14,8 @@ FOUNDATION_EXPORT NSString* _Nonnull const DWSporkManagerSporkUpdateNotification
 @class BRPeer;
 
 @interface DWSporkManager : NSObject
+    
+@property (nonatomic,assign) BOOL instantSendActive;
 
 + (instancetype _Nullable)sharedInstance;
 

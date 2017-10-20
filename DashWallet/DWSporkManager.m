@@ -43,6 +43,12 @@
     return self;
 }
     
+-(BOOL)instantSendActive {
+    DWSpork * instantSendSpork = self.sporkDictionary[@(Spork2InstantSendEnabled)];
+    if (!instantSendSpork) return TRUE;//assume true
+    return !!instantSendSpork.value;
+}
+    
 - (void)peer:(BRPeer *)peer relayedSpork:(DWSpork *)spork {
     if (!spork.isValid) return; //sanity check
     DWSpork * currentSpork = self.sporkDictionary[@(spork.identifier)];

@@ -41,6 +41,7 @@
 #import "NSData+Dash.h"
 #import "NSData+Bitcoin.h"
 #import "BREventManager.h"
+#import "DWSporkManager.h"
 #import "FBShimmeringView.h"
 #import "MBProgressHUD.h"
 #import "DSShapeshiftManager.h"
@@ -154,7 +155,14 @@ static NSString *sanitizeString(NSString *s)
     }
     
     self.sendInstantly = [[NSUserDefaults standardUserDefaults] boolForKey:SEND_INSTANTLY_KEY];
-    [self.instantSwitch setOn:self.sendInstantly];
+    BOOL sporkSendInstantly = [[DWSporkManager sharedInstance] instantSendActive];
+    if (self.sendInstantly && !sporkSendInstantly) {
+        [[NSUserDefaults standardUserDefaults] setBool:FALSE forKey:SEND_INSTANTLY_KEY]; //instant send is disabled on the network :(
+        [self.instantSwitch setOn:FALSE];
+    } else {
+        [self.instantSwitch setOn:self.sendInstantly];
+    }
+    
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
@@ -1562,7 +1570,24 @@ static NSString *sanitizeString(NSString *s)
 }
 
 - (IBAction)enableInstantX:(id)sender {
-    self.sendInstantly = ((UISwitch*)sender).isOn;
+    BOOL turnedOn = ((UISwitch*)sender).isOn;
+    BOOL sporkSendInstantly = [[DWSporkManager sharedInstance] instantSendActive];
+    if (turnedOn && !sporkSendInstantly) {
+        UIAlertController * alert = [UIAlertController
+                                     alertControllerWithTitle:@""
+                                     message:NSLocalizedString(@"Instant send is currently disabled on the network", nil)
+                                     preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction* okButton = [UIAlertAction
+                                   actionWithTitle:NSLocalizedString(@"ok", nil)
+                                   style:UIAlertActionStyleCancel
+                                   handler:^(UIAlertAction * action) {
+                                       [((UISwitch*)sender) setOn:FALSE animated:TRUE];
+                                   }];
+        [alert addAction:okButton];
+        [self presentViewController:alert animated:YES completion:nil];
+        return;
+    }
+    self.sendInstantly = turnedOn;
     [[NSUserDefaults standardUserDefaults] setBool:self.sendInstantly forKey:SEND_INSTANTLY_KEY];
 }
 
