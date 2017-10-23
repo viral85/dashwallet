@@ -31,12 +31,11 @@
 #import "BRWalletManager.h"
 #import "BRPeerManager.h"
 #import "BRTransaction.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "NSData+Bitcoin.h"
 #import "UIImage+Utils.h"
 #import "BREventConfirmView.h"
 #import "BREventManager.h"
-#import "NSString+Dash.h"
 #import <WebKit/WebKit.h>
 
 #define TRANSACTION_CELL_HEIGHT 75

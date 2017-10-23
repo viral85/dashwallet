@@ -10,7 +10,6 @@
 #import "NSData+Dash.h"
 #import "NSData+Bitcoin.h"
 #import "NSString+Dash.h"
-#import "NSString+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 #import "BRKey.h"
 
@@ -19,7 +18,6 @@
 #else
 #define SPORK_PUBLIC_KEY @"046f78dcf911fbd61910136f7f0f8d90578f68d0b3ac973b5040fb7afb501b5939f39b108b0569dca71488f5bbf498d92e4d1194f6f941307ffd95f75e76869f0e"
 #endif
-#define SPORK_MESSAGE_MAGIC @"DarkCoin Signed Message:\n"
 
 @interface DWSpork()
 
@@ -67,7 +65,7 @@
 -(BOOL)checkSignature:(NSData*)signature {
     NSString * stringMessage = [NSString stringWithFormat:@"%d%llu%llu",self.identifier,self.value,self.timeSigned];
     NSMutableData * stringMessageData = [NSMutableData data];
-    [stringMessageData appendString:SPORK_MESSAGE_MAGIC];
+    [stringMessageData appendString:DASH_MESSAGE_MAGIC];
     [stringMessageData appendString:stringMessage];
     BRKey * sporkPublicKey = [BRKey keyWithPublicKey:[NSData dataFromHexString:SPORK_PUBLIC_KEY]];
     UInt256 messageDigest = stringMessageData.SHA256_2;
@@ -75,4 +73,4 @@
     return [sporkPublicKey.publicKey isEqualToData:messagePublicKey.publicKey];
 }
     
-    @end
+@end

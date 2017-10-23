@@ -24,7 +24,7 @@
 //  THE SOFTWARE.
 
 #import "NSData+Bitcoin.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 
 // bitwise left rotation
 #define rol32(a, b) (((a) << (b)) | ((a) >> (32 - (b))))

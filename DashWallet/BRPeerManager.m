@@ -33,7 +33,7 @@
 #import "BRMerkleBlock.h"
 #import "BRMerkleBlockEntity.h"
 #import "BRWalletManager.h"
-#import "NSString+Bitcoin.h"
+#import "NSString+Dash.h"
 #import "NSData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
 #import "BREventManager.h"
@@ -823,6 +823,18 @@ static const char *dns_seeds[] = {
     }
 }
 
+-(void)startMasternodeSync {
+    for (BRPeer *p in self.connectedPeers) { // after syncing, get sporks from other peers
+        if (p.status != BRPeerStatusConnected) continue;
+        
+        [p sendPingMessageWithPongHandler:^(BOOL success) {
+            if (success) {
+                [p sendGetblocksMessageWithLocators:@[] andHashStop:UINT256_ZERO];
+            }
+        }];
+    }
+}
+
 // unconfirmed transactions that aren't in the mempools of any of connected peers have likely dropped off the network
 - (void)removeUnrelayedTransactions
 {
@@ -1393,8 +1405,10 @@ static const char *dns_seeds[] = {
     BOOL syncDone = NO;
     
     if (! prev) { // block is an orphan
+#if ORPHAN_BLOCKS_LOGGING
         NSLog(@"%@:%d relayed orphan block %@, previous %@, last block is %@, height %d", peer.host, peer.port,
               blockHash, prevBlock, uint256_obj(self.lastBlock.blockHash), self.lastBlockHeight);
+#endif
         
         // ignore orphans older than one week ago
         if (block.timestamp < [NSDate timeIntervalSinceReferenceDate] + NSTimeIntervalSince1970 - 7*24*60*60) return;

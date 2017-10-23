@@ -28,10 +28,10 @@
 #import "BRMnemonic.h"
 #import "BRAddressEntity.h"
 #import "NSMutableData+Bitcoin.h"
-#import "NSString+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"
 #import "BREventManager.h"
 #import "BRPeerManager.h"
+#import "NSString+Dash.h"
 
 #define PHRASE_LENGTH 12
 

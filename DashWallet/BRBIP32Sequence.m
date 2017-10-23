@@ -25,7 +25,6 @@
 
 #import "BRBIP32Sequence.h"
 #import "BRKey.h"
-#import "NSString+Bitcoin.h"
 #import "NSData+Bitcoin.h"
 #import "NSString+Dash.h"
 #import "NSMutableData+Bitcoin.h"

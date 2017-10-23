@@ -25,6 +25,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "IntTypes.h"
 
 #define DASH_PUBKEY_ADDRESS      76
 #define DASH_SCRIPT_ADDRESS      16
@@ -32,6 +33,15 @@
 #define DASH_SCRIPT_ADDRESS_TEST 19
 #define DASH_PRIVKEY             204
 #define DASH_PRIVKEY_TEST        239
+
+#define DASH_MESSAGE_MAGIC @"DarkCoin Signed Message:\n"
+
+#define BITCOIN_PUBKEY_ADDRESS      0
+#define BITCOIN_SCRIPT_ADDRESS      5
+#define BITCOIN_PUBKEY_ADDRESS_TEST 111
+#define BITCOIN_SCRIPT_ADDRESS_TEST 196
+#define BITCOIN_PRIVKEY             128
+#define BITCOIN_PRIVKEY_TEST        239
 
 #define BIP38_NOEC_PREFIX      0x0142
 #define BIP38_EC_PREFIX        0x0143
@@ -42,14 +52,32 @@
 
 @interface NSString (Dash)
 
++ (NSString * _Nullable)base58WithData:(NSData * _Nullable)d;
++ (NSString * _Nullable)base58checkWithData:(NSData * _Nullable)d;
++ (NSString * _Nullable)hexWithData:(NSData * _Nullable)d;
 
-+ (NSString *)addressWithScriptPubKey:(NSData *)script;
-+ (NSString *)addressWithScriptSig:(NSData *)script;
++ (NSString * _Nullable)hexWithUInt256:(UInt256)n;
 
-- (NSAttributedString*)attributedStringForDashSymbol;
-- (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color;
-- (NSAttributedString*)attributedStringForDashSymbolWithTintColor:(UIColor*)color dashSymbolSize:(CGSize)dashSymbolSize;
-+ (NSAttributedString*)dashSymbolAttributedStringWithTintColor:(UIColor*)color forDashSymbolSize:(CGSize)dashSymbolSize;
+- (NSData * _Nullable)base58ToData;
+- (NSData * _Nullable)base58checkToData;
+- (NSData * _Nullable)hexToData;
+- (NSData * _Nullable)addressToHash160;
+
+- (BOOL)isValidBitcoinAddress;
+- (BOOL)isValidBitcoinPrivateKey;
+- (BOOL)isValidBitcoinBIP38Key; // BIP38 encrypted keys: https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki
+
+
++ (NSString * _Nullable)addressWithScriptPubKey:(NSData * _Nullable)script;
++ (NSString * _Nullable)addressWithScriptSig:(NSData * _Nullable)script;
+
++ (NSString * _Nullable)bitcoinAddressWithScriptPubKey:(NSData * _Nullable)script;
++ (NSString * _Nullable)bitcoinAddressWithScriptSig:(NSData * _Nullable)script;
+
+- (NSAttributedString* _Nullable)attributedStringForDashSymbol;
+- (NSAttributedString* _Nullable)attributedStringForDashSymbolWithTintColor:(UIColor* _Nullable)color;
+- (NSAttributedString* _Nullable)attributedStringForDashSymbolWithTintColor:(UIColor* _Nullable)color dashSymbolSize:(CGSize)dashSymbolSize;
++ (NSAttributedString* _Nullable)dashSymbolAttributedStringWithTintColor:(UIColor* _Nullable)color forDashSymbolSize:(CGSize)dashSymbolSize;
 
 - (BOOL)isValidDashAddress;
 - (BOOL)isValidDashPrivateKey;
@@ -57,6 +85,6 @@
 
 -(NSInteger)indexOfCharacter:(unichar)character;
 
-+(NSString*)waitTimeFromNow:(NSTimeInterval)wait;
++(NSString* _Nullable)waitTimeFromNow:(NSTimeInterval)wait;
 
 @end

@@ -25,7 +25,6 @@
 
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Bitcoin.h"
-#import "NSString+Bitcoin.h"
 #import "NSData+Dash.h"
 #import "NSString+Dash.h"
 

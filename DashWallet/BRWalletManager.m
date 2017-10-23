@@ -33,7 +33,6 @@
 #import "BRTxMetadataEntity.h"
 #import "BRAddressEntity.h"
 #import "BREventManager.h"
-#import "NSString+Bitcoin.h"
 #import "NSData+Bitcoin.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSManagedObject+Sugar.h"

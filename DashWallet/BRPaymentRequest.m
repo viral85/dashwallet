@@ -25,7 +25,6 @@
 
 #import "BRPaymentRequest.h"
 #import "BRPaymentProtocol.h"
-#import "NSString+Bitcoin.h"
 #import "NSString+Dash.h"
 #import "NSMutableData+Bitcoin.h"
 

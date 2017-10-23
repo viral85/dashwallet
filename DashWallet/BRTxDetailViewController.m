@@ -28,7 +28,6 @@
 #import "BRWalletManager.h"
 #import "BRPeerManager.h"
 #import "BRCopyLabel.h"
-#import "NSString+Bitcoin.h"
 #import "NSData+Bitcoin.h"
 #import "BREventManager.h"
 #import "NSString+Dash.h"
