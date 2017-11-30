@@ -37,6 +37,8 @@
 #import "BREventConfirmView.h"
 #import "BREventManager.h"
 #import "NSString+Dash.h"
+#import "BRSellDashViewController.h"
+#import "BRBuyDashViewController.h"
 #import <WebKit/WebKit.h>
 
 #define TRANSACTION_CELL_HEIGHT 75
@@ -485,7 +487,7 @@ static NSString *dateFormat(NSString *template)
             return (self.moreTx) ? self.transactions.count + 1 : self.transactions.count;
 
         case 1:
-            return (buyEnabled ? 3 : 2);
+            return (buyEnabled ? 5 : 4);
     }
 
     return 0;
@@ -630,6 +632,19 @@ static NSString *dateFormat(NSString *template)
                     cell.textLabel.text = NSLocalizedString(@"settings", nil);
                     cell.imageView.image = [UIImage imageNamed:@"settings"];
                     break;
+                    // Add new options
+                    // sell dash for cash
+                    // buy dash with cash
+                case 3:
+                    cell = [tableView dequeueReusableCellWithIdentifier:disclosureIdent];
+                    cell.textLabel.text = NSLocalizedString(@"sell dash for cash", nil);
+                    cell.imageView.image = [UIImage imageNamed:@"settings"];
+                    break;
+                case 4:
+                    cell = [tableView dequeueReusableCellWithIdentifier:disclosureIdent];
+                    cell.textLabel.text = NSLocalizedString(@"buy dash with cash", nil);
+                    cell.imageView.image = [UIImage imageNamed:@"settings"];
+                    break;
             }
             
             break;
@@ -720,7 +735,43 @@ static NSString *dateFormat(NSString *template)
         {
             bool buyEnabled = FALSE;//[[BRAPIClient sharedClient] featureEnabled:BRFeatureFlagsBuyDash];
             long adjustedRow = !buyEnabled ? indexPath.row + 1 : indexPath.row;
-            switch (adjustedRow) {
+            if (adjustedRow == 0)
+            {
+                // buy dash
+                [BREventManager saveEvent:@"tx_history:buy_btc"];
+                [tableView deselectRowAtIndexPath:indexPath animated:YES];
+                //[self showBuy];
+            }
+            else if(adjustedRow == 1)
+            {
+                // import private key
+                [BREventManager saveEvent:@"tx_history:import_priv_key"];
+                [self scanQR:nil];
+            }
+            else if(adjustedRow == 2)
+            {
+                // settings
+                [BREventManager saveEvent:@"tx_history:settings"];
+                destinationController = [self.storyboard instantiateViewControllerWithIdentifier:@"SettingsViewController"];
+                [self.navigationController pushViewController:destinationController animated:YES];
+            }
+            else if(adjustedRow == 3)
+            {
+                // sell dash for cash
+                [BREventManager saveEvent:@"tx_history:sell_for_cash"];
+                BRSellDashViewController *detailController
+                = [self.storyboard instantiateViewControllerWithIdentifier:@"BRSellDashVC"];
+                [self.navigationController pushViewController:detailController animated:YES];
+            }
+            else if(adjustedRow == 4)
+            {
+                // buy dash with cash
+                [BREventManager saveEvent:@"tx_history:buy_with_cash"];
+                
+                BRBuyDashViewController *buy = [self.storyboard instantiateViewControllerWithIdentifier:@"BRBuyDashVC"];
+                [self.navigationController pushViewController:buy animated:YES];
+            }
+            /*switch (adjustedRow) {
                 case 0: // buy dash
                     [BREventManager saveEvent:@"tx_history:buy_btc"];
                     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -737,7 +788,7 @@ static NSString *dateFormat(NSString *template)
                     destinationController = [self.storyboard instantiateViewControllerWithIdentifier:@"SettingsViewController"];
                     [self.navigationController pushViewController:destinationController animated:YES];
                     break;
-            }
+            }*/
 
             break;
         }
